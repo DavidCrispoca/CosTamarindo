@@ -35,15 +35,15 @@ Un videojuego 2D jugable en el navegador (Unity 6 → WebGL) servido por Nginx, 
 | Unity Hub / Editor | `6000.3.27f1` (Unity 6.3 LTS) | `ProjectSettings/ProjectVersion.txt` |
 | Módulo WebGL | Instalado | `.../PlaybackEngines/WebGLSupport` |
 | Proyecto Unity | URP 2D, Input System 1.20.1, paquetes 2D completos | `Packages/manifest.json` |
-| Contenido Unity | Vacío: `SampleScene` con cámara y Global Light 2D, 0 scripts, 0 sprites, sin TMP Essentials | jerarquía vía Unity MCP |
-| **Unity MCP** | **Conectado** — `CosTamarindo@296f912073270ad2`, `ready_for_tools: true`, 36 herramientas | `mcpforunity://editor/state` |
+| Contenido Unity | Escena `Game` jugable (bucle completo offline), 10 scripts, 4 sprites, TMP Essentials, fuentes Lilita One / Patrick Hand como SDF | `docs/fases/F2.md` |
+| **Unity MCP** | **Conectado** — autoarranque reparado (§ F2 3.1); 36 herramientas | `mcpforunity://editor/state` |
 | **Figma MCP** | **Autenticado** — sesión `90118ff1-0eb1-4e3b-8a14-3bd385659ac0` | `figma.whoami` |
 | Figma: archivo | `qI8jr7abLu6tIpL0MnL8Ol` — Design System + 8 pantallas completas | `get_metadata` |
 | Supabase MCP | Deshabilitado en la config local; se habilitará **solo hacia DEV** | `.codex/config.toml`, `opencode.json` |
 | Docker Desktop | **No instalado** | `Get-Command docker` |
 | Ollama | **No instalado** | `Get-Command ollama` |
 | Máquina | 32 GB RAM, 86 GB libres, WSL2 v2, Python 3.12.10, Node 24.16 | — |
-| Remoto Git | `https://github.com/DavidCrispoca/CosTamarindo.git` **vacío** | `git ls-remote` |
+| Remoto Git | `https://github.com/DavidCrispoca/CosTamarindo.git` — `main` publicada y sincronizada | `git ls-remote` |
 
 ---
 
@@ -134,7 +134,7 @@ CosTamarindo/
 │   ├── CosTamarindo.md         # especificación ISO 27001
 │   ├── arquitectura.md         # diagramas y decisiones (se crea en F6)
 │   └── soa.md                  # Declaración de Aplicabilidad (F8)
-├── CosTamarindo/               # proyecto Unity 6 (Assets, Packages, ProjectSettings)
+├── unity/                      # proyecto Unity 6 (Assets, Packages, ProjectSettings)
 ├── backend/                    # FastAPI
 │   ├── app/                    # routers, modelos, seguridad, logging
 │   ├── tests/
@@ -219,7 +219,7 @@ Reglas: un commit = un cambio lógico; no mezclar arte con backend; nunca commit
 | 1 | Crear repo en `Desktop/CosTamarindo`, rama `main`, remoto `origin` | `git init`, `git remote add` |
 | 2 | `.gitignore` (Unity + agentes + secretos + artefactos) | editor |
 | 3 | Mover especificación a `docs/`, crear `README.md` y `.env.example` | `git mv` |
-| 4 | Renombrar la carpeta del proyecto Unity a `unity/` con el editor cerrado (**pendiente**, no bloquea; el editor está abierto con MCP conectado) | `git mv` + Unity Hub |
+| 4 | Renombrar la carpeta del proyecto Unity a `unity/` con el editor cerrado | `git mv` + Unity Hub |
 | 5 | Activar **Force Text** (`EditorSettings.asset`) y **Visible Meta Files** | archivo / MCP |
 | 6 | Importar **TMP Essentials** | menú `Window/TextMeshPro/Import TMP Essential Resources` vía `execute_menu_item` |
 | 7 | Verificar que `Library/`, `Temp/`, `Logs/`, `UserSettings/` no entran al índice | `git status` |
