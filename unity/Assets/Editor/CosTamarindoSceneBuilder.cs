@@ -102,6 +102,9 @@ namespace CosTamarindo.EditorTools
 
         private static void BuildInterface(GameManager manager)
         {
+            var displayFont = AssetDatabase.LoadAssetAtPath<TMP_FontAsset>("Assets/Art/Fonts/LilitaOne SDF.asset");
+            var bodyFont = AssetDatabase.LoadAssetAtPath<TMP_FontAsset>("Assets/Art/Fonts/PatrickHand SDF.asset");
+
             var canvasGo = new GameObject("UI", typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
             var canvas = canvasGo.GetComponent<Canvas>();
             canvas.renderMode = RenderMode.ScreenSpaceOverlay;
@@ -117,15 +120,15 @@ namespace CosTamarindo.EditorTools
             var root = canvasGo.transform;
 
             // ── HUD ──
-            var scoreText = CreateText(root, "ScoreText", "0", 72f, TextAlignmentOptions.TopLeft);
+            var scoreText = CreateText(root, "ScoreText", "0", 72f, TextAlignmentOptions.TopLeft, displayFont);
             Anchor(scoreText.rectTransform, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(0f, 1f),
                    new Vector2(48f, -40f), new Vector2(420f, 90f));
 
-            var bestText = CreateText(root, "BestText", "Récord 0", 34f, TextAlignmentOptions.TopLeft);
+            var bestText = CreateText(root, "BestText", "Récord 0", 34f, TextAlignmentOptions.TopLeft, bodyFont);
             Anchor(bestText.rectTransform, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(0f, 1f),
                    new Vector2(50f, -118f), new Vector2(420f, 50f));
 
-            var timerText = CreateText(root, "TimerText", "02:00", 64f, TextAlignmentOptions.Top);
+            var timerText = CreateText(root, "TimerText", "02:00", 64f, TextAlignmentOptions.Top, displayFont);
             Anchor(timerText.rectTransform, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0.5f, 1f),
                    new Vector2(0f, -40f), new Vector2(320f, 88f));
 
@@ -140,20 +143,20 @@ namespace CosTamarindo.EditorTools
 
             // ── Pausa ──
             var pausePanel = CreateOverlayPanel(root, "PausePanel", out var pauseContent);
-            CreateText(pauseContent, "Title", "Pausa", 84f, TextAlignmentOptions.Center);
-            CreateButton(pauseContent, "ResumeButton", "Continuar", 46f, new Vector2(420f, 96f), new Vector2(0f, 20f));
-            CreateButton(pauseContent, "RestartButton", "Reiniciar", 46f, new Vector2(420f, 96f), new Vector2(0f, -100f));
+            CreateText(pauseContent, "Title", "Pausa", 84f, TextAlignmentOptions.Center, displayFont);
+            CreateButton(pauseContent, "ResumeButton", "Continuar", 46f, new Vector2(420f, 96f), new Vector2(0f, 20f), bodyFont);
+            CreateButton(pauseContent, "RestartButton", "Reiniciar", 46f, new Vector2(420f, 96f), new Vector2(0f, -100f), bodyFont);
 
             // ── Fin de partida ──
             var gameOverPanel = CreateOverlayPanel(root, "GameOverPanel", out var overContent);
-            CreateText(overContent, "Title", "¡Se acabó la pesca!", 76f, TextAlignmentOptions.Center);
-            var finalScore = CreateText(overContent, "FinalScore", "0", 120f, TextAlignmentOptions.Center);
+            CreateText(overContent, "Title", "¡Se acabó la pesca!", 76f, TextAlignmentOptions.Center, displayFont);
+            var finalScore = CreateText(overContent, "FinalScore", "0", 120f, TextAlignmentOptions.Center, displayFont);
             finalScore.rectTransform.anchoredPosition = new Vector2(0f, 10f);
-            var finalBest = CreateText(overContent, "FinalBest", "Récord 0", 40f, TextAlignmentOptions.Center);
+            var finalBest = CreateText(overContent, "FinalBest", "Récord 0", 40f, TextAlignmentOptions.Center, bodyFont);
             finalBest.rectTransform.anchoredPosition = new Vector2(0f, -90f);
-            var breakdown = CreateText(overContent, "Breakdown", "", 34f, TextAlignmentOptions.Center);
+            var breakdown = CreateText(overContent, "Breakdown", "", 34f, TextAlignmentOptions.Center, bodyFont);
             breakdown.rectTransform.anchoredPosition = new Vector2(0f, -170f);
-            CreateButton(overContent, "RetryButton", "Reintentar", 46f, new Vector2(420f, 96f), new Vector2(0f, -280f));
+            CreateButton(overContent, "RetryButton", "Reintentar", 46f, new Vector2(420f, 96f), new Vector2(0f, -280f), bodyFont);
 
             // ── Controladores de UI ──
             var hud = canvasGo.AddComponent<HudController>();
@@ -199,7 +202,7 @@ namespace CosTamarindo.EditorTools
             return go;
         }
 
-        private static TextMeshProUGUI CreateText(Transform parent, string name, string content, float size, TextAlignmentOptions alignment)
+        private static TextMeshProUGUI CreateText(Transform parent, string name, string content, float size, TextAlignmentOptions alignment, TMP_FontAsset font = null)
         {
             var go = new GameObject(name, typeof(RectTransform));
             go.transform.SetParent(parent, false);
@@ -211,7 +214,8 @@ namespace CosTamarindo.EditorTools
             text.color = Ink;
             text.raycastTarget = false;
 
-            if (TMP_Settings.defaultFontAsset != null) text.font = TMP_Settings.defaultFontAsset;
+            var chosen = font != null ? font : TMP_Settings.defaultFontAsset;
+            if (chosen != null) text.font = chosen;
 
             var rt = text.rectTransform;
             rt.anchorMin = new Vector2(0.5f, 0.5f);
@@ -221,7 +225,7 @@ namespace CosTamarindo.EditorTools
             return text;
         }
 
-        private static Button CreateButton(Transform parent, string name, string label, float fontSize, Vector2 size, Vector2 position = default)
+        private static Button CreateButton(Transform parent, string name, string label, float fontSize, Vector2 size, Vector2 position = default, TMP_FontAsset font = null)
         {
             var go = new GameObject(name, typeof(RectTransform), typeof(Image), typeof(Button));
             go.transform.SetParent(parent, false);
@@ -239,7 +243,7 @@ namespace CosTamarindo.EditorTools
             var button = go.GetComponent<Button>();
             button.targetGraphic = image;
 
-            var text = CreateText(go.transform, "Label", label, fontSize, TextAlignmentOptions.Center);
+            var text = CreateText(go.transform, "Label", label, fontSize, TextAlignmentOptions.Center, font);
             text.color = Sand;
             var textRt = text.rectTransform;
             textRt.anchorMin = Vector2.zero;
