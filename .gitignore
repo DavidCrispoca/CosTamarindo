@@ -110,3 +110,7 @@ Thumbs.db
 desktop.ini
 *.swp
 *~
+
+# ── Bitácora local de trabajo (nunca se publica) ─────────────
+# Relato interno del avance. La versión commiteable son docs/fases/.
+Proceso.md
