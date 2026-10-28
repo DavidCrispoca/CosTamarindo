@@ -1,0 +1,38 @@
+# Normalización de finales de línea
+* text=auto
+
+# C# y documentación
+*.cs      text diff=csharp
+*.md      text
+*.json    text
+*.yml     text
+*.yaml    text
+*.sql     text
+*.py      text
+*.sh      text eol=lf
+
+# YAML de Unity: texto + merge driver oficial (UnityYAMLMerge)
+*.unity      text merge=unityyamlmerge eol=lf
+*.prefab     text merge=unityyamlmerge eol=lf
+*.asset      text merge=unityyamlmerge eol=lf
+*.meta       text merge=unityyamlmerge eol=lf
+*.mat        text merge=unityyamlmerge eol=lf
+*.anim       text merge=unityyamlmerge eol=lf
+*.controller text merge=unityyamlmerge eol=lf
+*.overrideController text merge=unityyamlmerge eol=lf
+*.physicMaterial2D   text merge=unityyamlmerge eol=lf
+*.spriteatlas        text merge=unityyamlmerge eol=lf
+
+# Binarios
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.psd  binary
+*.tga  binary
+*.ttf  binary
+*.otf  binary
+*.wav  binary
+*.mp3  binary
+*.ogg  binary
+*.fbx  binary
+*.zip  binary

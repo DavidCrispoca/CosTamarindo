@@ -1,0 +1,112 @@
+# ─────────────────────────────────────────────────────────────
+#  CosTamarindo · .gitignore
+#  Regla: al repositorio solo entra lo necesario para construir,
+#  desplegar y auditar el proyecto.
+# ─────────────────────────────────────────────────────────────
+
+# ── Agentes de IA (OpenCode / Codex / Claude / Cursor) ───────
+.opencode/
+opencode.json
+opencode.json.*
+opencode.json.backup*
+.codex/
+.claude/
+.cursor/
+.agents/
+agent/
+skills/
+*.skill.md
+AGENTS.md
+CLAUDE.md
+prompts/
+
+# ── Secretos y configuración local ───────────────────────────
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+secrets/
+.infisical/
+
+# ── Unity ────────────────────────────────────────────────────
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+[Uu]ser[Ss]ettings/
+MemoryCaptures/
+Recordings/
+.vs/
+.vscode/
+.idea/
+*.csproj
+*.unityproj
+*.sln
+*.suo
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+*.pidb.meta
+*.pdb.meta
+*.mdb.meta
+sysinfo.txt
+*.stackdump
+*.apk
+*.aab
+*.unitypackage
+*.app
+*.tmp
+*.bak
+
+# ── Python / backend ─────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+*.egg-info/
+dist/
+.uv/
+
+# ── Node / pruebas web ───────────────────────────────────────
+node_modules/
+npm-debug.log*
+yarn-error.log*
+.pnpm-store/
+playwright-report/
+test-results/
+
+# ── Infraestructura, artefactos y datos ──────────────────────
+builds/
+infra/nginx/html/
+infra/volumes/
+infra/tls/
+backups/
+*.dump
+*.sql.gz
+*.sqlite
+*.log
+
+# ── Sistema operativo y editores ─────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+*~
