@@ -1,0 +1,12 @@
+{
+  "name": "costamarindo-svg-render",
+  "private": true,
+  "type": "module",
+  "description": "Convierte los SVG exportados de Figma a PNG con canal alfa",
+  "scripts": {
+    "render": "node render.mjs ../../assets/figma/items ../../unity/Assets/Art/Items 3"
+  },
+  "dependencies": {
+    "@resvg/resvg-js": "^2.6.2"
+  }
+}
