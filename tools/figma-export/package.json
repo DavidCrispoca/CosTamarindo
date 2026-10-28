@@ -1,0 +1,10 @@
+{
+  "name": "costamarindo-figma-export",
+  "private": true,
+  "type": "module",
+  "description": "Exporta nodos de Figma por REST API (sin cuota de MCP)",
+  "scripts": {
+    "list": "node export.mjs --list",
+    "items": "node export.mjs --ids 1:440,1:450,1:455,1:462,1:469,1:476,1:485,1:493 --out ../../assets/figma/items"
+  }
+}

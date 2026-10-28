@@ -29,3 +29,18 @@ el origen para poder reexportar si el diseño cambia.
 
 Estos assets son de uso exclusivo del proyecto académico. No redistribuir arte
 de terceros sin revisar su licencia individual.
+
+## Cómo reexportar (API REST, sin cuota de MCP)
+
+```bash
+# 1. Token personal con scope file_content:read → .env (nunca se commitea)
+#    FIGMA_TOKEN=figd_...
+# 2. Inventario de nodos
+node tools/figma-export/export.mjs --list
+# 3. Exportar por lote (PNG @3x con transparencia)
+node tools/figma-export/export.mjs --ids 1:440,1:450 --out ../../assets/figma/items
+```
+
+Los PNG resultantes se copian a `unity/Assets/Art/` y se importan como Sprite
+(PPU 100, máx. 512). `ItemSpawner.NormalizeScale` iguala el tamaño en pantalla.
+
