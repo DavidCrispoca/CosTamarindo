@@ -6,15 +6,16 @@ infraestructura de 5 nodos con **Docker** y diálogos de NPC generados por **Oll
 
 - Especificación ISO 27001: [`docs/CosTamarindo.md`](docs/CosTamarindo.md)
 - Plan de ejecución por fases: [`Plan.md`](Plan.md)
+- Bitácora por fase: [`docs/fases/`](docs/fases/)
 
 ---
 
 ## Estado
 
-| Fase | Descripción | Estado |
-| :--- | :--- | :--- |
-| F0 | Repositorio y baseline | 🚧 en curso |
-| F1 | Assets Figma → Unity | ⬜ pendiente |
+| Fase | Descripción | Estado | Documento |
+| :--- | :--- | :--- | :--- |
+| F0 | Repositorio y baseline | ✅ cerrada | [`docs/fases/F0.md`](docs/fases/F0.md) |
+| F1 | Assets Figma → Unity | 🚧 en curso (bloqueo Figma) | [`docs/fases/F1.md`](docs/fases/F1.md) |
 | F2 | Vertical slice jugable | ⬜ pendiente |
 | F3 | Build WebGL + Nginx | ⬜ pendiente |
 | F4 | Supabase: Auth y leaderboard | ⬜ pendiente |
@@ -31,8 +32,8 @@ infraestructura de 5 nodos con **Docker** y diálogos de NPC generados por **Oll
 ```
 .
 ├── Plan.md              # fases, herramientas y criterios de terminado
-├── docs/                # especificación ISO, arquitectura, SoA
-├── CosTamarindo/        # proyecto Unity 6 (Assets, Packages, ProjectSettings)
+├── docs/                # especificación ISO, arquitectura, SoA, bitácora de fases
+├── unity/               # proyecto Unity 6 (Assets, Packages, ProjectSettings)
 ├── backend/             # API FastAPI (sesiones, puntaje, diálogo)
 ├── infra/               # Docker Compose, Nginx, Wazuh, scripts
 ├── assets/figma/        # exportaciones fuente del diseño
@@ -61,7 +62,7 @@ infraestructura de 5 nodos con **Docker** y diálogos de NPC generados por **Oll
 cp .env.example .env
 
 # 2. Abrir el proyecto Unity
-#    Unity Hub → Add project → CosTamarindo/
+#    Unity Hub → Add project → unity/
 
 # 3. Backend (desarrollo)
 cd backend && python -m venv .venv && .venv/Scripts/activate
