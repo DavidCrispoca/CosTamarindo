@@ -16,7 +16,7 @@ infraestructura de 5 nodos con **Docker** y diálogos de NPC generados por **Oll
 | :--- | :--- | :--- | :--- |
 | F0 | Repositorio y baseline | ✅ cerrada | [`docs/fases/F0.md`](docs/fases/F0.md) |
 | F1 | Assets Figma → Unity | 🚧 en curso (bloqueo Figma) | [`docs/fases/F1.md`](docs/fases/F1.md) |
-| F2 | Vertical slice jugable | ⬜ pendiente |
+| F2 | Vertical slice jugable | 🚧 jugable (sin red) | [`docs/fases/F2.md`](docs/fases/F2.md) |
 | F3 | Build WebGL + Nginx | ⬜ pendiente |
 | F4 | Supabase: Auth y leaderboard | ⬜ pendiente |
 | F5 | Backend FastAPI + puntaje firmado | ⬜ pendiente |
