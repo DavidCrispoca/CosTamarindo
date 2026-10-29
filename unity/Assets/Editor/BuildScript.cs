@@ -48,7 +48,9 @@ namespace CosTamarindo.EditorTools
                 locationPathName = output,
                 target = BuildTarget.WebGL,
                 targetGroup = BuildTargetGroup.WebGL,
-                options = BuildOptions.None,
+                // DetailedBuildReport deja el desglose por asset en report.packedAssets:
+                // sin él no hay forma de saber qué pesa dentro de webgl.data.
+                options = BuildOptions.DetailedBuildReport,
             };
 
             Debug.Log($"[BuildWebGL] escenas: {string.Join(", ", scenes)}");
@@ -66,6 +68,31 @@ namespace CosTamarindo.EditorTools
             if (summary.result != BuildResult.Succeeded)
             {
                 throw new Exception($"[BuildWebGL] el build falló con resultado {summary.result}.");
+            }
+
+            LogHeaviestAssets(report);
+        }
+
+        /// <summary>
+        /// Los 12 assets más pesados del build. Sirve para decidir qué comprimir o
+        /// bajar de resolución sin adivinar (p. ej. el fondo de playa).
+        /// </summary>
+        private static void LogHeaviestAssets(BuildReport report)
+        {
+            var heaviest = report.packedAssets
+                .SelectMany(packed => packed.contents)
+                .GroupBy(content => content.sourceAssetPath)
+                .Select(group => new
+                {
+                    Path = group.Key,
+                    Bytes = group.Sum(content => (long)content.packedSize),
+                })
+                .OrderByDescending(item => item.Bytes)
+                .Take(12);
+
+            foreach (var item in heaviest)
+            {
+                Debug.Log($"[BuildWebGL] {item.Bytes / 1024f:F0} KB  {item.Path}");
             }
         }
 
