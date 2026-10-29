@@ -1,0 +1,31 @@
+{
+  "fecha": "2026-10-28",
+  "fase": "F3",
+  "build": {
+    "unity": "6000.3.27f1 (672d562a42a7)",
+    "escenas": ["Assets/Scenes/Game.unity", "Assets/Scenes/SampleScene.unity"],
+    "compresion": "Gzip",
+    "resultado": "Succeeded",
+    "tamano_build_mb": 14.3,
+    "duracion_build_inicial": "00:07:11",
+    "duracion_rebuild_incremental": "00:02:27",
+    "nota": "el segundo build incluye el arreglo del spawner (los ítems no aparecían)"
+  },
+  "verificacion": {
+    "url": "http://localhost:8080/",
+    "servidor": "tools/dev-server/server.mjs",
+    "navegador": "Microsoft Edge headless via playwright-core",
+    "runtime_listo_segundos": 1.3,
+    "transferencia_mb": 14.2,
+    "errores_consola": 0,
+    "respuestas_http_error": 0,
+    "canvas": { "width": 960, "height": 600 },
+    "csp": "hash SHA-256 del script inline (sin unsafe-inline)",
+    "observado": "ítems cayendo, HUD, cronómetro y movimiento del jugador con teclado",
+    "captura": "screenshot-game.png"
+  },
+  "pruebas": {
+    "playmode": "4/4 verdes",
+    "comando": "Unity.exe -batchmode -projectPath unity -runTests -testPlatform PlayMode"
+  }
+}
