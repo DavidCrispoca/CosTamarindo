@@ -2,7 +2,7 @@
 
 > Documento vivo. Cada fase tiene objetivo, pasos con las herramientas concretas, entregables y criterio de terminado (DoD).
 > Especificación de origen: [`docs/CosTamarindo.md`](docs/CosTamarindo.md) (ISO/IEC 27001:2022).
-> Última actualización: 2026-10-27.
+> Última actualización: 2026-10-28.
 
 ---
 
@@ -28,7 +28,7 @@ Un videojuego 2D jugable en el navegador (Unity 6 → WebGL) servido por Nginx, 
 
 ---
 
-## 2. Estado actual verificado (2026-10-27)
+## 2. Estado actual verificado (2026-10-28)
 
 | Elemento | Estado | Evidencia |
 | :--- | :--- | :--- |
@@ -36,6 +36,7 @@ Un videojuego 2D jugable en el navegador (Unity 6 → WebGL) servido por Nginx, 
 | Módulo WebGL | Instalado | `.../PlaybackEngines/WebGLSupport` |
 | Proyecto Unity | URP 2D, Input System 1.20.1, paquetes 2D completos | `Packages/manifest.json` |
 | Contenido Unity | Escena `Game` jugable (bucle completo offline), 10 scripts, 4 sprites, TMP Essentials, fuentes Lilita One / Patrick Hand como SDF | `docs/fases/F2.md` |
+| **Build WebGL** | **Release 14,3 MB (Gzip), 1,1 s de carga, 0 errores** | `docs/fases/F3.md`, `evidencias/F3/` |
 | **Unity MCP** | **Conectado** — autoarranque reparado (§ F2 3.1); 36 herramientas | `mcpforunity://editor/state` |
 | **Figma MCP** | **Autenticado** — sesión `90118ff1-0eb1-4e3b-8a14-3bd385659ac0` | `figma.whoami` |
 | Figma: archivo | `qI8jr7abLu6tIpL0MnL8Ol` — Design System + 8 pantallas completas | `get_metadata` |
@@ -132,7 +133,7 @@ CosTamarindo/
 ├── .env.example                # variables sin valores reales
 ├── docs/
 │   ├── CosTamarindo.md         # especificación ISO 27001
-│   ├── arquitectura.md         # diagramas y decisiones (se crea en F6)
+│   ├── arquitectura.md         # nodos, redes, compose y flujo del equipo (F6)
 │   └── soa.md                  # Declaración de Aplicabilidad (F8)
 ├── unity/                      # proyecto Unity 6 (Assets, Packages, ProjectSettings)
 ├── backend/                    # FastAPI
@@ -306,6 +307,7 @@ Reglas: un commit = un cambio lógico; no mezclar arte con backend; nunca commit
 
 **Entregables:** build servido en `http://localhost:8080`, script de build.
 **DoD:** carga en < 10 s en local, jugable con teclado y ratón/táctil, 0 errores de consola, tamaño ≤ 30 MB.
+**Estado 2026-10-28:** pasos 1, 2, 4 y 5 ✅ en local (14,3 MB, 1,1 s, 0 errores). Paso 3 escrito y pendiente de validar dentro del contenedor de F6. Compresión **Gzip** en lugar de Brotli (`nginx:alpine` no trae `ngx_brotli`).
 
 ---
 

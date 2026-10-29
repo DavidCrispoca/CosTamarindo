@@ -6,6 +6,8 @@ infraestructura de 5 nodos con **Docker** y diálogos de NPC generados por **Oll
 
 - Especificación ISO 27001: [`docs/CosTamarindo.md`](docs/CosTamarindo.md)
 - Plan de ejecución por fases: [`Plan.md`](Plan.md)
+- Arquitectura de los 5 nodos Docker: [`docs/arquitectura.md`](docs/arquitectura.md)
+- Operación de infraestructura: [`infra/README.md`](infra/README.md)
 - Bitácora por fase: [`docs/fases/`](docs/fases/)
 
 ---
@@ -17,7 +19,7 @@ infraestructura de 5 nodos con **Docker** y diálogos de NPC generados por **Oll
 | F0 | Repositorio y baseline | ✅ cerrada | [`docs/fases/F0.md`](docs/fases/F0.md) |
 | F1 | Assets Figma → Unity | 🚧 en curso (bloqueo Figma) | [`docs/fases/F1.md`](docs/fases/F1.md) |
 | F2 | Vertical slice jugable | 🚧 jugable (sin red) | [`docs/fases/F2.md`](docs/fases/F2.md) |
-| F3 | Build WebGL + Nginx | ⬜ pendiente |
+| F3 | Build WebGL + Nginx | 🚧 build OK en local (contenedor pendiente) | [`docs/fases/F3.md`](docs/fases/F3.md) |
 | F4 | Supabase: Auth y leaderboard | ⬜ pendiente |
 | F5 | Backend FastAPI + puntaje firmado | ⬜ pendiente |
 | F6 | Infraestructura Docker (5 nodos) | ⬜ pendiente |
