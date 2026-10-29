@@ -1,0 +1,48 @@
+{
+  "fecha": "2026-10-28",
+  "fase": "F3",
+  "contenedor": {
+    "servicio": "frontend",
+    "contenedor": "sg-frontend",
+    "imagen": "nginx:1.29-alpine",
+    "compose": "infra/docker-compose.yml",
+    "estado": "healthy",
+    "red": "costamarindo-dmz",
+    "puertos": ["443:443", "8081:8080"],
+    "nota": "el 8080 del host lo ocupa Unity MCP; el HTTP plano se publica en 8081"
+  },
+  "tls": {
+    "herramienta": "mkcert 1.4.4",
+    "dominio": "juego.local",
+    "alternativas": ["localhost", "127.0.0.1", "::1"],
+    "ca": "confiada en el almacen del usuario (sin admin)",
+    "hosts": "127.0.0.1 juego.local"
+  },
+  "verificacion": {
+    "url": "https://juego.local/",
+    "navegador": "Microsoft Edge headless via playwright-core",
+    "runtime_listo_segundos": 2.9,
+    "transferencia_mb": 16.1,
+    "errores_consola": 0,
+    "advertencias_consola": 0,
+    "respuestas_http_error": 0,
+    "canvas": { "width": 960, "height": 600 },
+    "cabeceras": {
+      "content_security_policy": "hash SHA-256 + 'wasm-unsafe-eval' (sin unsafe-inline)",
+      "strict_transport_security": "max-age=31536000",
+      "x_frame_options": "DENY",
+      "x_content_type_options": "nosniff"
+    },
+    "wasm": {
+      "content_type": "application/wasm",
+      "content_encoding": "gzip",
+      "cache_control": "public, max-age=31536000, immutable"
+    },
+    "capturas": ["screenshot-nginx.png", "screenshot-nginx-movimiento.png"]
+  },
+  "comandos": {
+    "levantar": "docker compose -f infra/docker-compose.yml up -d --wait",
+    "verificar": "node tools/dev-server/check.mjs https://juego.local/ evidencias/F3/screenshot-nginx.png",
+    "logs": "docker logs sg-frontend"
+  }
+}
