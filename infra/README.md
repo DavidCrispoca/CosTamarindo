@@ -26,6 +26,9 @@ docker compose -f infra/docker-compose.yml down -v    # borra volúmenes
 
 # desde infra/ los comandos son más cortos
 cd infra && docker compose up -d
+
+# tras recompilar el juego: Nginx lee la CSP al arrancar, hay que recargarlo
+docker exec sg-frontend nginx -s reload
 ```
 
 El HTTPS escucha en **443**; el HTTP plano en **8081** porque el 8080 del host lo ocupa
