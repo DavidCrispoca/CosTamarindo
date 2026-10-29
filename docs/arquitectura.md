@@ -1,6 +1,7 @@
 # Arquitectura de infraestructura — CosTamarindo 2D
 
-> **Estado:** diseño cerrado · implementación pendiente (F6, requiere Docker Desktop + WSL2)
+> **Estado:** diseño cerrado · `Sg-Frontend` implementado y healthy (F6 en curso; faltan
+> `backend`, `ai` y `security`)
 > **Alcance:** cómo se levanta, se opera y se comparte el entorno de 5 nodos.
 > **Decisiones de referencia:** `Plan.md` §3 (D1–D8).
 
@@ -108,24 +109,26 @@ directorio (`../builds/webgl`, `../backend`).
 
 ```yaml
 frontend:
-  image: nginx:1.27-alpine
+  image: nginx:1.29-alpine
   ports:
     - "443:443"
-    # dev (docker-compose.override.yml): "8080:8080"
+    - "8081:8080"   # dev: el 8080 del host lo ocupa Unity MCP
   volumes:
     - ../builds/webgl:/usr/share/nginx/html:ro
     - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
     - ./nginx/conf.d:/etc/nginx/conf.d:ro
     - ./nginx/snippets:/etc/nginx/snippets:ro
-    - ./certs:/etc/nginx/certs:ro
+    - ./tls:/etc/nginx/certs:ro
   networks: [dmz, app, mgmt]
   healthcheck: wget -qO- http://localhost:8080/healthz
   restart: unless-stopped
   mem_limit: 128m
 ```
 
-Puertos: en `dev` se publica `443:443` y `8080:8080`; en `prod`, **solo** `443:443`. Se controla
-con `infra/docker-compose.override.yml` (dev) y `-f docker-compose.yml` solo (prod).
+Puertos: en `dev` se publica `443:443` y `8081:8080`; en `prod`, **solo** `443:443`. La
+separación dev/prod con `docker-compose.override.yml` llega en F6b; hoy hay un único
+`infra/docker-compose.yml`, que declara solo la red `dmz` (las redes `app`/`mgmt` y
+`mem_limit` entran con el backend).
 
 ### 5.2 `backend`
 

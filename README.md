@@ -19,10 +19,10 @@ infraestructura de 5 nodos con **Docker** y diálogos de NPC generados por **Oll
 | F0 | Repositorio y baseline | ✅ cerrada | [`docs/fases/F0.md`](docs/fases/F0.md) |
 | F1 | Assets Figma → Unity | 🚧 personaje + fondo en juego · faltan ítems y UI | [`docs/fases/F1.md`](docs/fases/F1.md) |
 | F2 | Vertical slice jugable | 🚧 jugable (sin red) | [`docs/fases/F2.md`](docs/fases/F2.md) |
-| F3 | Build WebGL + Nginx | 🚧 build OK en local (contenedor pendiente) | [`docs/fases/F3.md`](docs/fases/F3.md) |
+| F3 | Build WebGL + Nginx | ✅ cerrada (16,1 MB, 2,9 s, 0 errores) | [`docs/fases/F3.md`](docs/fases/F3.md) |
 | F4 | Supabase: Auth y leaderboard | ⬜ pendiente |
 | F5 | Backend FastAPI + puntaje firmado | ⬜ pendiente |
-| F6 | Infraestructura Docker (5 nodos) | ⬜ pendiente |
+| F6 | Infraestructura Docker (5 nodos) | 🚧 `Sg-Frontend` arriba · faltan backend, IA y seguridad |
 | F7 | NPC con Ollama | ⬜ pendiente |
 | F8 | Controles ISO, ataques y evidencias | ⬜ pendiente |
 | F9 | Despliegue final y entrega | ⬜ pendiente |
@@ -66,16 +66,18 @@ cp .env.example .env
 # 2. Abrir el proyecto Unity
 #    Unity Hub → Add project → unity/
 
-# 3. Backend (desarrollo)
-cd backend && python -m venv .venv && .venv/Scripts/activate
-pip install -r requirements.txt
-uvicorn app.main:app --reload --port 8000
+# 3. Compilar el juego y servirlo con Nginx en Docker
+powershell -File infra/scripts/build_webgl.ps1
+powershell -File infra/scripts/tls.ps1            # una vez: certificado de juego.local
+docker compose -f infra/docker-compose.yml up -d --wait
 
-# 4. Infraestructura completa
-cd infra && docker compose --profile security up -d
+# 4. Backend (F5, todavía no existe backend/)
+#    cd backend && uvicorn app.main:app --reload --port 8000
 ```
 
-El juego queda disponible en `https://juego.local` (certificado local generado con `mkcert`).
+El juego queda en **`https://juego.local`** (una vez agregado `127.0.0.1 juego.local` al
+archivo `hosts`). El HTTP plano escucha en **8081** porque el 8080 del host lo ocupa Unity
+MCP. La infraestructura de 5 nodos se completa en F6.
 
 ---
 

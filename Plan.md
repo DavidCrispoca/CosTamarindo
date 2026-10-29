@@ -36,14 +36,14 @@ Un videojuego 2D jugable en el navegador (Unity 6 → WebGL) servido por Nginx, 
 | Módulo WebGL | Instalado | `.../PlaybackEngines/WebGLSupport` |
 | Proyecto Unity | URP 2D, Input System 1.20.1, paquetes 2D completos | `Packages/manifest.json` |
 | Contenido Unity | Escena `Game` jugable (bucle completo offline), 10 scripts, 4 sprites, TMP Essentials, fuentes Lilita One / Patrick Hand como SDF | `docs/fases/F2.md` |
-| **Build WebGL** | **Release 16,1 MB (Gzip) con el arte, 1,1 s de carga, 0 errores** | `docs/fases/F3.md`, `evidencias/F3/` |
+| **Build WebGL** | **Release 16,1 MB (Gzip) con el arte, servido por Nginx en `https://juego.local` (2,9 s, 0 errores)** | `docs/fases/F3.md`, `evidencias/F3/` |
 | **Unity MCP** | **Conectado** — autoarranque reparado (§ F2 3.1); 36 herramientas | `mcpforunity://editor/state` |
 | **Figma MCP** | **Autenticado** — sesión `90118ff1-0eb1-4e3b-8a14-3bd385659ac0` | `figma.whoami` |
 | Figma: archivo | `qI8jr7abLu6tIpL0MnL8Ol` — Design System + 8 pantallas completas | `get_metadata` |
 | Supabase MCP | Deshabilitado en la config local; se habilitará **solo hacia DEV** | `.codex/config.toml`, `opencode.json` |
-| Docker Desktop | **No instalado** | `Get-Command docker` |
+| Docker Desktop | **Instalado** (4.97.0, motor WSL2) | `docker version` |
 | Ollama | **No instalado** | `Get-Command ollama` |
-| Máquina | 32 GB RAM, 86 GB libres, WSL2 v2, Python 3.12.10, Node 24.16 | — |
+| Máquina | 32 GB RAM, 45 GB libres, WSL2 v2, Python 3.12.10, Node 24.16 | — |
 | Remoto Git | `https://github.com/DavidCrispoca/CosTamarindo.git` — `main` publicada y sincronizada | `git ls-remote` |
 
 ---
@@ -307,9 +307,13 @@ Reglas: un commit = un cambio lógico; no mezclar arte con backend; nunca commit
 | 5 | Ajustar si hay pantalla de carga infinita (`Content-Encoding`, MIME, CSP) | Nginx |
 | 6 | Script `infra/scripts/build_webgl.sh` reproducible | shell |
 
-**Entregables:** build servido en `http://localhost:8080`, script de build.
+**Entregables:** build servido en `https://juego.local` (contenedor `Sg-Frontend`), script de build.
 **DoD:** carga en < 10 s en local, jugable con teclado y ratón/táctil, 0 errores de consola, tamaño ≤ 30 MB.
-**Estado 2026-10-28:** pasos 1, 2, 4 y 5 ✅ en local (16,1 MB con el arte, 1,1 s, 0 errores, 6/6 tests PlayMode). Paso 3 escrito y pendiente de validar dentro del contenedor de F6. Compresión **Gzip** en lugar de Brotli (`nginx:alpine` no trae `ngx_brotli`).
+**Estado 2026-10-28:** pasos 1, 2, 4, 5 y 6 ✅. Paso 3 ✅ en contenedor: `Sg-Frontend`
+(`nginx:1.29-alpine`) sirve el build montado en solo lectura por HTTPS en `https://juego.local`
+con TLS de mkcert; 2,9 s en frío, 16,1 MB, 0 errores y 6/6 tests PlayMode. Compresión **Gzip**
+en lugar de Brotli (`nginx:alpine` no trae `ngx_brotli`). Queda como deuda desactivar
+`SampleScene` del build.
 
 ---
 
@@ -375,6 +379,10 @@ Reglas: un commit = un cambio lógico; no mezclar arte con backend; nunca commit
 
 **Entregables:** `docker compose up` funcional, documentación en `docs/arquitectura.md`.
 **DoD:** juego y API bajo `https://juego.local`; `:11434` y `:8000` inaccesibles desde fuera de su red; healthchecks en verde.
+
+**Estado 2026-10-28:** Docker Desktop 4.97 instalado y motor WSL2 operativo. Paso 2 parcial:
+solo `Sg-Frontend` en `infra/docker-compose.yml` (healthy, HTTPS con mkcert). Faltan
+`backend`, `ai`, `security`, las redes `app/data/ai/mgmt` y los scripts `up/down`.
 
 ---
 
