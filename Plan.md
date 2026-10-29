@@ -36,7 +36,7 @@ Un videojuego 2D jugable en el navegador (Unity 6 → WebGL) servido por Nginx, 
 | Módulo WebGL | Instalado | `.../PlaybackEngines/WebGLSupport` |
 | Proyecto Unity | URP 2D, Input System 1.20.1, paquetes 2D completos | `Packages/manifest.json` |
 | Contenido Unity | Escena `Game` jugable (bucle completo offline), 10 scripts, 4 sprites, TMP Essentials, fuentes Lilita One / Patrick Hand como SDF | `docs/fases/F2.md` |
-| **Build WebGL** | **Release 14,3 MB (Gzip), 1,1 s de carga, 0 errores** | `docs/fases/F3.md`, `evidencias/F3/` |
+| **Build WebGL** | **Release 16,1 MB (Gzip) con el arte, 1,1 s de carga, 0 errores** | `docs/fases/F3.md`, `evidencias/F3/` |
 | **Unity MCP** | **Conectado** — autoarranque reparado (§ F2 3.1); 36 herramientas | `mcpforunity://editor/state` |
 | **Figma MCP** | **Autenticado** — sesión `90118ff1-0eb1-4e3b-8a14-3bd385659ac0` | `figma.whoami` |
 | Figma: archivo | `qI8jr7abLu6tIpL0MnL8Ol` — Design System + 8 pantallas completas | `get_metadata` |
@@ -267,6 +267,8 @@ Reglas: un commit = un cambio lógico; no mezclar arte con backend; nunca commit
 **Entregables:** `unity/Assets/Art/` con sprites correctamente importados, atlas, fuentes SDF y prefabs de UI.
 **DoD:** cada componente del inventario existe como prefab o sprite; los fondos pesan ≤ 1.5 MB; el proyecto compila sin errores en consola.
 
+**Estado 2026-10-28:** Palenquera y fondo de playa ✅ importados y en la escena `Game` (animación procedural con un solo sprite). Ítems 4/8. Faltan los otros 2 personajes, 3 fondos, logo y componentes de UI. Ajustes de importación automatizados en `Assets/Editor/FigmaArtImporter.cs`.
+
 ---
 
 ### F2 · Vertical slice jugable  ·  *(H1)*
@@ -307,7 +309,7 @@ Reglas: un commit = un cambio lógico; no mezclar arte con backend; nunca commit
 
 **Entregables:** build servido en `http://localhost:8080`, script de build.
 **DoD:** carga en < 10 s en local, jugable con teclado y ratón/táctil, 0 errores de consola, tamaño ≤ 30 MB.
-**Estado 2026-10-28:** pasos 1, 2, 4 y 5 ✅ en local (14,3 MB, 1,1 s, 0 errores). Paso 3 escrito y pendiente de validar dentro del contenedor de F6. Compresión **Gzip** en lugar de Brotli (`nginx:alpine` no trae `ngx_brotli`).
+**Estado 2026-10-28:** pasos 1, 2, 4 y 5 ✅ en local (16,1 MB con el arte, 1,1 s, 0 errores, 6/6 tests PlayMode). Paso 3 escrito y pendiente de validar dentro del contenedor de F6. Compresión **Gzip** en lugar de Brotli (`nginx:alpine` no trae `ngx_brotli`).
 
 ---
 

@@ -3,6 +3,32 @@
 Exportaciones fuente del archivo de diseño **CosTamarindo**
 (`qI8jr7abLu6tIpL0MnL8Ol`), usadas para generar los sprites y prefabs de Unity.
 
+## Archivo de diseño (fuente de todo el arte)
+
+| Dato | Valor |
+| :--- | :--- |
+| URL | <https://www.figma.com/design/qI8jr7abLu6tIpL0MnL8Ol/CosTamarindo?node-id=0-1&t=p2hEW0NuUDtfsm9e-1> |
+| `fileKey` | `qI8jr7abLu6tIpL0MnL8Ol` |
+| Nodo raíz | `0:1` |
+| Dueño del archivo | equipo del proyecto (plan Starter) |
+
+**Todo el arte del juego sale de ese archivo.** Si se reexporta un asset, se guarda
+aquí y luego se copia a `unity/Assets/Art/`. Los nombres de archivo y los `nodeId`
+del inventario están en [`docs/fases/F1.md`](../../docs/fases/F1.md).
+
+## Estado dentro de Unity
+
+| Asset | Origen | Destino en Unity | Estado |
+| :--- | :--- | :--- | :--- |
+| Palenquera | `characters/Palenquera-Ingame.png` | `Assets/Art/Characters/palenquera.png` | ✅ en escena, animada por código |
+| Fondo de playa | `backgrounds/Background-Playa.png` | `Assets/Art/Backgrounds/bg_playa.png` | ✅ en escena (`BackgroundFitter`) |
+| 4 ítems | `items/*.png` | `Assets/Art/Items/` | ✅ |
+| 4 ítems restantes | `items/*.png` | — | ⛔ falta exportar |
+| Tipografías | Google Fonts (OFL) | `Assets/Art/Fonts/` | ✅ SDF |
+
+Los ajustes de importación no se tocan a mano: los aplica
+`Assets/Editor/FigmaArtImporter.cs` (menú **CosTamarindo → Importar arte de Figma**).
+
 ## Organización
 
 ```
