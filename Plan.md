@@ -383,6 +383,7 @@ en lugar de Brotli (`nginx:alpine` no trae `ngx_brotli`). Queda como deuda desac
 **Estado 2026-10-28:** Docker Desktop 4.97 instalado y motor WSL2 operativo. Paso 2 parcial:
 solo `Sg-Frontend` en `infra/docker-compose.yml` (healthy, HTTPS con mkcert). Faltan
 `backend`, `ai`, `security`, las redes `app/data/ai/mgmt` y los scripts `up/down`.
+Detalle en [`docs/fases/F6.md`](docs/fases/F6.md).
 
 ---
 

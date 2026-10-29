@@ -22,10 +22,13 @@ infraestructura de 5 nodos con **Docker** y diálogos de NPC generados por **Oll
 | F3 | Build WebGL + Nginx | ✅ cerrada (16,1 MB, 2,9 s, 0 errores) | [`docs/fases/F3.md`](docs/fases/F3.md) |
 | F4 | Supabase: Auth y leaderboard | ⬜ pendiente |
 | F5 | Backend FastAPI + puntaje firmado | ⬜ pendiente |
-| F6 | Infraestructura Docker (5 nodos) | 🚧 `Sg-Frontend` arriba · faltan backend, IA y seguridad |
+| F6 | Infraestructura Docker (5 nodos) | 🚧 `Sg-Frontend` arriba · faltan backend, IA y seguridad | [`docs/fases/F6.md`](docs/fases/F6.md) |
 | F7 | NPC con Ollama | ⬜ pendiente |
 | F8 | Controles ISO, ataques y evidencias | ⬜ pendiente |
 | F9 | Despliegue final y entrega | ⬜ pendiente |
+
+**La web del juego ya corre** en <https://juego.local> dentro del contenedor `Sg-Frontend`
+([F6](docs/fases/F6.md)): build WebGL de 16,1 MB servido por HTTPS con 0 errores.
 
 ---
 
