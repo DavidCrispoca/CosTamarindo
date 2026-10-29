@@ -1,0 +1,52 @@
+# CosTamarindo · Sg-Frontend (Nginx + build WebGL)
+#
+# Fase F6, paso 2. Por ahora solo el nodo público: el backend todavía no
+# existe y Sg-AI/Sg-Security se añaden cuando toque (F6b).
+#
+#   docker compose -f infra/docker-compose.yml up -d
+#   https://juego.local        (TLS mkcert, requiere entrada en hosts)
+#   http://localhost:8081      (HTTP plano; el 8080 del host lo usa Unity MCP)
+
+name: costamarindo
+
+services:
+  frontend:
+    image: nginx:1.29-alpine
+    container_name: sg-frontend
+    restart: unless-stopped
+
+    ports:
+      - "8081:8080"   # HTTP plano (el 8080 del host lo ocupa Unity MCP)
+      - "443:443"     # HTTPS del juego (juego.local)
+
+    volumes:
+      # El build lo genera infra/scripts/build_webgl.ps1 fuera del contenedor.
+      - ../builds/webgl:/usr/share/nginx/html:ro
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./nginx/snippets:/etc/nginx/snippets:ro
+      # Certificados de mkcert (infra/tls está en .gitignore).
+      - ./tls:/etc/nginx/certs:ro
+
+    networks:
+      - dmz
+
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:8080/healthz"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
+
+    # Los logs JSON de Nginx los recogerá Wazuh en F8; de momento solo se
+    # limita el crecimiento en disco.
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+networks:
+  # Zona pública. El backend se conectará aquí (proxy /api/) y a la red app.
+  dmz:
+    name: costamarindo-dmz
