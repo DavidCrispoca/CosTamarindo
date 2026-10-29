@@ -32,6 +32,11 @@ secrets/
 .infisical/
 
 # ── Unity ────────────────────────────────────────────────────
+# El proyecto Unity es `unity/`. Si Unity se abre en la raíz del repo crea un
+# proyecto fantasma: estas reglas lo mantienen fuera del índice.
+/Packages/
+/ProjectSettings/
+/Assets/
 [Ll]ibrary/
 [Tt]emp/
 [Oo]bj/
