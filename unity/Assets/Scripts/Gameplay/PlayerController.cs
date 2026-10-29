@@ -5,8 +5,9 @@ using CosTamarindo.Core;
 namespace CosTamarindo.Gameplay
 {
     /// <summary>
-    /// Controla la canasta del jugador: teclado (A/D, flechas), ratón y pantalla táctil.
+    /// Controla a la Palenquera: teclado (A/D, flechas), ratón y pantalla táctil.
     /// El movimiento es horizontal y se limita al ancho visible de la cámara.
+    /// La zona de captura se coloca a la altura de la canasta que lleva en la cabeza.
     /// </summary>
     [DisallowMultipleComponent]
     public sealed class PlayerController : MonoBehaviour
@@ -14,21 +15,30 @@ namespace CosTamarindo.Gameplay
         [Header("Movimiento")]
         [SerializeField] private float keyboardSpeed = 14f;
         [SerializeField] private float followSharpness = 18f;
-        [SerializeField] private float margin = 0.9f;
+        [SerializeField] private float margin = 1.35f;
 
         [Header("Captura")]
         [Tooltip("Semi-ancho de la zona de captura, en unidades de mundo.")]
-        [SerializeField] private float catchHalfWidth = 0.95f;
+        [SerializeField] private float catchHalfWidth = 0.75f;
+        [Tooltip("Distancia bajo el borde superior del sprite: deja la línea de captura en la canasta.")]
+        [SerializeField] private float catchInset = 0.28f;
+
+        [Header("Referencias")]
+        [Tooltip("Sprite del personaje. Si falta, se busca el hijo 'Visual'.")]
+        [SerializeField] private SpriteRenderer visual;
 
         private Camera cam;
         private float minX = -8f;
         private float maxX = 8f;
         private float targetX;
         private bool hasTarget;
+        private float catchHeight = -2.5f;
 
         public float CatchHalfWidth => catchHalfWidth;
-        /// <summary>Altura a la que un ítem se considera capturado.</summary>
-        public float CatchHeight => transform.position.y + 0.55f;
+        /// <summary>Altura a la que un ítem se considera capturado (borde de la canasta).</summary>
+        public float CatchHeight => catchHeight;
+        /// <summary>Velocidad horizontal actual, en unidades de mundo por segundo.</summary>
+        public float HorizontalVelocity { get; private set; }
 
         private void Awake()
         {
@@ -36,11 +46,37 @@ namespace CosTamarindo.Gameplay
             RecalculateBounds();
             targetX = transform.position.x;
 
-            // El sprite de relleno se genera en tiempo de ejecución: un Sprite creado
-            // por código no se puede serializar dentro de la escena.
-            var renderer = GetComponent<SpriteRenderer>();
-            if (renderer != null && renderer.sprite == null)
-                renderer.sprite = PlaceholderSprites.For(ItemKind.Good);
+            // El arte va en el hijo "Visual"; si falta, se usa el relleno procedural
+            // (un Sprite creado por código no se puede serializar en la escena).
+            // Se busca por nombre para no confundirlo con la sombra, que también
+            // es un SpriteRenderer hijo.
+            if (visual == null)
+            {
+                var visualTransform = transform.Find("Visual");
+                visual = visualTransform != null
+                    ? visualTransform.GetComponent<SpriteRenderer>()
+                    : GetComponentInChildren<SpriteRenderer>();
+            }
+
+            if (visual != null && visual.sprite == null)
+                visual.sprite = PlaceholderSprites.For(ItemKind.Good);
+        }
+
+        private void Start()
+        {
+            RecalculateCatchLine();
+        }
+
+        /// <summary>
+        /// La línea de captura sale del sprite real, así que si el arte cambia de
+        /// tamaño la canasta sigue quedando en el sitio correcto.
+        /// </summary>
+        private void RecalculateCatchLine()
+        {
+            if (visual != null && visual.sprite != null)
+                catchHeight = visual.bounds.max.y - catchInset;
+            else
+                catchHeight = transform.position.y + 0.55f;
         }
 
         private void RecalculateBounds()
@@ -106,8 +142,12 @@ namespace CosTamarindo.Gameplay
         private void ApplyMovement()
         {
             var p = transform.position;
+            float previousX = p.x;
             p.x = Mathf.Lerp(p.x, Mathf.Clamp(targetX, minX, maxX), 1f - Mathf.Exp(-followSharpness * Time.deltaTime));
             transform.position = p;
+
+            float dt = Time.deltaTime;
+            HorizontalVelocity = dt > 0f ? (p.x - previousX) / dt : 0f;
         }
 
         private void OnEnable() => RecalculateBounds();
@@ -116,6 +156,7 @@ namespace CosTamarindo.Gameplay
         private void OnValidate()
         {
             catchHalfWidth = Mathf.Max(0.1f, catchHalfWidth);
+            catchInset = Mathf.Max(0f, catchInset);
         }
 #endif
     }

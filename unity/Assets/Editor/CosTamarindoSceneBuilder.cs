@@ -36,6 +36,7 @@ namespace CosTamarindo.EditorTools
 
             var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
 
+            BuildBackground();
             BuildCamera();
             var manager = BuildGameManager();
             var player = BuildPlayer();
@@ -63,9 +64,31 @@ namespace CosTamarindo.EditorTools
             cam.orthographic = true;
             cam.orthographicSize = 5f;
             cam.clearFlags = CameraClearFlags.SolidColor;
+            // Color de respaldo: solo se ve si el fondo no cubre (aspecto extremo).
             cam.backgroundColor = Sea;
 
             go.AddComponent<AudioListener>();
+        }
+
+        /// <summary>
+        /// Fondo de playa exportado de Figma. Va en sortingOrder -100 y
+        /// <c>BackgroundFitter</c> lo escala para cubrir la cámara sin deformarlo.
+        /// </summary>
+        private static void BuildBackground()
+        {
+            var sprite = AssetDatabase.LoadAssetAtPath<Sprite>(FigmaArtImporter.BackgroundPath);
+
+            var go = new GameObject("Background");
+            go.transform.position = new Vector3(0f, 0f, 5f);
+
+            var renderer = go.AddComponent<SpriteRenderer>();
+            renderer.sprite = sprite;
+            renderer.sortingOrder = -100;
+
+            go.AddComponent<BackgroundFitter>();
+
+            if (sprite == null)
+                Debug.LogWarning($"[CosTamarindo] falta el fondo en {FigmaArtImporter.BackgroundPath}");
         }
 
         private static GameManager BuildGameManager()
@@ -74,19 +97,50 @@ namespace CosTamarindo.EditorTools
             return go.AddComponent<GameManager>();
         }
 
+        /// <summary>
+        /// Palenquera con la canasta en la cabeza. El controlador mueve el objeto
+        /// raíz y <c>CharacterAnimator</c> anima el hijo <c>Visual</c> (paso,
+        /// inclinación y respiración) para que ambas cosas no se pisen.
+        /// </summary>
         private static PlayerController BuildPlayer()
         {
-            var go = new GameObject("Player");
-            go.transform.position = new Vector3(0f, -4.05f, 0f);
-            go.transform.localScale = new Vector3(1.9f, 0.65f, 1f);
+            const float targetHeight = 3f;
+            const float feetY = -4.6f;
 
-            // Sin sprite asignado: PlayerController genera el relleno en Awake,
-            // porque un Sprite creado por código no se serializa en la escena.
-            var renderer = go.AddComponent<SpriteRenderer>();
-            renderer.color = new Color(0.99f, 0.62f, 0.36f);
+            var sprite = AssetDatabase.LoadAssetAtPath<Sprite>(FigmaArtImporter.CharacterPath);
+
+            var go = new GameObject("Player");
+            go.transform.position = new Vector3(0f, feetY, 0f);
+
+            var visualGo = new GameObject("Visual");
+            visualGo.transform.SetParent(go.transform, false);
+
+            var renderer = visualGo.AddComponent<SpriteRenderer>();
+            renderer.sprite = sprite;
             renderer.sortingOrder = 20;
 
-            return go.AddComponent<PlayerController>();
+            // Sin sprite (arte sin importar) se deja escala 1 y PlayerController
+            // cae al relleno procedural en Awake.
+            if (sprite != null)
+            {
+                float height = sprite.bounds.size.y;
+                if (height > 0.001f)
+                    visualGo.transform.localScale = Vector3.one * (targetHeight / height);
+            }
+            else
+            {
+                renderer.color = new Color(0.99f, 0.62f, 0.36f);
+                Debug.LogWarning($"[CosTamarindo] falta el personaje en {FigmaArtImporter.CharacterPath}");
+            }
+
+            var controller = go.AddComponent<PlayerController>();
+            SetObject(controller, "visual", renderer);
+
+            var animator = visualGo.AddComponent<CharacterAnimator>();
+            SetObject(animator, "player", controller);
+            SetObject(animator, "spriteRenderer", renderer);
+
+            return controller;
         }
 
         private static void BuildSpawner(PlayerController player)

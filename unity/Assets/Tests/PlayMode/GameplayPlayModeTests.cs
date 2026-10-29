@@ -84,5 +84,44 @@ namespace CosTamarindo.Tests
             var items = Object.FindObjectsByType<FallingItem>(FindObjectsSortMode.None);
             Assert.Greater(items.Length, 0, "El spawner debe generar ítems durante la partida.");
         }
+
+        [UnityTest]
+        public IEnumerator PlayerCatchLine_SitsAtBasketHeight()
+        {
+            yield return LoadGameScene();
+
+            var player = Object.FindFirstObjectByType<PlayerController>();
+            Assert.IsNotNull(player, "La escena debe tener al jugador.");
+
+            var visual = player.transform.Find("Visual")?.GetComponent<SpriteRenderer>();
+            Assert.IsNotNull(visual, "El personaje debe tener un SpriteRenderer en el hijo Visual.");
+            Assert.IsNotNull(visual.sprite, "El sprite de la Palenquera debe estar asignado.");
+
+            float feet = player.transform.position.y;
+            Assert.Greater(player.CatchHeight, feet + 1.5f,
+                "La línea de captura debe estar a la altura de la canasta, no de los pies.");
+            Assert.LessOrEqual(player.CatchHeight, visual.bounds.max.y + 0.01f,
+                "La línea de captura no puede quedar por encima del sprite.");
+        }
+
+        [UnityTest]
+        public IEnumerator Background_CoversCameraView()
+        {
+            yield return LoadGameScene();
+
+            var background = GameObject.Find("Background");
+            Assert.IsNotNull(background, "La escena debe tener el fondo de playa.");
+
+            var renderer = background.GetComponent<SpriteRenderer>();
+            Assert.IsNotNull(renderer);
+            Assert.IsNotNull(renderer.sprite, "El fondo debe tener su sprite asignado.");
+
+            var cam = Camera.main;
+            float height = cam.orthographicSize * 2f;
+            float width = height * cam.aspect;
+
+            Assert.GreaterOrEqual(renderer.bounds.size.y + 0.01f, height, "El fondo debe cubrir el alto.");
+            Assert.GreaterOrEqual(renderer.bounds.size.x + 0.01f, width, "El fondo debe cubrir el ancho.");
+        }
     }
 }
