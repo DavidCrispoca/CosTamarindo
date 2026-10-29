@@ -36,7 +36,20 @@ secrets/
 # proyecto fantasma: estas reglas lo mantienen fuera del índice.
 /Packages/
 /ProjectSettings/
-/Assets/
+# Unity crea estas carpetas al abrir un proyecto en la raíz. Se enumeran una a
+# una porque `/Assets/` a secas también atrapaba `assets/` (en Windows el
+# matching de .gitignore ignora mayúsculas) y dejaba fuera las exportaciones
+# de Figma, que sí se versionan.
+/Assets/Art/
+/Assets/Editor/
+/Assets/Prefabs/
+/Assets/Resources/
+/Assets/Scenes/
+/Assets/Scripts/
+/Assets/Settings/
+/Assets/StreamingAssets/
+/Assets/Tests/
+/Assets/TextMesh Pro/
 [Ll]ibrary/
 [Tt]emp/
 [Oo]bj/
@@ -73,6 +86,15 @@ sysinfo.txt
 *.app
 *.tmp
 *.bak
+
+# ── Exportaciones fuente de Figma ─────────────────────────────────────────────
+# Los binarios pesados (personaje y fondos) se versionan solo en
+# `unity/Assets/Art/`, que es lo que Unity importa. Duplicar aquí los 4,5 MB del
+# fondo no aporta nada: se reexportan con `tools/figma-export`.
+assets/figma/characters/*.png
+assets/figma/backgrounds/*.png
+# Unity deja .meta sueltos si alguna vez se abrió la raíz por error.
+assets/**/*.meta
 
 # ── Python / backend ─────────────────────────────────────────
 __pycache__/

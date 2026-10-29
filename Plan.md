@@ -246,7 +246,7 @@ Reglas: un commit = un cambio lógico; no mezclar arte con backend; nunca commit
 | 6 | Descargar `Lilita One` y `Patrick Hand` (OFL) y generar SDF en TMP | Google Fonts + TMP Font Asset Creator |
 | 7 | Importar todo por MCP con ajustes de importación (PPU, sprite mode, 9-slice, compresión) | `manage_texture`, `manage_asset` |
 | 8 | Crear atlas de sprites y prefabs de UI (`WoodButton`, `IconButton`, `HandInput`, `PinSlot`, `WoodPanel`, `Heart`, `Counter`, `DialogBubble`, `LeaderRow`, `CollectibleCard`) | `manage_prefabs`, `manage_gameobject` |
-| 9 | Guardar exportaciones fuente en `assets/figma/` (sin duplicar binarios pesados) | `git add` selectivo |
+| 9 | Guardar exportaciones fuente en `assets/figma/` (ítems, SVG, fuentes); el personaje y el fondo viven solo en `unity/Assets/Art/` para no duplicar 4,9 MB | regla en `.gitignore` |
 
 **Inventario a extraer**
 

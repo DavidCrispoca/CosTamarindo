@@ -38,7 +38,7 @@ infraestructura de 5 nodos con **Docker** y diálogos de NPC generados por **Oll
 ├── unity/               # proyecto Unity 6 (Assets, Packages, ProjectSettings)
 ├── backend/             # API FastAPI (sesiones, puntaje, diálogo)
 ├── infra/               # Docker Compose, Nginx, Wazuh, scripts
-├── assets/figma/        # exportaciones fuente del diseño
+├── assets/figma/        # fuente del arte (los PNG pesados solo en unity/Assets/Art)
 └── evidencias/          # una carpeta por control ISO auditado
 ```
 

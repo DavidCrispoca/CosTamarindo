@@ -44,6 +44,22 @@ assets/figma/
 Los archivos que Unity importa viven en `unity/Assets/Art/`; esta carpeta conserva
 el origen para poder reexportar si el diseño cambia.
 
+### Qué se versiona y qué no
+
+| Contenido | ¿En git? | Por qué |
+| :--- | :--- | :--- |
+| `items/*.png`, `items/*.svg`, `fonts/*.ttf`, este README | ✅ | son ligeros y son la fuente del arte |
+| `characters/*.png` y `backgrounds/*.png` | ⛔ | binarios pesados: el máster vive en `unity/Assets/Art/` y duplicarlo sumaba 4,9 MB al repo |
+| `*.meta` | ⛔ | Unity no importa esta carpeta; los `.meta` que aparecían eran restos de abrir la raíz por error |
+
+La regla está en `.gitignore` (`assets/figma/characters/*.png`,
+`assets/figma/backgrounds/*.png`). Si se reexporta uno de esos PNG, se copia directo
+a `unity/Assets/Art/`; aquí no hace falta dejarlo.
+
+> Ojo: en Windows `.gitignore` ignora mayúsculas, así que un patrón `/Assets/` para
+> bloquear el proyecto Unity fantasma también bloqueaba `assets/`. Por eso el
+> `.gitignore` enumera las carpetas de Unity una a una.
+
 ## Tipografías
 
 | Uso | Familia | Licencia |
