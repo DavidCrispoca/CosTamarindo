@@ -57,7 +57,11 @@ namespace CosTamarindo.UI
             sb.Clear();
             int total = Mathf.Max(lives, 0);
             for (int i = 0; i < total; i++) sb.Append('\u2665');
-            if (sb.Length == 0) sb.Append('\u2661');
+
+            // El corazón hueco (♡) no existe en LiberationSans SDF: se usa el relleno
+            // atenuado por rich text, que sí tiene glifo.
+            if (sb.Length == 0) sb.Append("<alpha=#55>\u2665</alpha>");
+
             livesText.text = sb.ToString();
         }
 
