@@ -1,0 +1,13 @@
+{
+  "name": "costamarindo-dev-server",
+  "private": true,
+  "type": "module",
+  "description": "Servidor estático del build WebGL para pruebas locales y Playwright",
+  "scripts": {
+    "start": "node server.mjs 8080",
+    "check": "node check.mjs"
+  },
+  "devDependencies": {
+    "playwright-core": "^1.64.1"
+  }
+}
