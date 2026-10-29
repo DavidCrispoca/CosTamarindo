@@ -6,26 +6,31 @@
     "escenas": ["Assets/Scenes/Game.unity", "Assets/Scenes/SampleScene.unity"],
     "compresion": "Gzip",
     "resultado": "Succeeded",
-    "tamano_build_mb": 14.3,
-    "duracion_build_inicial": "00:07:11",
-    "duracion_rebuild_incremental": "00:02:27",
-    "nota": "el segundo build incluye el arreglo del spawner (los ítems no aparecían)"
+    "tamano_build_mb": 16.1,
+    "tamano_sin_arte_mb": 14.3,
+    "duracion_rebuild_incremental": "00:00:10",
+    "assets_mas_pesados": [
+      { "asset": "Built-in Texture2D: Splash Screen Unity Logo", "kb": 2731 },
+      { "asset": "Assets/Art/Backgrounds/bg_playa.png (1024 px)", "kb": 1756 },
+      { "asset": "Assets/Art/Characters/palenquera.png", "kb": 1476 }
+    ],
+    "nota": "el build incluye el arte de Figma: personaje animado y fondo de playa"
   },
   "verificacion": {
     "url": "http://localhost:8080/",
     "servidor": "tools/dev-server/server.mjs",
     "navegador": "Microsoft Edge headless via playwright-core",
-    "runtime_listo_segundos": 1.3,
-    "transferencia_mb": 14.2,
+    "runtime_listo_segundos": 1.1,
+    "transferencia_mb": 16.1,
     "errores_consola": 0,
     "respuestas_http_error": 0,
     "canvas": { "width": 960, "height": 600 },
     "csp": "hash SHA-256 del script inline (sin unsafe-inline)",
-    "observado": "ítems cayendo, HUD, cronómetro y movimiento del jugador con teclado",
-    "captura": "screenshot-game.png"
+    "observado": "Palenquera con la canasta, fondo de playa cubriendo la cámara, ítems cayendo, HUD, cronómetro y desplazamiento con teclado",
+    "capturas": ["screenshot-game.png", "screenshot-game-movimiento.png"]
   },
   "pruebas": {
-    "playmode": "4/4 verdes",
+    "playmode": "6/6 verdes",
     "comando": "Unity.exe -batchmode -projectPath unity -runTests -testPlatform PlayMode"
   }
 }

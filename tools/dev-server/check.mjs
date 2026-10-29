@@ -55,6 +55,11 @@ await page.waitForTimeout(4000)
 await page.mouse.click(640, 360)
 await page.keyboard.down('ArrowRight')
 await page.waitForTimeout(700)
+
+// Captura en pleno movimiento: el personaje debe estar inclinado y desplazado.
+const shotMove = SHOT.replace(/\.png$/i, '-movimiento.png')
+await page.screenshot({ path: shotMove, fullPage: false })
+
 await page.keyboard.up('ArrowRight')
 
 const canvas = await page.evaluate(() => {
@@ -80,6 +85,7 @@ console.log(JSON.stringify({
   consoleErrors: errors,
   consoleWarnings: warnings.slice(0, 5),
   screenshot: SHOT,
+  screenshotMovimiento: shotMove,
 }, null, 2))
 
 process.exit(ready && errors.length === 0 && bad.length === 0 ? 0 : 1)
