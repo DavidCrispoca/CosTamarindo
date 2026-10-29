@@ -40,6 +40,7 @@ namespace CosTamarindo.Gameplay
         private float nextSpawnAt;
         private float elapsed;
         private bool running;
+        private bool subscribed;
 
         private float HalfWidth => cam != null ? cam.orthographicSize * cam.aspect : 8f;
         private float SpawnY => cam != null ? cam.orthographicSize + 1.5f : 6.5f;
@@ -67,20 +68,40 @@ namespace CosTamarindo.Gameplay
 
         private void OnEnable()
         {
-            if (GameManager.Instance != null)
-            {
-                GameManager.Instance.StateChanged += HandleStateChanged;
-                GameManager.Instance.MatchEnded += HandleMatchEnded;
-            }
+            TrySubscribe();
+        }
+
+        private void Start()
+        {
+            TrySubscribe();
+        }
+
+        /// <summary>
+        /// Se suscribe al GameManager cuando ya existe. No basta con OnEnable:
+        /// el orden de Awake/OnEnable entre objetos no está garantizado y el
+        /// spawner puede activarse antes de que GameManager.Instance exista.
+        /// </summary>
+        private void TrySubscribe()
+        {
+            if (subscribed || GameManager.Instance == null) return;
+
+            GameManager.Instance.StateChanged += HandleStateChanged;
+            GameManager.Instance.MatchEnded += HandleMatchEnded;
+            subscribed = true;
+
+            // Si la partida ya estaba en curso, sincroniza el estado actual.
+            HandleStateChanged(GameManager.Instance.State);
         }
 
         private void OnDisable()
         {
-            if (GameManager.Instance != null)
+            if (subscribed && GameManager.Instance != null)
             {
                 GameManager.Instance.StateChanged -= HandleStateChanged;
                 GameManager.Instance.MatchEnded -= HandleMatchEnded;
             }
+
+            subscribed = false;
         }
 
         private void HandleStateChanged(GameState state)
@@ -107,6 +128,8 @@ namespace CosTamarindo.Gameplay
 
         private void Update()
         {
+            TrySubscribe();
+
             if (!running || GameManager.Instance == null || GameManager.Instance.State != GameState.Playing)
                 return;
 
