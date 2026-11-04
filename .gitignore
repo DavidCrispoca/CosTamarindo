@@ -141,3 +141,6 @@ desktop.ini
 # ── Bitácora local de trabajo (nunca se publica) ─────────────
 # Relato interno del avance. La versión commiteable son docs/fases/.
 Proceso.md
+
+# Cache del registro de skills (herramientas del agente)
+.atl/
