@@ -18,14 +18,14 @@ infraestructura de 5 nodos con **Docker** y diálogos de NPC generados por **Oll
 | :--- | :--- | :--- | :--- |
 | F0 | Repositorio y baseline | ✅ cerrada | [`docs/fases/F0.md`](docs/fases/F0.md) |
 | F1 | Assets Figma → Unity | 🚧 personaje + fondo en juego · faltan ítems y UI | [`docs/fases/F1.md`](docs/fases/F1.md) |
-| F2 | Vertical slice jugable | 🚧 jugable (sin red) | [`docs/fases/F2.md`](docs/fases/F2.md) |
+| F2 | Vertical slice jugable | ✅ offline cerrado (Libro + feedback + 15 tests) | [`docs/fases/F2.md`](docs/fases/F2.md) |
 | F3 | Build WebGL + Nginx | ✅ cerrada (16,1 MB, 2,9 s, 0 errores) | [`docs/fases/F3.md`](docs/fases/F3.md) |
-| F4 | Supabase: Auth y leaderboard | ⬜ pendiente |
-| F5 | Backend FastAPI + puntaje firmado | ⬜ pendiente |
-| F6 | Infraestructura Docker (5 nodos) | 🚧 `Sg-Frontend` arriba · faltan backend, IA y seguridad | [`docs/fases/F6.md`](docs/fases/F6.md) |
-| F7 | NPC con Ollama | ⬜ pendiente |
-| F8 | Controles ISO, ataques y evidencias | ⬜ pendiente |
-| F9 | Despliegue final y entrega | ⬜ pendiente |
+| F4 | Supabase: Auth y leaderboard | ⬜ pendiente (pantalla Login ya hecha con stub) | — |
+| F5 | Backend FastAPI + puntaje firmado | ⬜ pendiente (`backend/` aún vacío) | — |
+| F6 | Infraestructura Docker (5 nodos) | 🚧 compose de 5 nodos validado · frontend + IA arriba | [`docs/fases/F6.md`](docs/fases/F6.md) |
+| F7 | NPC con Ollama | ⬜ pendiente | — |
+| F8 | Controles ISO, ataques y evidencias | 🚧 A.8.25 (Gitleaks) con evidencia | [`evidencias/A.8.25/`](evidencias/A.8.25/) |
+| F9 | Despliegue final y entrega | ⬜ pendiente | — |
 
 **La web del juego ya corre** en <https://juego.local> dentro del contenedor `Sg-Frontend`
 ([F6](docs/fases/F6.md)): build WebGL de 16,1 MB servido por HTTPS con 0 errores.

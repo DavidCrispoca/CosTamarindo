@@ -292,6 +292,12 @@ Reglas: un commit = un cambio lógico; no mezclar arte con backend; nunca commit
 **Entregables:** escena jugable con arte real, prefabs, scripts y tests.
 **DoD:** partida completa de 2–3 min en el editor; 3 vidas; puntaje y colección persistentes; 0 errores en consola; tests verdes.
 
+**Estado 2026-11-03:** ✅ **parte offline cerrada.** Libro de colección (grilla 4×2, estados
+bloqueado/desbloqueado) y feedback de captura (texto flotante `+15`, destello del marcador,
+aviso «¡Nuevo!» y SFX sintetizado) implementados. **15/15** tests PlayMode verdes.
+Falta el playtest de dificultad y el arte definitivo (F1). Detalle en
+[`evidencias/F2/`](evidencias/F2/).
+
 ---
 
 ### F3 · Build WebGL + Nginx  ·  *(H1)*
@@ -384,6 +390,13 @@ en lugar de Brotli (`nginx:alpine` no trae `ngx_brotli`). Queda como deuda desac
 solo `Sg-Frontend` en `infra/docker-compose.yml` (healthy, HTTPS con mkcert). Faltan
 `backend`, `ai`, `security`, las redes `app/data/ai/mgmt` y los scripts `up/down`.
 Detalle en [`docs/fases/F6.md`](docs/fases/F6.md).
+
+**Estado 2026-11-03:** compose de **5 nodos declarado y validado**. `Sg-Frontend` y `Sg-AI`
+arriba y *healthy*; las 5 redes (`dmz`, `app`, `data`, `ai`, `mgmt`) con `internal: true` donde
+corresponde; `mem_limit` y healthcheck en todos los nodos; scripts `up/down/logs/deploy` en
+`.sh` y `.ps1`. `Sg-AI` corre en la red `ai` **sin salida a Internet** (verificado: `:11434` no
+se publica y no responde desde el host). `Sg-Backend` y `Sg-Security` quedan tras perfiles
+porque dependen de F5 y F8.
 
 ---
 
