@@ -41,7 +41,7 @@ namespace CosTamarindo.EditorTools
             var manager = BuildGameManager();
             var player = BuildPlayer();
             BuildSpawner(player);
-            BuildInterface(manager);
+            BuildInterface(manager, player);
 
             EditorSceneManager.MarkSceneDirty(scene);
             EditorSceneManager.SaveScene(scene, ScenePath);
@@ -154,7 +154,7 @@ namespace CosTamarindo.EditorTools
 
         // ── Interfaz ─────────────────────────────────────────────────────
 
-        private static void BuildInterface(GameManager manager)
+        private static void BuildInterface(GameManager manager, PlayerController player)
         {
             var displayFont = AssetDatabase.LoadAssetAtPath<TMP_FontAsset>("Assets/Art/Fonts/LilitaOne SDF.asset");
             var bodyFont = AssetDatabase.LoadAssetAtPath<TMP_FontAsset>("Assets/Art/Fonts/PatrickHand SDF.asset");
@@ -225,6 +225,41 @@ namespace CosTamarindo.EditorTools
             SetObject(overlay, "finalScoreText", finalScore);
             SetObject(overlay, "finalBestText", finalBest);
             SetObject(overlay, "breakdownText", breakdown);
+
+            // ── Libro de la colección (F2) ──
+            var bookButton = CreateButton(root, "BookButton", "Libro", 32f, new Vector2(160f, 64f), default, bodyFont);
+            Anchor(bookButton.GetComponent<RectTransform>(), new Vector2(0f, 1f), new Vector2(0f, 1f),
+                   new Vector2(0f, 1f), new Vector2(50f, -182f), new Vector2(160f, 64f));
+
+            var book = canvasGo.AddComponent<BookView>();
+            SetObjectArray(book, "itemSprites", LoadItemSprites());
+            SetObject(book, "displayFont", displayFont);
+            SetObject(book, "bodyFont", bodyFont);
+            bookButton.onClick.AddListener(book.Toggle);
+
+            // ── Feedback de captura (F2) ──
+            var floatingLayer = new GameObject("FloatingLayer", typeof(RectTransform));
+            floatingLayer.transform.SetParent(root, false);
+
+            var floatingRt = floatingLayer.GetComponent<RectTransform>();
+            floatingRt.anchorMin = Vector2.zero;
+            floatingRt.anchorMax = Vector2.one;
+            floatingRt.offsetMin = Vector2.zero;
+            floatingRt.offsetMax = Vector2.zero;
+            floatingRt.pivot = new Vector2(0.5f, 0.5f);
+            // Encima del HUD pero debajo de los paneles modales.
+            floatingLayer.transform.SetSiblingIndex(1);
+
+            var audio = canvasGo.AddComponent<AudioSource>();
+            audio.playOnAwake = false;
+            audio.spatialBlend = 0f;
+
+            var feedback = canvasGo.AddComponent<CaptureFeedback>();
+            SetObject(feedback, "floatingRoot", floatingRt);
+            SetObject(feedback, "scoreText", scoreText);
+            SetObject(feedback, "font", displayFont);
+            SetObject(feedback, "player", player != null ? player.transform : null);
+            SetObject(feedback, "audioSource", audio);
         }
 
         private static GameObject CreateOverlayPanel(Transform parent, string name, out Transform content)
