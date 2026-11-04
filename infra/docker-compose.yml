@@ -1,35 +1,41 @@
-# CosTamarindo · Sg-Frontend (Nginx + build WebGL)
+# CosTamarindo · entorno de 5 nodos (F6)
 #
-# Fase F6, paso 2. Por ahora solo el nodo público: el backend todavía no
-# existe y Sg-AI/Sg-Security se añaden cuando toque (F6b).
+#   docker compose up -d --wait                 # juego + IA
+#   docker compose --profile security up -d     # + Wazuh
+#   docker compose --profile backend up -d      # + API (cuando exista backend/)
 #
-#   docker compose -f infra/docker-compose.yml up -d
-#   https://juego.local        (TLS mkcert, requiere entrada en hosts)
-#   http://localhost:8081      (HTTP plano; el 8080 del host lo usa Unity MCP)
+# Diseño completo: docs/arquitectura.md
+#
+# Reglas que este archivo hace cumplir:
+#   · Un solo puerto publicado hacia fuera: 443 (y 8081 en dev, por comodidad).
+#   · `expose:` para lo interno; nunca `ports:` para backend ni IA.
+#   · Redes `internal: true` donde no debe haber salida a Internet.
+#   · Límite de memoria por nodo y healthcheck en todos.
 
 name: costamarindo
 
 services:
+  # ── DMZ ───────────────────────────────────────────────────────────────
   frontend:
     image: nginx:1.29-alpine
     container_name: sg-frontend
     restart: unless-stopped
 
     ports:
-      - "8081:8080"   # HTTP plano (el 8080 del host lo ocupa Unity MCP)
       - "443:443"     # HTTPS del juego (juego.local)
+      - "8081:8080"   # HTTP plano: el 8080 del host lo ocupa Unity MCP
 
     volumes:
-      # El build lo genera infra/scripts/build_webgl.ps1 fuera del contenedor.
       - ../builds/webgl:/usr/share/nginx/html:ro
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./nginx/conf.d:/etc/nginx/conf.d:ro
       - ./nginx/snippets:/etc/nginx/snippets:ro
-      # Certificados de mkcert (infra/tls está en .gitignore).
       - ./tls:/etc/nginx/certs:ro
 
     networks:
       - dmz
+      - app     # para poder proxificar /api/ hacia sg-backend
+      - mgmt    # para enviar logs al SIEM en F8
 
     healthcheck:
       test: ["CMD", "wget", "-qO-", "http://127.0.0.1:8080/healthz"]
@@ -38,15 +44,145 @@ services:
       retries: 5
       start_period: 5s
 
-    # Los logs JSON de Nginx los recogerá Wazuh en F8; de momento solo se
-    # limita el crecimiento en disco.
+    mem_limit: 128m
+
     logging:
       driver: json-file
       options:
         max-size: "10m"
         max-file: "3"
 
+  # ── APP ───────────────────────────────────────────────────────────────
+  # Se levanta solo con --profile backend. Hasta que exista backend/ con su
+  # Dockerfile, `docker compose up` no lo intenta construir.
+  backend:
+    profiles: ["backend"]
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    container_name: sg-backend
+    restart: unless-stopped
+
+    expose:
+      - "8000"
+
+    env_file:
+      - ../.env
+
+    networks:
+      - app
+      - data
+      - ai
+      - mgmt
+
+    depends_on:
+      ai:
+        condition: service_healthy
+
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8000/api/health').status==200 else 1)"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+    mem_limit: 512m
+
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # ── IA ────────────────────────────────────────────────────────────────
+  ai:
+    image: ollama/ollama:latest
+    container_name: sg-ai
+    restart: unless-stopped
+
+    expose:
+      - "11434"
+
+    environment:
+      OLLAMA_NUM_PARALLEL: "1"
+      OLLAMA_MAX_LOADED_MODELS: "1"
+      OLLAMA_KEEP_ALIVE: "10m"
+
+    volumes:
+      - sg-ai-models:/root/.ollama
+
+    networks:
+      - ai
+
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 20s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+    mem_limit: 4g
+
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # ── SEGURIDAD ─────────────────────────────────────────────────────────
+  # Perfil `security`: se enciende en F8, cuando haya logs que ingerir.
+  # No arranca con `docker compose up` a propósito (consume ~3 GB).
+  security:
+    profiles: ["security"]
+    image: wazuh/wazuh-manager:4.9.0
+    container_name: sg-security
+    restart: unless-stopped
+
+    networks:
+      - mgmt
+
+    volumes:
+      - wazuh-data:/var/ossec/data
+      - ./wazuh:/etc/wazuh-local:ro
+
+    mem_limit: 3g
+
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+# ── Redes ───────────────────────────────────────────────────────────────
+#   dmz  : entrada pública (frontend).
+#   app  : frontend ↔ backend.
+#   data : backend → Supabase Cloud por TLS 443 (única con salida a Internet
+#          además de dmz).
+#   ai   : backend → Ollama. `internal` = sin salida a Internet: el modelo se
+#          descarga en el build del entorno, no en runtime.
+#   mgmt : envío de logs al SIEM. `internal` también.
+
 networks:
-  # Zona pública. El backend se conectará aquí (proxy /api/) y a la red app.
   dmz:
     name: costamarindo-dmz
+
+  app:
+    name: costamarindo-app
+    internal: true
+
+  data:
+    name: costamarindo-data
+
+  ai:
+    name: costamarindo-ai
+    internal: true
+
+  mgmt:
+    name: costamarindo-mgmt
+    internal: true
+
+volumes:
+  sg-ai-models:
+    name: costamarindo-ai-models
+  wazuh-data:
+    name: costamarindo-wazuh-data
