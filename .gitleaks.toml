@@ -1,0 +1,28 @@
+# Gitleaks — control ISO/IEC 27001:2022 A.8.25 (SDLC seguro)
+#
+# Se extiende la configuración por defecto (más de 150 reglas: AWS, GCP, Stripe,
+# JWT, claves privadas, tokens de GitHub/Supabase/Figma…) y solo se añade una
+# allowlist con justificación por entrada. Nunca se desactiva una regla global.
+title = "CosTamarindo 2D"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Identificadores públicos y artefactos de evidencia, no secretos"
+
+# Informes de escaneo: contienen los propios hallazgos y no deben re-escanearse.
+paths = [
+  '''evidencias/A\.8\.25/.*\.json''',
+]
+
+# fileKey del archivo de diseño en Figma.
+#   qI8jr7abLu6tIpL0MnL8Ol
+# No es una credencial: es el identificador del documento, público por diseño.
+# El acceso al archivo lo controla Figma por permisos de equipo, no por esta
+# cadena; además la URL pública ya está documentada en docs/fases/F1.md.
+# Se allowlistea el valor exacto, no el patrón, para que un token real de Figma
+# (figd_...) siga siendo detectado.
+regexes = [
+  '''qI8jr7abLu6tIpL0MnL8Ol''',
+]

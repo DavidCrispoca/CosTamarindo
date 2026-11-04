@@ -10,6 +10,8 @@
 *.sql     text
 *.py      text
 *.sh      text eol=lf
+# Los hooks de Git se ejecutan con sh: CRLF rompe el shebang.
+tools/git-hooks/pre-commit text eol=lf
 
 # YAML de Unity: texto + merge driver oficial (UnityYAMLMerge)
 *.unity      text merge=unityyamlmerge eol=lf

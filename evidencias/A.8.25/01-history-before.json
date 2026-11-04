@@ -1,0 +1,23 @@
+[
+ {
+  "RuleID": "generic-api-key",
+  "Description": "Detected a Generic API Key, potentially exposing access to various services and sensitive operations.",
+  "StartLine": 112,
+  "EndLine": 112,
+  "StartColumn": 19,
+  "EndColumn": 51,
+  "Match": "fileKey: \"REDACTED\"",
+  "Secret": "REDACTED",
+  "File": "docs/fases/F1.md",
+  "SymlinkFile": "",
+  "Commit": "9993cbc77a5cc5668fe1a8d552e82126c4d321f6",
+  "Link": "https://github.com/DavidCrispoca/CosTamarindo/blob/9993cbc77a5cc5668fe1a8d552e82126c4d321f6/docs/fases/F1.md?plain=1#L112",
+  "Entropy": 4.061482,
+  "Author": "Santiago Crispoca",
+  "Email": "est.david.crispoca@unimilitar.edu.co",
+  "Date": "2026-10-28T03:39:48Z",
+  "Message": "docs(fases): documenta el cierre de F0 y el estado de F1\n\nAgrega la bitacora por fase solicitada por el equipo: F0 cerrada con verificaciones y aprendizajes (renombrado bloqueado por mcp-for-unity, import de TMP por API), y F1 en curso con inventario de Figma, bloqueo de cuota del plan Starter y salidas evaluadas.\\n\\nIncluye las tipografias Lilita One y Patrick Hand (SIL OFL 1.1) descargadas de Google Fonts, que no dependen de la cuota de Figma.",
+  "Tags": [],
+  "Fingerprint": "9993cbc77a5cc5668fe1a8d552e82126c4d321f6:docs/fases/F1.md:generic-api-key:112"
+ }
+]

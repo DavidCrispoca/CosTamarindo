@@ -1,0 +1,34 @@
+#!/bin/sh
+# Gitleaks pre-commit hook - control ISO/IEC 27001:2022 A.8.25
+#
+# Bloquea el commit si el indice de Git contiene algo que parezca un secreto.
+# Instalacion (una vez por clon):  powershell -File tools/git-hooks/install.ps1
+#
+# Los mensajes van en ASCII a proposito: git para Windows ejecuta el hook con
+# sh (MSYS) y los acentos salen corruptos en la consola de cmd/PowerShell.
+#
+# Busca gitleaks en PATH o en GITLEAKS_BIN. install.ps1 hornea la ruta absoluta
+# al instalar, porque el sh de MSYS no hereda el PATH de Windows.
+
+GITLEAKS="${GITLEAKS_BIN:-gitleaks}"
+
+if [ ! -x "$GITLEAKS" ] && ! command -v "$GITLEAKS" >/dev/null 2>&1; then
+  echo "[pre-commit] gitleaks no encontrado; se omite el escaneo." >&2
+  echo "[pre-commit] Instalar con: winget install Gitleaks.Gitleaks" >&2
+  echo "[pre-commit] Luego: powershell -File tools/git-hooks/install.ps1" >&2
+  exit 0
+fi
+
+echo "[pre-commit] gitleaks: escaneando cambios preparados..."
+
+if ! "$GITLEAKS" git --staged --redact --no-banner --exit-code 1; then
+  echo "" >&2
+  echo "[pre-commit] COMMIT BLOQUEADO: gitleaks detecto un posible secreto." >&2
+  echo "[pre-commit] Revisar el hallazgo. Si es un falso positivo justificado," >&2
+  echo "[pre-commit] agregarlo a .gitleaks.toml con su razon documentada." >&2
+  echo "[pre-commit] Nunca usar 'git commit --no-verify' para saltarlo." >&2
+  exit 1
+fi
+
+echo "[pre-commit] gitleaks: sin hallazgos."
+exit 0
