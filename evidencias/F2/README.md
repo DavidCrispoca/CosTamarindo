@@ -125,6 +125,7 @@ PlayMode: total=15  passed=15  failed=0  skipped=0
 
 ## 6. Pendiente de F2
 
-- [ ] Playtest real de 10–15 min para ajustar `spawnInterval` y `fallSpeed`.
-- [ ] Sustituir el relleno procedural de 4 ítems cuando llegue el token de Figma (F1).
-- [ ] Hacer obligatorio el acceso: mover `Login` a build index 0 cuando F4/F5 estén listos.
+- [ ] Playtest real de 10–15 min para ajustar `spawnInterval` y `fallSpeed` (`FE-11`).
+- [ ] Reparar e integrar el arte de ítems (`FE-01`, `FE-02`): los 4 sprites originales fueron
+      borrados y la escena quedó con referencias rotas (ver `docs/fases/F1.md` §5).
+- [ ] Hacer obligatorio el acceso: mover `Login` a build index 0 cuando F4/F5 estén listos (`FE-10`).

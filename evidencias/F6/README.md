@@ -109,7 +109,8 @@ Verificado: el modelo (`qwen2.5:3b`, 1,9 GB) queda en el volumen `costamarindo-a
 
 ## 6. Pendiente para cerrar F6
 
-- [ ] `backend/Dockerfile` (F5) para activar el perfil `backend` y validar el proxy `/api/`.
-- [ ] `docker-compose.override.yml` dev/prod (en prod, solo `443`; sin `8081`).
-- [ ] `nmap` desde el host y desde otro contenedor (F8) para la evidencia formal de A.8.20.
-- [ ] Wazuh con reglas 100100/100101 (F8) para activar el perfil `security`.
+- [ ] `backend/Dockerfile` (F5) para activar el perfil `backend` y validar el proxy `/api/` (`BE-08`).
+- [ ] `docker-compose.override.yml` dev/prod (en prod, solo `443`; sin `8081`) (`BE-11`).
+- [ ] `nmap` desde el host y desde otro contenedor (F8) para la evidencia formal de A.8.20 (`SEC-06`).
+- [ ] Wazuh con reglas 100100/100101 (F8) para activar el perfil `security` (`SEC-08`).
+- [ ] Revisar la conexión de `frontend` a `mgmt`: hoy no hay ningún servicio que reciba esos logs.
