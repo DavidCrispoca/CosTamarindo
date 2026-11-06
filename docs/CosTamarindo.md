@@ -10,7 +10,7 @@ Universidad Militar Nueva Granada · Seguridad Informática · Versión 1.1 (pro
 
 | Campo | Detalle |
 | :---- | :---- |
-| Nombre | CyberCatcher 2D: ISO 27001 Security Audit |
+| Nombre | CosTamarindo 2D: ISO 27001 Security Audit |
 | Motor | Unity 6, compilación WebGL |
 | Género | Catcher 2D: el personaje recoge objetos que caen antes de tocar el suelo |
 | Mecánica de IA | Diálogos dinámicos con un NPC mediante un LLM local (Ollama) |
@@ -257,8 +257,14 @@ navegador solo habla con **un origen**, se reduce la superficie CORS y el backen
 | Escenas | `Boot` → `Login` → `Menu` → `Game` → `Dialogue` → `Leaderboard` |
 | Duración | 5 a 10 minutos (3 niveles cortos o una partida con dificultad creciente) |
 | Diálogo IA | Un NPC "auditor" hace preguntas y comentarios de ciberseguridad. Cosmético, sin efecto en el puntaje |
-| Leaderboard | Top 10 global con nombre de usuario y puntaje |
+| Leaderboard | Top 5 global con nombre de usuario y puntaje, más la posición propia (el diseño de Figma manda; la especificación original decía top 10) |
 | Scripts C\# clave | `GameManager`, `PlayerController`, `Spawner`, `ApiClient`, `ScoreSigner`, `DialogueClient`, `ConfigLoader` |
+
+> **Nota de alineación (2026-11-06).** Esta sección es la especificación original. La
+> implementación real usa escenas `Game` y `Login` (más `SampleScene`, sobrante), y los ítems son
+> comida y fauna de playa (cocada, tamarindo, pescado, frutas, erizo, medusa, basura) en lugar de
+> «parches de seguridad» y «malware». El cambio de tema lo fijó el diseño de Figma (decisión D7) y
+> no altera el objeto de auditoría. El estado real vive en [`Plan.md`](../Plan.md).
 
 ---
 
@@ -523,7 +529,7 @@ import httpx
 app = FastAPI(docs_url=None, redoc_url=None)  # sin docs públicas en producción
 
 # Logs JSON hacia archivo que lee el agente de Wazuh
-log = logging.getLogger("cybercatcher")
+log = logging.getLogger("costamarindo")
 def audit(event: str, **kw):
     log.info(json.dumps({"ts": time.time(), "event": event, **kw}))
 
@@ -694,16 +700,16 @@ Agente en `Sg-Frontend` (`ossec.conf`):
 Reglas en el manager (`/var/ossec/etc/rules/local_rules.xml`):
 
 ```xml
-<group name="cybercatcher,">
+<group name="costamarindo,">
   <rule id="100100" level="5">
     <decoded_as>json</decoded_as>
     <field name="event">score_rejected</field>
-    <description>CyberCatcher: puntaje rechazado</description>
+    <description>CosTamarindo: puntaje rechazado</description>
   </rule>
   <rule id="100101" level="10" frequency="5" timeframe="120">
     <if_matched_sid>100100</if_matched_sid>
     <same_field>ip</same_field>
-    <description>CyberCatcher: múltiples puntajes rechazados desde la misma IP (posible manipulación)</description>
+    <description>CosTamarindo: múltiples puntajes rechazados desde la misma IP (posible manipulación)</description>
   </rule>
 </group>
 ```
