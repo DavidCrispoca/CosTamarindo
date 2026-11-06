@@ -1,0 +1,16 @@
+# Override de DESARROLLO.
+#
+# Compose lo aplica solo cuando se ejecuta `docker compose up` desde infra/.
+# En produccion se usa unicamente docker-compose.yml: publica nada mas que 443.
+#
+# Lo usan los scripts up.ps1 / up.sh, que pasan ambos archivos de forma explicita.
+
+services:
+  frontend:
+    ports:
+      - "8081:8080"   # HTTP plano para depurar; el 8080 del host es de Unity MCP
+
+  backend:
+    environment:
+      ENV: dev
+      LOG_LEVEL: DEBUG

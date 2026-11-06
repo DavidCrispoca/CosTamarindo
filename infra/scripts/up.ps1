@@ -1,14 +1,16 @@
 # Levanta el entorno de 5 nodos (F6) en Windows.
 #
-#   powershell -File infra/scripts/up.ps1              -> juego + IA
+#   powershell -File infra/scripts/up.ps1              -> juego + IA (dev)
 #   powershell -File infra/scripts/up.ps1 security     -> + Wazuh
 #   powershell -File infra/scripts/up.ps1 backend      -> + API
+#   powershell -File infra/scripts/up.ps1 -Prod        -> sin override de dev
 #
 # Equivalente a up.sh. Resuelve docker.exe aunque no esté en el PATH del
 # proceso actual, que es lo que pasa cuando Docker se instaló con el shell
 # ya abierto (el PATH nuevo no se hereda).
 
 param(
+    [switch] $Prod,
     [Parameter(ValueFromRemainingArguments = $true)]
     [string[]] $Profiles
 )
@@ -28,8 +30,12 @@ function Resolve-Docker {
 $docker = Resolve-Docker
 $infraDir = Split-Path -Parent $PSScriptRoot
 $composePath = Join-Path $infraDir 'docker-compose.yml'
+$overridePath = Join-Path $infraDir 'docker-compose.override.yml'
 
 $arguments = @('compose', '-f', $composePath)
+if (-not $Prod -and (Test-Path $overridePath)) {
+    $arguments += @('-f', $overridePath)
+}
 
 if ($Profiles) {
     foreach ($profile in $Profiles) {
@@ -48,3 +54,6 @@ Write-Host ''
 
 Write-Host ''
 Write-Host 'Juego: https://juego.local   (requiere "127.0.0.1 juego.local" en hosts)' -ForegroundColor Green
+if ($Profiles -contains 'backend') {
+    Write-Host 'API:   https://juego.local/api/health' -ForegroundColor Green
+}

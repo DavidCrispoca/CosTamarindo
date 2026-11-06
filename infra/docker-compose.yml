@@ -23,7 +23,7 @@ services:
 
     ports:
       - "443:443"     # HTTPS del juego (juego.local)
-      - "8081:8080"   # HTTP plano: el 8080 del host lo ocupa Unity MCP
+      # El 8081 (HTTP plano) solo existe en dev: vive en docker-compose.override.yml
 
     volumes:
       - ../builds/webgl:/usr/share/nginx/html:ro
@@ -83,8 +83,10 @@ services:
       test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8000/api/health').status==200 else 1)"]
       interval: 15s
       timeout: 5s
-      retries: 5
-      start_period: 20s
+      retries: 10
+      # El pooler de Supabase puede tardar en aceptar las primeras conexiones
+      # desde un contenedor recien creado (DNS interno de Docker).
+      start_period: 45s
 
     mem_limit: 512m
 
