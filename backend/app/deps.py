@@ -7,7 +7,7 @@ from dataclasses import dataclass
 
 from fastapi import Depends, Request
 
-from .config import Settings, get_settings
+from .config import Settings
 from .errors import InvalidToken
 from .logging_setup import user_id_var
 from .providers.supabase_auth import SupabaseAuth
@@ -23,6 +23,15 @@ class CurrentUser:
     username: str
 
 
+def get_request_settings(request: Request) -> Settings:
+    """Settings de la instancia que atiende la peticion.
+
+    No usa el singleton global: en pruebas se construye la app con settings
+    explicitos y sin .env, y el singleton intentaria leer el archivo.
+    """
+    return request.app.state.settings
+
+
 def get_repository(request: Request) -> Repository:
     return request.app.state.repository
 
@@ -34,14 +43,14 @@ def get_auth_provider(request: Request) -> SupabaseAuth:
 def get_auth_service(
     repo: Repository = Depends(get_repository),
     provider: SupabaseAuth = Depends(get_auth_provider),
-    settings: Settings = Depends(get_settings),
+    settings: Settings = Depends(get_request_settings),
 ) -> AuthService:
     return AuthService(repo, provider, settings)
 
 
 def get_score_service(
     repo: Repository = Depends(get_repository),
-    settings: Settings = Depends(get_settings),
+    settings: Settings = Depends(get_request_settings),
 ) -> ScoreService:
     return ScoreService(repo, settings)
 
@@ -66,7 +75,7 @@ def _decode(token: str, settings: Settings) -> CurrentUser:
 
 
 def current_user(
-    request: Request, settings: Settings = Depends(get_settings)
+    request: Request, settings: Settings = Depends(get_request_settings)
 ) -> CurrentUser:
     token = _extract_bearer(request)
     if token is None:
@@ -75,7 +84,7 @@ def current_user(
 
 
 def optional_user(
-    request: Request, settings: Settings = Depends(get_settings)
+    request: Request, settings: Settings = Depends(get_request_settings)
 ) -> CurrentUser | None:
     token = _extract_bearer(request)
     if token is None:

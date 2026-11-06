@@ -35,6 +35,7 @@ def create_app(
 
     @asynccontextmanager
     async def lifespan(app: FastAPI) -> AsyncIterator[None]:
+        app.state.settings = settings
         database: Database | None = None
         if repository is None:
             database = Database(settings)
@@ -81,6 +82,7 @@ def create_app(
         redoc_url=None,
         openapi_url=None if settings.is_prod else "/api/openapi.json",
     )
+    app.state.settings = settings
 
     app.add_middleware(
         CORSMiddleware,

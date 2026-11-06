@@ -3,8 +3,8 @@ from __future__ import annotations
 from fastapi import APIRouter, Depends, Response, status
 from sqlalchemy.exc import SQLAlchemyError
 
-from ..config import Settings, get_settings
-from ..deps import get_repository
+from ..config import Settings
+from ..deps import get_repository, get_request_settings
 from ..logging_setup import audit
 from ..models import HealthResponse
 from ..repositories import Repository
@@ -16,7 +16,7 @@ router = APIRouter(prefix="/api", tags=["health"])
 async def health(
     response: Response,
     repo: Repository = Depends(get_repository),
-    settings: Settings = Depends(get_settings),
+    settings: Settings = Depends(get_request_settings),
 ) -> HealthResponse:
     database_ok = True
     try:
