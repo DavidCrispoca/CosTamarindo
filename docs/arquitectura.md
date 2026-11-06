@@ -1,9 +1,11 @@
 # Arquitectura de infraestructura — CosTamarindo 2D
 
-> **Estado:** diseño cerrado · `Sg-Frontend` implementado y healthy (F6 en curso; faltan
-> `backend`, `ai` y `security`)
+> **Estado (2026-11-06):** los cinco nodos están **declarados y validados** en Compose.
+> `Sg-Frontend` y `Sg-AI` corren *healthy*; `Sg-Backend` espera a `backend/` (F5) y
+> `Sg-Security` se enciende en F8. `Sg-DB` es Supabase Cloud (excepción D3).
 > **Alcance:** cómo se levanta, se opera y se comparte el entorno de 5 nodos.
-> **Decisiones de referencia:** `Plan.md` §3 (D1–D8).
+> **Decisiones de referencia:** `Plan.md` §11.5 (D1–D8).
+> **Avance por división y backlog:** `Plan.md` §4–§8.
 
 ---
 
@@ -39,6 +41,16 @@ la IA y con la base de datos.
 ```
 
 Regla de oro: **el jugador solo ve `Sg-Frontend`**. Todo lo demás es inalcanzable desde fuera.
+
+Cada nodo tiene una **división dueña** con su propio backlog en `Plan.md`:
+
+| Nodo | División | Sección del plan |
+| :--- | :--- | :--- |
+| `Sg-Frontend` | Frontend | `Plan.md` §4 |
+| `Sg-Backend` | Backend | `Plan.md` §5 |
+| `Sg-DB` | DB | `Plan.md` §6 |
+| `Sg-Security` | Security | `Plan.md` §7 |
+| `Sg-AI` | IA | `Plan.md` §8 |
 
 ---
 
@@ -126,9 +138,14 @@ frontend:
 ```
 
 Puertos: en `dev` se publica `443:443` y `8081:8080`; en `prod`, **solo** `443:443`. La
-separación dev/prod con `docker-compose.override.yml` llega en F6b; hoy hay un único
-`infra/docker-compose.yml`, que declara solo la red `dmz` (las redes `app`/`mgmt` y
-`mem_limit` entran con el backend).
+separación dev/prod con `docker-compose.override.yml` todavía no existe (`Plan.md` → `BE-11`).
+El `docker-compose.yml` actual declara los **cinco servicios** (`frontend`, `backend`, `ai`,
+`security` y las cinco redes con `mem_limit` y healthcheck); `backend` y `security` viven detrás
+de perfiles porque dependen de F5 y F8.
+
+> Desajuste conocido: el servicio `frontend` está conectado a `app` y `mgmt`, pero `mgmt` es
+> `internal: true` y hoy no hay ningún servicio que reciba los logs. Hasta que exista `security`,
+> esa conexión no aporta nada y sí amplía la superficie del nodo público.
 
 ### 5.2 `backend`
 
@@ -194,11 +211,13 @@ TLS se hace por la red `data`.
 
 ### 6.1 Qué hace cada quien
 
-| Rol | Toca | No toca |
+| División | Toca | No toca |
 | :--- | :--- | :--- |
-| **Frontend / arte** | `unity/`, `assets/`, `builds/` (generado) | `backend/`, `infra/nginx/` |
-| **Backend** | `backend/`, `backend/sql/` | `unity/`, `infra/nginx/` |
-| **Infra / seguridad** | `infra/`, `docs/`, `evidencias/` | lógica de juego y de negocio |
+| **Frontend** | `unity/`, `assets/figma/`, `builds/` (generado), `infra/nginx/` | `backend/`, `backend/sql/`, `infra/wazuh/` |
+| **Backend** | `backend/app/`, `backend/tests/`, `backend/Dockerfile`, `docs/api.md` | `unity/`, `backend/sql/`, `infra/nginx/` |
+| **DB** | `backend/sql/`, esquema y políticas en Supabase DEV | lógica de juego y de negocio |
+| **Security** | `evidencias/`, `docs/soa.md`, `infra/wazuh/`, Gitleaks, TLS, CI | lógica de juego y de negocio |
+| **IA** | prompt y guardrails en `backend/app/ai/`, `infra/scripts/pull-model.sh` | `unity/`, esquema de datos |
 | **Todos** | leer `docs/arquitectura.md`, correr `compose up` | commitear `.env`, certs, `builds/` |
 
 ### 6.2 Ciclo diario (dev)
