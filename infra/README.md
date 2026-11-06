@@ -1,10 +1,12 @@
 # infra/ — tarjeta de operación
 
 Diseño completo de nodos, redes y responsabilidades: [`../docs/arquitectura.md`](../docs/arquitectura.md).
+Backlog por división y criterios de terminado: [`../Plan.md`](../Plan.md).
 
-> **Estado (2026-11-03):** compose de 5 nodos declarado y validado.
+> **Estado (2026-11-06):** los cinco nodos están declarados y validados en Compose.
 > `Sg-Frontend` y `Sg-AI` arrancan por defecto; `Sg-Backend` y `Sg-Security` viven en
-> perfiles porque dependen de `backend/` (F5) y de que haya logs (F8).
+> perfiles porque dependen de `backend/` (F5) y de que haya logs (F8). `Sg-DB` es Supabase
+> Cloud, no un contenedor.
 >
 > Sin `backend/` todavía, `/api/` devuelve 502 a propósito: Nginx arranca igual.
 
@@ -33,16 +35,15 @@ docker compose down          # conserva volúmenes
 docker compose down -v       # borra volúmenes
 ```
 
-## Nodos y perfiles
+## Nodos, perfiles y dueño
 
-| Nodo | Perfil | Puerto | Por qué |
-| :--- | :--- | :--- | :--- |
-| `frontend` (Sg-Frontend) | *(siempre)* | **443**, 8081 | Nginx con el build WebGL y TLS |
-| `ai` (Sg-AI) | *(siempre)* | 11434 **interno** | Ollama; el modelo va al volumen `costamarindo-ai-models` |
-| `backend` (Sg-Backend) | `backend` | 8000 **interno** | Necesita `backend/Dockerfile` (F5) |
-| `security` (Sg-Security) | `security` | interno | Wazuh consume ~3 GB; se enciende en F8 |
-
-`Sg-DB` no es un contenedor: es Supabase Cloud (decisión D3).
+| Nodo | División | Perfil | Puerto | Por qué |
+| :--- | :--- | :--- | :--- | :--- |
+| `frontend` (Sg-Frontend) | Frontend | *(siempre)* | **443**, 8081 | Nginx con el build WebGL y TLS |
+| `ai` (Sg-AI) | IA | *(siempre)* | 11434 **interno** | Ollama; el modelo va al volumen `costamarindo-ai-models` |
+| `backend` (Sg-Backend) | Backend | `backend` | 8000 **interno** | Necesita `backend/Dockerfile` (F5) |
+| `security` (Sg-Security) | Security | `security` | interno | Wazuh consume ~3 GB; se enciende en F8 |
+| — (Sg-DB) | DB | — | 443 salida | Supabase Cloud (decisión D3) |
 
 ## Redes
 
@@ -53,6 +54,18 @@ docker compose down -v       # borra volúmenes
 | `costamarindo-data` | no | backend | backend → Supabase (TLS 443) |
 | `costamarindo-ai` | **sí** | backend, ai | backend → Ollama |
 | `costamarindo-mgmt` | **sí** | frontend, backend, security | logs al SIEM |
+
+## Scripts disponibles
+
+| Script | Función |
+| :--- | :--- |
+| `up.ps1` / `up.sh` | Levanta el entorno con los perfiles pedidos |
+| `down.sh` | Apaga; `--purge` borra volúmenes (no hay `down.ps1`) |
+| `logs.sh` | Logs de un nodo en vivo |
+| `deploy.sh` | Build → TLS → up → salud → aislamiento |
+| `pull-model.sh` | Descarga el modelo con salida temporal a Internet |
+| `tls.ps1` | Certificado de `juego.local` con mkcert |
+| `build_webgl.ps1` / `.sh` | Build Release + regeneración de CSP |
 
 ## Modelo del NPC
 
