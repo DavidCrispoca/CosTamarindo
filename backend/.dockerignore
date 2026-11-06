@@ -1,0 +1,11 @@
+# El contexto de build es backend/; esto evita mandar al daemon lo que no se usa.
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+tests/
+scripts/
+sql/
+requirements-dev.txt
+pytest.ini
+*.md
