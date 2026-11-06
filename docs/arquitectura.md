@@ -1,8 +1,8 @@
 # Arquitectura de infraestructura — CosTamarindo 2D
 
 > **Estado (2026-11-06):** los cinco nodos están **declarados y validados** en Compose.
-> `Sg-Frontend` y `Sg-AI` corren *healthy*; `Sg-Backend` espera a `backend/` (F5) y
-> `Sg-Security` se enciende en F8. `Sg-DB` es Supabase Cloud (excepción D3).
+> `Sg-Frontend`, `Sg-AI` y `Sg-Backend` corren *healthy*; `Sg-Security` se enciende en F8.
+> `Sg-DB` es Supabase Cloud (excepción D3) y ya tiene esquema, RLS y backups.
 > **Alcance:** cómo se levanta, se opera y se comparte el entorno de 5 nodos.
 > **Decisiones de referencia:** `Plan.md` §11.5 (D1–D8).
 > **Avance por división y backlog:** `Plan.md` §4–§8.
@@ -59,7 +59,7 @@ Cada nodo tiene una **división dueña** con su propio backlog en `Plan.md`:
 | Nodo | Tecnología | Qué hace | Redes | Puerto | Persistencia | Límite RAM | Control ISO |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
 | **Sg-Frontend** | `nginx:1.27-alpine` | Sirve el build WebGL, termina TLS, aplica CSP/HSTS, rate limit y proxy `/api/` | `dmz`, `app` | **443** (público), 8080 (solo dev local) | build montado `../builds/webgl` (ro), certs (ro), logs | 128 MB | A.8.19, A.8.20, A.8.24 |
-| **Sg-Backend** | Python 3.12 + FastAPI/Uvicorn (imagen propia, multi-stage, usuario `app`) | Valida JWT, firma HMAC, nonce, TTL y plausibilidad; único que escribe en la BD (`service_role`); único que llama a la IA | `app`, `data`, `ai` | 8000 (**solo interno**) | ninguna: estado en Postgres | 512 MB | A.8.24, A.8.28, A.8.5, A.8.15 |
+| **Sg-Backend** | Python 3.12 + FastAPI/Uvicorn (imagen propia, multi-stage, usuario `app`) | Valida JWT, firma HMAC, nonce, TTL y plausibilidad; único que escribe en la BD (`service_role`); único que llama a la IA | `app`, `data`, `ai`, `mgmt` | 8000 (**solo interno**) | ninguna: estado en Postgres | 512 MB | A.8.24, A.8.28, A.8.5, A.8.15 |
 | **Sg-AI** | `ollama/ollama` | NPC: diálogos en español con `qwen2.5:3b` | `ai` (**`internal: true`**) | 11434 (**solo interno**) | volumen `sg-ai-models` (~2,5 GB) | 4 GB | A.8.20, A.8.28 |
 | **Sg-Security** | Wazuh 4.x (+ SonarQube bajo demanda) | SIEM: recibe logs, reglas 100100/100101, FIM del webroot | `mgmt` (**`internal: true`**) | 5601 (dashboard, opcional por túnel) | volúmenes `wazuh-*` | 3 GB | A.8.15, A.8.25 |
 | **Sg-DB** | **Supabase Cloud** (Postgres 15 + GoTrue) | Identidad, leaderboard, `game_sessions` | — (salida 443 desde `data`) | 443 salida | gestionada por Supabase + `pg_dump` diario | — | A.8.5, A.8.28, A.8.13 |

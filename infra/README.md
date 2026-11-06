@@ -4,11 +4,10 @@ Diseño completo de nodos, redes y responsabilidades: [`../docs/arquitectura.md`
 Backlog por división y criterios de terminado: [`../Plan.md`](../Plan.md).
 
 > **Estado (2026-11-06):** los cinco nodos están declarados y validados en Compose.
-> `Sg-Frontend` y `Sg-AI` arrancan por defecto; `Sg-Backend` y `Sg-Security` viven en
-> perfiles porque dependen de `backend/` (F5) y de que haya logs (F8). `Sg-DB` es Supabase
-> Cloud, no un contenedor.
+> `Sg-Frontend`, `Sg-AI` y `Sg-Backend` corren *healthy*; `Sg-Security` vive en un perfil
+> porque depende de F8. `Sg-DB` es Supabase Cloud, no un contenedor.
 >
-> Sin `backend/` todavía, `/api/` devuelve 502 a propósito: Nginx arranca igual.
+> La API ya responde en `https://juego.local/api/` (`/api/health` en 200).
 
 ## Arranque
 
@@ -41,7 +40,7 @@ docker compose down -v       # borra volúmenes
 | :--- | :--- | :--- | :--- | :--- |
 | `frontend` (Sg-Frontend) | Frontend | *(siempre)* | **443**, 8081 | Nginx con el build WebGL y TLS |
 | `ai` (Sg-AI) | IA | *(siempre)* | 11434 **interno** | Ollama; el modelo va al volumen `costamarindo-ai-models` |
-| `backend` (Sg-Backend) | Backend | `backend` | 8000 **interno** | Necesita `backend/Dockerfile` (F5) |
+| `backend` (Sg-Backend) | Backend | `backend` | 8000 **interno** | `backend/Dockerfile`; imagen multi-stage |
 | `security` (Sg-Security) | Security | `security` | interno | Wazuh consume ~3 GB; se enciende en F8 |
 | — (Sg-DB) | DB | — | 443 salida | Supabase Cloud (decisión D3) |
 
@@ -59,13 +58,25 @@ docker compose down -v       # borra volúmenes
 
 | Script | Función |
 | :--- | :--- |
-| `up.ps1` / `up.sh` | Levanta el entorno con los perfiles pedidos |
+| `up.ps1` / `up.sh` | Levanta el entorno con los perfiles pedidos (`-Prod` omite el override) |
 | `down.sh` | Apaga; `--purge` borra volúmenes (no hay `down.ps1`) |
 | `logs.sh` | Logs de un nodo en vivo |
 | `deploy.sh` | Build → TLS → up → salud → aislamiento |
 | `pull-model.sh` | Descarga el modelo con salida temporal a Internet |
 | `tls.ps1` | Certificado de `juego.local` con mkcert |
 | `build_webgl.ps1` / `.sh` | Build Release + regeneración de CSP |
+| `backup.ps1` / `backup.sh` | `pg_dump` comprimido + SHA256 en `infra/backups/` |
+| `restore-test.ps1` | Restauración verificada en un Postgres efímero |
+| `keepalive.ps1` | Lectura real para que el plan Free no pause el proyecto |
+
+## Puertos
+
+| Puerto | Quién | Cuándo |
+| :--- | :--- | :--- |
+| `443` | Nginx | siempre |
+| `8081` | Nginx HTTP plano | solo en dev (`docker-compose.override.yml`) |
+| `8000` | Backend | **nunca publicado**: solo red `app` |
+| `11434` | Ollama | **nunca publicado**: solo red `ai` |
 
 ## Modelo del NPC
 
@@ -93,6 +104,7 @@ Una sola vez: el volumen conserva el modelo entre reinicios.
 | Pantalla de carga infinita | `Content-Encoding`/MIME de `Build/*.gz`; consola del navegador |
 | `NET::ERR_CERT_AUTHORITY_INVALID` | ejecutar `infra/scripts/tls.ps1` y reiniciar el navegador |
 | `juego.local` no resuelve | agregar `127.0.0.1 juego.local` a `hosts` |
-| `/api/` devuelve 502 | normal sin `backend`; con backend, ver `docker compose logs backend` |
+| `/api/` devuelve 502 | backend caído o sin perfil: `docker compose --profile backend up -d` y `docker compose logs backend` |
+| `/api/health` devuelve 503 | la base no responde: revisar `SUPABASE_DB_URL` (pooler 5432) y el estado del proyecto en Supabase |
 | 403/500 en el juego por CSP | regenerar `infra/nginx/snippets/csp.conf` y recargar Nginx |
 | `sg-ai` responde lento | `docker compose logs ai`; modelo descargado; RAM del contenedor |

@@ -20,8 +20,8 @@ backlog y criterio de terminado en [`Plan.md`](Plan.md) §4–§8.
 | División | Nodo | Estado real (2026-11-06) | Documento |
 | :--- | :--- | :--- | :--- |
 | **Frontend** | `Sg-Frontend` | 🚧 juego jugable offline; arte de ítems sin cablear; build de 16,2 MB desactualizado | [`Plan.md` §4](Plan.md) |
-| **Backend** | `Sg-Backend` | ⬜ no existe (`backend/` vacío) | [`Plan.md` §5](Plan.md) |
-| **DB** | `Sg-DB` | ⬜ no existe (sin proyecto Supabase DEV) | [`Plan.md` §6](Plan.md) |
+| **Backend** | `Sg-Backend` | ✅ API completa y desplegada (43/43 tests) | [`Plan.md` §5](Plan.md) |
+| **DB** | `Sg-DB` | ✅ Supabase DEV con RLS y backup probado | [`Plan.md` §6](Plan.md) |
 | **Security** | `Sg-Security` | 🚧 1 de 10 controles: A.8.25 (Gitleaks) | [`evidencias/A.8.25/`](evidencias/A.8.25/README.md) |
 | **IA** | `Sg-AI` | 🚧 nodo y modelo `qwen2.5:3b` operativos; sin endpoint ni guardrails | [`Plan.md` §8](Plan.md) |
 
@@ -31,17 +31,20 @@ backlog y criterio de terminado en [`Plan.md`](Plan.md) §4–§8.
   CSP por hash y HSTS.
 - **Bucle jugable completo offline**: menú → partida → 3 vidas → game over → reintento, con
   Libro de colección, feedback de captura y SFX sintetizado. **15/15** tests PlayMode verdes.
+- **API online completa** en `https://juego.local/api/`: registro y login con PIN, bloqueo
+  progresivo, sesión de partida, puntaje firmado con HMAC y leaderboard con posición propia.
+  **43/43** tests y cuatro ataques de puntaje rechazados con motivo.
+- **Base de datos Supabase DEV** con esquema versionado, RLS sin acceso de cliente y
+  restauración verificada.
 - **`Sg-AI`** está aislado en la red `ai` con el modelo `qwen2.5:3b` descargado.
 - **Gitleaks** implementado como control A.8.25, con hook de pre-commit probado.
 
 ### Qué falta para cumplir el objetivo
 
-1. **DB**: proyecto Supabase DEV, esquema versionado, RLS y backups.
-2. **Backend**: FastAPI con sesión, puntaje firmado, leaderboard y diálogo.
-3. **Frontend**: arte de ítems cableado, UI de Figma, clientes de red y login obligatorio.
-4. **IA**: prompt, guardrails y fallback del NPC.
-5. **Security**: los 9 controles restantes con ataque y evidencia.
-6. **Entrega**: build final, E2E, SoA, runbook y demo.
+1. **Frontend**: arte de ítems cableado, UI de Figma, clientes de red y login obligatorio.
+2. **IA**: prompt, guardrails y fallback del NPC.
+3. **Security**: los 9 controles restantes con ataque y evidencia.
+4. **Entrega**: build final, E2E de navegador, SoA, runbook y demo.
 
 > El detalle de cada pendiente, con su código (`FE-01`, `BE-03`, `DB-02`, `SEC-04`, `IA-02`…) y
 > su criterio de terminado, está en [`Plan.md`](Plan.md).
@@ -88,10 +91,10 @@ cp .env.example .env
 # 3. Compilar el juego y servirlo con Nginx en Docker
 powershell -File infra/scripts/build_webgl.ps1
 powershell -File infra/scripts/tls.ps1            # una vez: certificado de juego.local
-powershell -File infra/scripts/up.ps1             # frontend + IA
+powershell -File infra/scripts/up.ps1 backend     # frontend + IA + API
 
-# 4. Backend (F5, todavía no existe backend/)
-#    cd backend && uvicorn app.main:app --reload --port 8000
+# 4. Backend fuera de Docker (opcional, para iterar)
+#    cd backend && .venv\Scripts\python -m uvicorn app.main:app --reload --port 8000
 ```
 
 El juego queda en **`https://juego.local`** (una vez agregado `127.0.0.1 juego.local` al

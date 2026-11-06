@@ -66,7 +66,7 @@ terminado. Nada se da por hecho porque «funciona en el editor»: se verifica en
 | Escenas | `Game.unity` (índice 0), `Login.unity` (índice 1), `SampleScene` (índice 2, sobra) | `unity/ProjectSettings/EditorBuildSettings.asset` |
 | Gameplay offline | Completo: 3 vidas, 120 s, curva de dificultad, pausa, game over, Libro, feedback de captura, SFX sintetizado | `unity/Assets/Scripts/`, [`evidencias/F2/`](evidencias/F2/README.md) |
 | Tests PlayMode | **15/15** verdes (última corrida 2026-11-03; no re-ejecutados el 2026-11-06) | `unity/Assets/Tests/PlayMode/` |
-| Autenticación | **Stub local** (`AuthStub`), no Supabase. Bloqueo 5 fallos → 60 s, token en memoria | `unity/Assets/Scripts/Auth/AuthStub.cs` |
+| Autenticación | ✅ real en el backend: usuario + PIN contra Supabase Auth, bloqueo 5 fallos → 60 s persistido, JWT propio de 30 min. El cliente Unity todavía usa el stub (`FE-07`) | `backend/app/services/auth_service.py` |
 | Arte de personaje y fondo | Palenquera y `bg_playa.png` importados y en la escena | `unity/Assets/Art/Characters/`, `.../Backgrounds/` |
 | Arte de ítems | ⚠️ **Regresión real**: los 4 sprites originales se borraron y la escena quedó con 4 referencias rotas. Hay 60 PNG nuevos sin cablear | ver §3.2 |
 | UI de Figma | 0 componentes exportados; `unity/Assets/Art/UI/` está **vacío** | — |
@@ -74,8 +74,8 @@ terminado. Nada se da por hecho porque «funciona en el editor»: se verifica en
 | Nginx / Sg-Frontend | Operativo: 443 + 8081, TLS mkcert, CSP por hash, HSTS, proxy `/api/` | `infra/nginx/`, [`docs/fases/F3.md`](docs/fases/F3.md) |
 | Docker | Compose de 5 nodos declarado y validado. `sg-frontend` y `sg-ai` *healthy*; `backend` y `security` tras perfiles | `infra/docker-compose.yml`, [`evidencias/F6/`](evidencias/F6/README.md) |
 | Modelo de IA | `qwen2.5:3b` (1,9 GB) descargado en el volumen `costamarindo-ai-models`; `sg-ai` aislado en red `ai` | [`evidencias/F6/`](evidencias/F6/README.md) §4 |
-| Backend | **No existe**: `backend/` está vacío | — |
-| Base de datos | **No existe**: sin proyecto Supabase DEV, sin SQL versionado | — |
+| Backend | ✅ API completa en `backend/`, desplegada en `sg-backend` (healthy) y con 43/43 tests | [`evidencias/F5/`](evidencias/F5/README.md) |
+| Base de datos | ✅ Supabase DEV con esquema versionado, RLS cerrado, leaderboard y backup/restauración probados | [`evidencias/F4/`](evidencias/F4/README.md) |
 | Logs / SIEM | Sin Wazuh activo ni reglas; solo se declara en el compose | `infra/docker-compose.yml` |
 | Gitleaks (A.8.25) | ✅ Implementado, hook instalado y probado | [`evidencias/A.8.25/`](evidencias/A.8.25/README.md) |
 | Otros 9 controles ISO | ⬜ Sin implementar ni evidenciar | — |
@@ -181,10 +181,15 @@ documentación interactiva en producción.
 
 ### 5.1 Estado actual
 
-**No existe.** `backend/` está vacío. El compose ya lo declara en el perfil `backend` y Nginx ya
-proxifica `/api/` (hoy devuelve 502 a propósito).
+✅ **Implementado y desplegado.** `backend/` contiene la API completa con 43 pruebas
+herméticas, imagen multi-stage sin privilegios y healthcheck real. Corre como
+`sg-backend` (healthy) sin publicar el 8000. Evidencia en
+[`evidencias/F5/`](evidencias/F5/README.md) y contratos en [`docs/api.md`](docs/api.md).
 
 ### 5.2 Backlog
+
+**Estado 2026-11-06:** cerradas `BE-01`…`BE-05` y `BE-07`…`BE-11`. `BE-06` queda con el
+contrato y el respaldo implementados; la conexión con Ollama es `IA-02`…`IA-04`.
 
 | ID | Tarea | Depende de | DoD |
 | :--- | :--- | :--- | :--- |
@@ -219,11 +224,15 @@ escribe nunca (D1). `game_sessions` es invisible para `anon` y `authenticated`.
 
 ### 6.1 Estado actual
 
-**No existe.** Sin proyecto DEV, sin SQL versionado, sin backups. La plantilla de esquema está
-en [`docs/CosTamarindo.md`](docs/CosTamarindo.md) §8.2 y sirve como punto de partida, no como
-verdad final.
+✅ **Operativo en DEV.** Proyecto `CosTamarindo` (`us-east-1`, Postgres 17) con esquema
+versionado en `backend/sql/`, RLS sin acceso de cliente, leaderboard con posición propia y
+restauración verificada. Evidencia en [`evidencias/F4/`](evidencias/F4/README.md).
+Pendiente: proyecto PROD al desplegar.
 
 ### 6.2 Backlog
+
+**Estado 2026-11-06:** cerradas `DB-01`…`DB-07`. `DB-08` queda implementada en DEV
+(guard de entorno + claim `env`); el proyecto PROD se crea al desplegar.
 
 | ID | Tarea | Depende de | DoD |
 | :--- | :--- | :--- | :--- |
@@ -337,8 +346,8 @@ El modelo se descarga por procedimiento explícito, no en caliente.
 | **F1** | Pipeline Figma → Unity (arte y UI) | **Frontend** | — | 🚧 ~25 % real (§3.2) |
 | **F2** | Vertical slice jugable | **Frontend** | — | ✅ offline cerrado |
 | **F3** | Build WebGL + Nginx | **Frontend** | Security (TLS/CSP) | ✅ cerrada (build a regenerar) |
-| **F4** | Supabase: Auth, esquema y leaderboard | **DB** | Backend (rate limit), Frontend (AuthClient) | ⬜ pendiente |
-| **F5** | Backend FastAPI + puntaje firmado | **Backend** | DB (service_role), Frontend (clientes) | ⬜ pendiente |
+| **F4** | Supabase: Auth, esquema y leaderboard | **DB** | Backend (rate limit), Frontend (AuthClient) | ✅ cerrada en DEV |
+| **F5** | Backend FastAPI + puntaje firmado | **Backend** | DB (service_role), Frontend (clientes) | ✅ cerrada (diálogo IA pendiente) |
 | **F6** | Infraestructura Docker de 5 nodos | *Transversal*: un nodo por división | Security (aislamiento) | 🚧 2 de 4 contenedores arriba |
 | **F7** | NPC con Ollama | **IA** | Backend (endpoint), Frontend (bocadillo) | ⬜ pendiente |
 | **F8** | Controles ISO, ataques y evidencias | **Security** | Las cuatro restantes | 🚧 1 de 10 controles |
@@ -354,9 +363,9 @@ división: es la suma de los cinco nodos, y cada división cierra el suyo.
 | :--- | :--- | :--- | :--- |
 | `Sg-Frontend` | Frontend | ✅ healthy | Rebuild, `override` prod (BE-11) |
 | `Sg-AI` | IA | ✅ healthy | Endpoint y guardrails (IA-02…IA-06) |
-| `Sg-Backend` | Backend | 🚧 declarado, perfil `backend` | `Dockerfile` y API (BE-08) |
+| `Sg-Backend` | Backend | ✅ healthy | Nada: imagen, API y healthcheck en verde |
 | `Sg-Security` | Security | 🚧 declarado, perfil `security` | Reglas Wazuh y FIM (SEC-08) |
-| `Sg-DB` | DB | ⬜ no existe | Proyecto Supabase DEV (DB-01…DB-08) |
+| `Sg-DB` | DB | ✅ operativo | Proyecto PROD al desplegar (DB-08) |
 
 ---
 
@@ -445,6 +454,11 @@ primer commit.
 | — | SVG es la fuente; el PNG es derivado y se renderiza con `@resvg/resvg-js` |
 | — | Compilar y testear por batchmode; MCP solo para escena y APIs en vivo |
 | — | Gzip en Nginx, no Brotli (`nginx:alpine` no trae `ngx_brotli`) |
+| D9 | El PIN se deriva con `PIN_PEPPER` antes de llegar a GoTrue (GoTrue exige 6 caracteres y el PIN tiene 4) |
+| D10 | El backend emite su propio JWT de 30 min con claim `env`; el cliente nunca habla con Supabase Auth |
+| D11 | La API usa el pooler en **modo sesión** (5432): el modo transacción rompe las sentencias preparadas |
+| D12 | Se rechazan PIN secuenciales, repetidos y de la lista de los más usados (HIBP está desactivado a propósito) |
+| D13 | `anon` y `authenticated` no tienen acceso ni `USAGE` sobre `public`: el leaderboard solo sale por la API |
 
 ---
 

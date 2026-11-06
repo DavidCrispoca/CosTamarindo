@@ -11,15 +11,19 @@
 ```
 $ docker compose -f infra/docker-compose.yml ps
 sg-ai        Up (healthy)   11434/tcp
+sg-backend   Up (healthy)   8000/tcp
 sg-frontend  Up (healthy)   0.0.0.0:443->443/tcp, 0.0.0.0:8081->8080/tcp
 ```
 
 | Nodo | Estado | Perfil | Puerto publicado |
 | :--- | :--- | :--- | :--- |
-| `Sg-Frontend` | healthy | *(siempre)* | 443, 8081 |
+| `Sg-Frontend` | healthy | *(siempre)* | 443, 8081 (8081 solo en dev) |
 | `Sg-AI` | healthy | *(siempre)* | **ninguno** |
-| `Sg-Backend` | declarado | `backend` | ninguno (`expose` 8000) |
+| `Sg-Backend` | healthy | `backend` | ninguno (`expose` 8000) |
 | `Sg-Security` | declarado | `security` | ninguno |
+
+Actualizado 2026-11-06: el backend ya existe, arranca con `--profile backend` y responde
+`/api/health` a través de Nginx.
 
 `Sg-Backend` espera a `backend/Dockerfile` (F5) y `Sg-Security` consume ~3 GB, por eso están
 detrás de perfiles: `docker compose up` nunca intenta construir lo que no existe.
@@ -33,8 +37,9 @@ El objetivo de F6 es que **desde fuera solo se vea el juego**.
 | Comprobación | Comando | Resultado |
 | :--- | :--- | :--- |
 | Puerto de IA publicado | `docker port sg-ai 11434` | `no public port published` ✅ |
+| Puerto del backend publicado | `docker compose port sg-backend 8000` | sin salida ✅ |
 | Ollama desde el host | `Invoke-WebRequest http://127.0.0.1:11434` | no alcanzable ✅ |
-| Backend desde el host | `Invoke-WebRequest http://127.0.0.1:8000` | no alcanzable ✅ |
+| API por HTTPS | `curl https://juego.local/api/health` | `200` con `database: true` ✅ |
 | Redes de `sg-ai` | `docker inspect sg-ai` | solo `costamarindo-ai` ✅ |
 | Red `ai` | `docker-compose.yml` | `internal: true` ✅ |
 | Juego por HTTPS | `curl --ssl-no-revoke https://juego.local/healthz` | `200` en 0,08 s ✅ |
@@ -109,8 +114,8 @@ Verificado: el modelo (`qwen2.5:3b`, 1,9 GB) queda en el volumen `costamarindo-a
 
 ## 6. Pendiente para cerrar F6
 
-- [ ] `backend/Dockerfile` (F5) para activar el perfil `backend` y validar el proxy `/api/` (`BE-08`).
-- [ ] `docker-compose.override.yml` dev/prod (en prod, solo `443`; sin `8081`) (`BE-11`).
+- [x] `backend/Dockerfile` (F5) para activar el perfil `backend` y validar el proxy `/api/` (`BE-08`).
+- [x] `docker-compose.override.yml` dev/prod (en prod, solo `443`; sin `8081`) (`BE-11`).
 - [ ] `nmap` desde el host y desde otro contenedor (F8) para la evidencia formal de A.8.20 (`SEC-06`).
 - [ ] Wazuh con reglas 100100/100101 (F8) para activar el perfil `security` (`SEC-08`).
 - [ ] Revisar la conexión de `frontend` a `mgmt`: hoy no hay ningún servicio que reciba esos logs.
