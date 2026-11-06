@@ -10,6 +10,10 @@
 > **DB**, **Security** e **IA**. Cada tarea tiene un código (`FE-01`, `BE-01`, `DB-01`,
 > `SEC-01`, `IA-01`), un criterio de terminado y una division dueña. Si una tarea toca dos
 > divisiones, se parte en dos y cada una se cierra por separado.
+>
+> **Para empezar a trabajar en una división:** [`docs/handoff/`](docs/handoff/README.md).
+> Ahí está el arranque, las recetas de ataque, el punto exacto de integración de la IA y qué
+> no tocar.
 
 ---
 
@@ -348,14 +352,15 @@ El modelo se descarga por procedimiento explícito, no en caliente.
 | **F3** | Build WebGL + Nginx | **Frontend** | Security (TLS/CSP) | ✅ cerrada (build a regenerar) |
 | **F4** | Supabase: Auth, esquema y leaderboard | **DB** | Backend (rate limit), Frontend (AuthClient) | ✅ cerrada en DEV |
 | **F5** | Backend FastAPI + puntaje firmado | **Backend** | DB (service_role), Frontend (clientes) | ✅ cerrada (diálogo IA pendiente) |
-| **F6** | Infraestructura Docker de 5 nodos | *Transversal*: un nodo por división | Security (aislamiento) | 🚧 2 de 4 contenedores arriba |
+| **F6** | Infraestructura Docker de 5 nodos | *Transversal*: un nodo por división | Security (aislamiento) | 🚧 3 de 4 contenedores arriba |
 | **F7** | NPC con Ollama | **IA** | Backend (endpoint), Frontend (bocadillo) | ⬜ pendiente |
 | **F8** | Controles ISO, ataques y evidencias | **Security** | Las cuatro restantes | 🚧 1 de 10 controles |
 | **F9** | Despliegue final y entrega | *Transversal* | Las cinco | ⬜ pendiente |
 
-**Lectura de la matriz.** Las fases F1, F2 y F3 son **Frontend** y ya están casi cerradas. Lo que
-falta de verdad son F4 (DB), F5 (Backend), F7 (IA) y F8 (Security). F6 no es una fase de una sola
-división: es la suma de los cinco nodos, y cada división cierra el suyo.
+**Lectura de la matriz.** F1, F2 y F3 son **Frontend** y están casi cerradas. **F4 (DB) y
+F5 (Backend) ya están cerradas.** Lo que falta de verdad es F1/FE-07 del Frontend, F7 (IA) y
+F8 (Security). F6 no es una fase de una sola división: es la suma de los cinco nodos, y cada
+división cierra el suyo.
 
 ### 9.1 Reparto de F6 por división
 
@@ -507,7 +512,24 @@ autenticación, evidencias de ataque y corrección.
 
 ---
 
-## 15. Estructura del repositorio
+## 15. Handoff por división
+
+Cada división tiene un documento de traspaso con el arranque, el estado real, el backlog
+accionable y lo que no debe tocarse:
+
+| División | Documento | Qué incluye |
+| :--- | :--- | :--- |
+| Todas | [`docs/handoff/README.md`](docs/handoff/README.md) | puesta en marcha desde cero, secretos, qué se versiona, orden de trabajo |
+| Frontend | [`docs/handoff/frontend.md`](docs/handoff/frontend.md) | reparación del arte, integración con la API (firma HMAC en C#), verificación del build |
+| Security | [`docs/handoff/security.md`](docs/handoff/security.md) | recetas de ataque ejecutables, estado por control, plantilla de evidencia |
+| IA | [`docs/handoff/ia.md`](docs/handoff/ia.md) | punto exacto de conexión con Ollama, guardrails, pruebas y límites |
+
+Plantilla obligatoria de evidencia:
+[`docs/handoff/_plantilla-evidencia.md`](docs/handoff/_plantilla-evidencia.md).
+
+---
+
+## 16. Estructura del repositorio
 
 ```
 CosTamarindo/
@@ -535,7 +557,7 @@ CosTamarindo/
 └── evidencias/                 # una carpeta por control ISO (Security)
 ```
 
-### 15.1 Qué **no** se sube
+### 16.1 Qué **no** se sube
 
 `.opencode/`, `opencode.json*`, `.codex/`, `.claude/`, `.cursor/`, `AGENTS.md`, `CLAUDE.md`,
 skills, configuraciones de MCP, `Library/`, `Temp/`, `Logs/`, `UserSettings/`, builds, binarios,

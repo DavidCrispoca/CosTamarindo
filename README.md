@@ -4,6 +4,7 @@ Videojuego *catcher* 2D desarrollado en **Unity 6 (WebGL)** como objeto de audit
 **ISO/IEC 27001:2022**. Incluye autenticación y leaderboard online con **Supabase**,
 infraestructura de 5 nodos con **Docker** y diálogos de NPC generados por **Ollama** local.
 
+- [`docs/handoff/`](docs/handoff/README.md) — puesta en marcha y handoff por división
 - Plan de ejecución por divisiones: [`Plan.md`](Plan.md) — **fuente de verdad del avance**
 - Especificación ISO 27001: [`docs/CosTamarindo.md`](docs/CosTamarindo.md)
 - Arquitectura de los 5 nodos Docker: [`docs/arquitectura.md`](docs/arquitectura.md)
@@ -48,6 +49,11 @@ backlog y criterio de terminado en [`Plan.md`](Plan.md) §4–§8.
 
 > El detalle de cada pendiente, con su código (`FE-01`, `BE-03`, `DB-02`, `SEC-04`, `IA-02`…) y
 > su criterio de terminado, está en [`Plan.md`](Plan.md).
+
+### Empezar a trabajar
+
+Cada división tiene su documento de traspaso en [`docs/handoff/`](docs/handoff/README.md):
+puesta en marcha, contratos, recetas de ataque, punto de integración de la IA y qué no tocar.
 
 ---
 
