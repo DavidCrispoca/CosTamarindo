@@ -106,6 +106,27 @@ Para trabajar en Frontend **no hace falta** ninguna clave de Supabase: Unity sol
 `/api/`. Para Security, las claves de ataque se piden al responsable de DB y se usan desde
 `.env`, nunca en un script versionado.
 
+### 3.1 MCP de Supabase en OpenCode
+
+El MCP remoto se autentica con el **token personal** de la cuenta dueña del proyecto. En
+`opencode.json` del repositorio (ignorado por git):
+
+```json
+"supabase": {
+  "type": "remote",
+  "url": "https://mcp.supabase.com/mcp",
+  "headers": { "Authorization": "Bearer {env:SUPABASE_ACCESS_TOKEN}" }
+}
+```
+
+Sin ese encabezado, OpenCode usa su sesión OAuth guardada, que puede pertenecer a **otra
+cuenta** y ver otros proyectos. Verificación rápida: `list_projects` debe devolver
+`CosTamarindo` (`jukyiwsteuzwrmzlgfme`, organización *Eunomia*).
+
+Si el MCP sigue mostrando otros proyectos, **reiniciar OpenCode**: los encabezados se leen al
+conectar, no en cada llamada. Mientras tanto, la Management API con el mismo token
+(`https://api.supabase.com/v1/projects/<ref>/database/query`) hace exactamente lo mismo.
+
 ---
 
 ## 4. Qué está versionado y qué no
