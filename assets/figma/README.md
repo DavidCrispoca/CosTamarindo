@@ -22,9 +22,13 @@ del inventario están en [`docs/fases/F1.md`](../../docs/fases/F1.md).
 | :--- | :--- | :--- | :--- |
 | Palenquera | `characters/Palenquera-Ingame.png` | `Assets/Art/Characters/palenquera.png` | ✅ en escena, animada por código |
 | Fondo de playa | `backgrounds/Background-Playa.png` | `Assets/Art/Backgrounds/bg_playa.png` | ✅ en escena (`BackgroundFitter`) |
-| 4 ítems | `items/*.png` | `Assets/Art/Items/` | ✅ |
-| 4 ítems restantes | `items/*.png` | — | ⛔ falta exportar |
+| Ítems originales (4) | `items/*.svg` | `Assets/Art/Items/item_*.png` | ⛔ borrados en `ee62e8c`; la escena quedó con referencias rotas |
+| Pack de 60 ítems | aportado por el equipo | `Assets/Art/Items/recolectables/` y `.../daninos/` | ⚠️ en disco y versionado, **sin integrar** (`.meta` sin versionar, nombres fuera de catálogo) |
 | Tipografías | Google Fonts (OFL) | `Assets/Art/Fonts/` | ✅ SDF |
+| Componentes de UI | — | `Assets/Art/UI/` | ⛔ carpeta vacía |
+
+El detalle del bloqueo y el orden de reparación están en
+[`docs/fases/F1.md`](../../docs/fases/F1.md) §5, y las tareas en `Plan.md` (`FE-01`…`FE-03`).
 
 Los ajustes de importación no se tocan a mano: los aplica
 `Assets/Editor/FigmaArtImporter.cs` (menú **CosTamarindo → Importar arte de Figma**).
