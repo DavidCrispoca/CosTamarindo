@@ -162,6 +162,3 @@ def create_app(
     app.include_router(dialog.router)
 
     return app
-
-
-app = create_app()
