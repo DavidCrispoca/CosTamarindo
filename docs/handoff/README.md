@@ -1,7 +1,7 @@
 # Handoff · CosTamarindo 2D
 
 > **Para quién:** las personas que toman Frontend, Security e IA.
-> **Estado del proyecto:** 2026-11-06.
+> **Estado del proyecto:** 2026-11-13.
 > **Fuente de verdad del avance:** [`../../Plan.md`](../../Plan.md).
 > **Contratos de la API:** [`../api.md`](../api.md).
 
@@ -13,7 +13,7 @@ división por división. No reemplaza a `Plan.md`: lo hace accionable.
 | [`frontend.md`](frontend.md) | integrar Unity con la API, reparar el arte y cerrar `FE-01`…`FE-14` |
 | [`security.md`](security.md) | atacar y evidenciar los 10 controles (`SEC-01`…`SEC-14`) |
 | [`ia.md`](ia.md) | conectar Ollama al NPC sin romper el puntaje (`IA-01`…`IA-07`) |
-| [`_plantilla-evidencia.md`](_plantilla-evidencia.md) | formato obligatorio de una carpeta de evidencia |
+| [`evidencias/_plantilla/README.md`](../../evidencias/_plantilla/README.md) | formato obligatorio de una carpeta de evidencia |
 
 ---
 
@@ -21,11 +21,11 @@ división por división. No reemplaza a `Plan.md`: lo hace accionable.
 
 | División | Nodo | Estado | Qué falta |
 | :--- | :--- | :--- | :--- |
-| **Frontend** | `Sg-Frontend` | 🚧 jugable offline; build de 16,2 MB desactualizado | arte de ítems cableado, UI de Figma, clientes de red, login obligatorio |
-| **Backend** | `Sg-Backend` | ✅ healthy, 43 tests, E2E en verde | solo `BE-06` completo, que depende de IA |
+| **Frontend** | `Sg-Frontend` | 🚧 Nginx/TLS healthy; `builds/webgl` vacío en este clon | regenerar build, arte, UI y clientes de red |
+| **Backend** | `Sg-Backend` | 🚧 imagen construida y 43 tests; no arranca sin claves | cargar Supabase/JWT y `BE-06` |
 | **DB** | `Sg-DB` | ✅ esquema, RLS, leaderboard, backup probado | proyecto PROD al desplegar |
-| **Security** | `Sg-Security` | 🚧 1 de 10 controles evidenciados (A.8.25) | nueve controles con ataque y evidencia |
-| **IA** | `Sg-AI` | 🚧 nodo y modelo operativos, sin endpoint conectado | prompt, guardrails, fallback y pruebas |
+| **Security** | `Sg-Security` | 🟡 A.8.25 completo; A.8.15/A.8.20/A.8.24 parciales; SoA de 93 | cerrar ataques y controles restantes |
+| **IA** | `Sg-AI` | ⬜ no iniciado; compose y código listos; volumen vacío | levantar Ollama, modelo, prompt y guardrails |
 
 ---
 
@@ -67,8 +67,10 @@ powershell -File infra/scripts/up.ps1 backend
 curl.exe --ssl-no-revoke https://juego.local/api/health
 ```
 
-Resultado esperado: `sg-frontend`, `sg-ai` y `sg-backend` en `healthy`, y
-`{"status":"ok","env":"dev","database":true}`.
+Resultado esperado: `sg-frontend` en `healthy` y `{"status":"ok","env":"dev","database":true}`.
+`sg-ai` y `sg-backend` requieren, respectivamente, descargar el modelo y cargar las claves
+de Supabase/JWT; sin eso quedan detenidos o no arrancan. El build WebGL también debe
+regenerarse si `builds/webgl` está vacío.
 
 ### 2.3 Verificación rápida de que todo está sano
 

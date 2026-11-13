@@ -3,7 +3,9 @@
 > **División:** IA · **Nodo:** `Sg-AI`
 > **Backlog:** `Plan.md` §8 (`IA-01`…`IA-07`)
 > **Contrato:** [`../api.md`](../api.md) §4 · **Código a tocar:** `backend/app/services/dialog_service.py`
-> **Estado:** nodo y modelo operativos; el endpoint responde del banco de respaldos, sin Ollama.
+> **Estado:** nodo **no iniciado**; el código del endpoint y los guardrails están listos, pero
+> `sg-ai` no está levantado y el volumen del modelo está vacío. El endpoint puede responder del
+> banco de respaldos sin Ollama.
 
 ---
 
@@ -11,16 +13,34 @@
 
 | Pieza | Estado | Dónde |
 | :--- | :--- | :--- |
-| Contenedor Ollama | ✅ *healthy* | `infra/docker-compose.yml` |
-| Modelo `qwen2.5:3b` (1,9 GB) | ✅ en el volumen `costamarindo-ai-models` | `infra/scripts/pull-model.sh` |
-| Aislamiento | ✅ red `ai` con `internal: true`, sin puerto publicado | compose |
-| Límites | ✅ `OLLAMA_NUM_PARALLEL=1`, `MAX_LOADED_MODELS=1`, `mem_limit: 4g` | compose |
+| Contenedor Ollama | ⬜ definido, **no iniciado** | `infra/docker-compose.yml` (perfil `ai`) |
+| Modelo `qwen2.5:3b` (1,9 GB) | ⬜ volumen `costamarindo-ai-models` vacío (4 KB) | `infra/scripts/pull-model.sh` |
+| Aislamiento | ✅ definido: red `ai` con `internal: true`, sin puerto publicado; verificar al levantar | compose |
+| Límites | ✅ definidos: `OLLAMA_NUM_PARALLEL=1`, `MAX_LOADED_MODELS=1`, `mem_limit: 4g` | compose |
 | Contrato del endpoint | ✅ `POST /api/dialog` | `app/routers/dialog.py` |
 | Saneo de entrada | ✅ quita `<`, `>`, controles y detecta inyección | `dialog_service.sanitize_input` |
 | Filtro de salida | ✅ quita rich text y acota a 300 caracteres | `dialog_service.filter_output` |
 | Rate limit | ✅ 10/min por usuario (en memoria) | `dialog_service.DialogGuard` |
 | Respaldo | ✅ banco por contexto | `dialog_service.FALLBACKS` |
 | Log del bloqueo | ✅ evento `dialog_blocked` | mismo módulo |
+
+> **Readiness 2026-11-13.** La configuración y el código están listos; lo que falta es
+> operativo. Para iniciar `Sg-AI`:
+>
+> ```powershell
+> # 1. levantar solo el nodo de IA
+> docker compose --env-file .env -f infra/docker-compose.yml --profile ai up -d ai
+>
+> # 2. descargar el modelo (conexión temporal a bridge, luego vuelve a la red interna)
+> bash infra/scripts/pull-model.sh
+>
+> # 3. medir IA-01 antes de tocar prompt o guardrails
+> docker exec -it sg-ai ollama list
+> ```
+>
+> No se inicia todavía porque el usuario aún no abrió la división `Sg-IA` y el backend no
+> arranca sin las claves de Supabase/JWT. El endpoint puede probarse con dobles, pero la
+> integración real con el juego queda para F7.
 
 ---
 
