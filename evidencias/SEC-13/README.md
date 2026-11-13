@@ -13,7 +13,7 @@
 Que cada push o pull request a `main` pase por tres barreras automáticas:
 
 1. **Gitleaks:** detecta secretos en el historial y en el diff.
-2. **Tests del backend:** 43 pruebas con `pytest`.
+2. **Tests del backend:** 43 pruebas con `pytest` en la fecha de la evidencia; hoy son 53 tras F7.
 3. **Auditoría de dependencias:** `pip-audit` sobre `backend/requirements.txt`.
 4. **Validación de Compose:** `docker compose config --quiet` con `.env.example`.
 
@@ -57,7 +57,7 @@ Resultados de esta pasada:
 
 | Paso | Resultado |
 | :--- | :--- |
-| `pytest` | 43 passed |
+| `pytest` | 43 passed en la fecha; hoy 53 tras F7 |
 | `pip-audit` | `No known vulnerabilities found` |
 | `docker compose config` | Sin errores (verificado antes de la pasada) |
 

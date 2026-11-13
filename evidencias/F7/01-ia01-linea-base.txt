@@ -1,0 +1,18 @@
+﻿Fecha: 2026-11-13T15:49:35.3790895-05:00
+Contenedor:
+NAMES     STATUS                   PORTS
+sg-ai     Up 6 minutes (healthy)   11434/tcp
+
+Modelos:
+NAME          ID              SIZE      MODIFIED      
+qwen2.5:3b    357c53fb659c    1.9 GB    3 minutes ago    
+
+Puertos publicados:
+(ninguno)
+
+Redes:
+costamarindo-ai
+
+Recursos:
+NAME      CPU %     MEM USAGE / LIMIT
+sg-ai     0.00%     3.431GiB / 4GiB

@@ -18,7 +18,7 @@ Todo lo que sigue funciona **ahora**, con el entorno levantado:
 | API | `https://juego.local/api/*` | 🚧 código y tests listos; backend no arranca sin claves |
 | Auth | `/api/auth/register`, `/login`, `/refresh` | 🚧 contrato listo; depende del backend |
 | Puntaje | `/api/session/start` + `/api/score` | 🚧 HMAC, nonce, TTL y tests; falta ataque real |
-| Diálogo | `/api/dialog` | 🚧 saneo y rate limit; sin Ollama (responde del banco) |
+| Diálogo | `/api/dialog` | ✅ saneo, rate limit, Ollama y fallback; inyección bloqueada |
 | Base | PostgREST (`/rest/v1/`) | ✅ cerrado: `anon` recibe 401 |
 | Frontend | build WebGL | 🚧 Nginx y TLS operativos; `builds/webgl` vacío |
 

@@ -9,8 +9,8 @@
 >
 > **Estado:** `Sg-Security` **cerrado operativamente** y con el primer bloque de evidencias
 > independientes. La VM está `Running`, el agente `002` está **Active** y el manager recibe
-> logs reales de Nginx. Tailscale queda para cuando estén los cinco nodos; `Sg-IA` todavía
-> no se inicia.
+> logs reales de Nginx. Tailscale queda para cuando estén los cinco nodos; `Sg-AI` ya está
+> operativo con `qwen2.5:3b` y el backend conectado, aunque falta el bocadillo en WebGL.
 >
 > **Alcance:** recuperar y operar la VM `sg-security`, integrarla como nodo `Sg-Security`
 > del juego y dejar Wazuh, UFW, agente, reglas, logs y evidencias en un estado
@@ -35,7 +35,7 @@
 > `evidencias/ataques/`, `docs/soa.md`, `evidencias/A.8.15/`, `evidencias/A.8.20/`,
 > `evidencias/A.8.24/`, `evidencias/SEC-12/`, `evidencias/SEC-13/` y el workflow
 > `.github/workflows/security.yml`. `pip-audit` pasó de 38 vulnerabilidades a 0 en runtime;
-> los 43 tests del backend pasan. SonarQube sigue diferido.
+> los 53 tests del backend pasan. SonarQube sigue diferido.
 >
 > **Histórico:** la VM `sg-jacome-security` no se pudo recuperar y se reemplazó por
 > `sg-security`, creada desde cero con `provision-security-node.sh`; la vieja se
@@ -595,7 +595,8 @@ El backlog completo y los controles restantes están en `Plan.md` §7.
 - El FIM de Wazuh 4.14 no emite alerta por archivo en este all-in-one; solo se
   confirma el estado en `002.db`. Es una limitación de la versión, no de la regla.
 - El backend no arranca porque faltan las claves de Supabase/JWT en el `.env` real.
-- Tailscale se difiere hasta tener los cinco nodos; `Sg-IA` aún no se inicia.
+- Tailscale se difiere hasta tener los cinco nodos; `Sg-AI` está healthy y el endpoint de
+  diálogo ya llama a Ollama. Falta compilar y probar el bocadillo en WebGL.
 - `multipass info/exec` falla por DNS/KVP (`sg-security.mshome.net` apunta a la IP
   vieja); el acceso operativo es SSH directo a `172.18.18.220`.
 - `builds/webgl` está vacío en este clon; `https://juego.local/` devuelve `403`.

@@ -15,8 +15,9 @@
 | Libro, feedback de captura, SFX | ✅ | `BookView.cs`, `CaptureFeedback.cs`, `ProceduralSfx.cs` |
 | Personaje y fondo de Figma | ✅ en escena | `Assets/Art/Characters/`, `.../Backgrounds/` |
 | Tipografías SDF | ✅ | `Assets/Art/Fonts/` |
-| Escena de login con bloqueo | ✅ contra stub | `Assets/Scenes/Login.unity`, `Auth/AuthStub.cs` |
-| Build + Nginx + TLS | ✅ | `builds/webgl`, `infra/nginx/` |
+| Escena de login con bloqueo | ✅ intenta backend y cae a local | `Assets/Scenes/Login.unity`, `Auth/AuthStub.cs` |
+| Build + Nginx + TLS | ✅ (build WebGL a regenerar) | `builds/webgl`, `infra/nginx/` |
+| Bocadillo del NPC | ✅ código runtime; ⬜ falta probar en WebGL | `Assets/Scripts/UI/NpcDialogueController.cs` |
 | 15 pruebas PlayMode | ✅ | `Assets/Tests/PlayMode/` |
 
 ---
@@ -110,7 +111,7 @@ para “cuadrar”**: si un playtest real los supera, se ajusta el servidor con 
 
 | Archivo | Cambio |
 | :--- | :--- |
-| `Assets/Scripts/Auth/AuthStub.cs` | reemplazar el cuerpo de `SignIn` por la llamada a `/api/auth/login`. **La UI no se toca** |
+| `Assets/Scripts/Auth/AuthStub.cs` | ✅ ya llama a `/api/auth/login` y `/api/auth/register`; cae a local si el backend no está desplegado. **La UI no se toca** |
 | `Assets/Scripts/Core/GameManager.cs` | al terminar la partida, exponer `score`, `durationMs`, `catches` |
 | nuevo `Assets/Scripts/Net/ApiClient.cs` | cliente HTTP con token en memoria |
 | nuevo `Assets/Scripts/Net/ScoreSigner.cs` | firma HMAC (arriba) |
@@ -124,7 +125,7 @@ para “cuadrar”**: si un playtest real los supera, se ajusta el servidor con 
 | `FE-05` | 10 prefabs de UI (`WoodButton`, `HandInput`, `PinSlot`, `Heart`, `DialogBubble`, `LeaderRow`…) |
 | `FE-06` | aplicar el kit a HUD, pausa, game over, Libro y Login; corazones con sprite |
 | `FE-08` | pantalla de leaderboard con estados vacío/error/timeout |
-| `FE-09` | bocadillo del NPC (depende de `IA-03` para el contenido) |
+| `FE-09` | ✅ bocadillo del NPC en `NpcDialogueController`; falta build WebGL y captura |
 | `FE-10` | `Login` a build index 0 y encadenado `Login → Game` |
 | `FE-11` | playtest de 10–15 min y ajuste de `spawnInterval` / `fallSpeed` |
 | `FE-12` | rebuild Release + medición (≤ 30 MB, < 10 s, 0 errores) |

@@ -57,7 +57,8 @@ cd backend
 uv run --python 3.12 --with-requirements requirements-dev.txt pytest -q
 ```
 
-Resultado: **43 passed**. Salida en [`03-tests.txt`](03-tests.txt).
+Resultado: **43 passed** en la fecha de esta evidencia. Tras F7 la suite es de **53 tests**;
+la salida original se conserva en [`03-tests.txt`](03-tests.txt).
 
 ### 4.2 Auditoría después
 
@@ -113,7 +114,7 @@ Quality Gate y adjuntar el reporte.
 | :--- | :--- |
 | [`01-pip-audit-antes.txt`](01-pip-audit-antes.txt) | 38 vulnerabilidades antes de la corrección |
 | [`02-pip-audit-despues.txt`](02-pip-audit-despues.txt) | Sin vulnerabilidades conocidas después |
-| [`03-tests.txt`](03-tests.txt) | 43 tests pasan con las versiones nuevas |
+| [`03-tests.txt`](03-tests.txt) | 43 tests pasaban con las versiones nuevas (hoy 53 tras F7) |
 
 ---
 

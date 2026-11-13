@@ -21,10 +21,10 @@ backlog y criterio de terminado en [`Plan.md`](Plan.md) §4–§8.
 | División | Nodo | Estado real (2026-11-13) | Documento |
 | :--- | :--- | :--- | :--- |
 | **Frontend** | `Sg-Frontend` | 🚧 Nginx/TLS *healthy*; `builds/webgl` vacío → `403`; arte sin cablear | [`Plan.md` §4](Plan.md) |
-| **Backend** | `Sg-Backend` | 🚧 API y 43/43 tests; imagen construida, no arranca sin claves | [`Plan.md` §5](Plan.md) |
+| **Backend** | `Sg-Backend` | 🚧 API y 53/53 tests; imagen construida, no arranca sin claves | [`Plan.md` §5](Plan.md) |
 | **DB** | `Sg-DB` | ✅ Supabase DEV con RLS y backup probado | [`Plan.md` §6](Plan.md) |
 | **Security** | `Sg-Security` | 🟡 A.8.25 completo; A.8.15/A.8.20/A.8.24 parciales; SoA de 93 controles | [`evidencias/`](evidencias/) |
-| **IA** | `Sg-AI` | ⬜ no iniciado; compose y código listos; volumen del modelo vacío | [`Plan.md` §8](Plan.md) |
+| **IA** | `Sg-AI` | 🚧 Ollama healthy, `qwen2.5:3b` y endpoint listos; falta bocadillo WebGL | [`Plan.md` §8](Plan.md) |
 
 ### Qué funciona hoy
 
@@ -33,10 +33,13 @@ backlog y criterio de terminado en [`Plan.md`](Plan.md) §4–§8.
 - **Bucle jugable offline** implementado: menú → partida → 3 vidas → game over → reintento,
   con Libro de colección, feedback de captura y SFX sintetizado. **15/15** tests PlayMode
   verdes (última corrida 2026-11-03).
-- **API y tests**: 43/43 tests del backend; la imagen se construyó con dependencias
+- **API y tests**: 53/53 tests del backend; la imagen se construyó con dependencias
   actualizadas, pero el contenedor no arranca hasta cargar las claves de Supabase/JWT.
 - **Base de datos Supabase DEV** con esquema versionado, RLS sin acceso de cliente y
   restauración verificada.
+- **`Sg-AI`**: Ollama healthy, `qwen2.5:3b` (1,9 GB), sin puerto publicado, prompt versionado,
+  guardrails y fallback; `POST /api/dialog` ya genera texto real. Evidencias en
+  [`evidencias/F7/`](evidencias/F7/).
 - **`Sg-Security`**: VM Wazuh con agente **002** activo, `100250` con 36 alertas y
   evidencias parciales de A.8.15/A.8.20/A.8.24; SoA de 93 controles en [`docs/soa.md`](docs/soa.md).
 - **Gitleaks y CI**: A.8.25 con hook probado; workflow de Gitleaks + tests + `pip-audit` en
@@ -46,8 +49,9 @@ backlog y criterio de terminado en [`Plan.md`](Plan.md) §4–§8.
 
 1. **Frontend**: regenerar `builds/webgl`, cablear el arte, UI de Figma, clientes de red y
    login obligatorio.
-2. **Backend**: cargar las claves de Supabase/JWT y completar la integración de IA.
-3. **IA**: levantar Ollama, descargar `qwen2.5:3b`, prompt, guardrails y fallback del NPC.
+2. **Backend**: cargar las claves de Supabase/JWT y validar el arranque completo.
+3. **IA**: compilar el bocadillo en WebGL y guardar la captura; el nodo, el prompt y el endpoint
+   ya están listos.
 4. **Security**: cerrar A.8.15/A.8.20/A.8.24 y los 6 controles restantes con ataque y evidencia.
 5. **Entrega**: build final, E2E de navegador, informe, runbook y demo.
 
@@ -68,7 +72,7 @@ puesta en marcha, contratos, recetas de ataque, punto de integración de la IA y
 ├── Plan.md              # divisiones, backlog, fases y criterios de terminado
 ├── docs/                # especificación ISO, arquitectura, SoA, bitácora de fases
 ├── unity/               # proyecto Unity 6 (Assets, Packages, ProjectSettings)
-├── backend/             # API FastAPI (vacío: F5)
+├── backend/             # API FastAPI + IA del NPC (F5, F7)
 ├── infra/               # Docker Compose, Nginx, Wazuh, scripts
 ├── assets/figma/        # fuente del arte (los PNG pesados solo en unity/Assets/Art)
 └── evidencias/          # una carpeta por control ISO auditado

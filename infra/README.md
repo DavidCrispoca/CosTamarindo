@@ -6,8 +6,9 @@ Backlog por división y criterios de terminado: [`../Plan.md`](../Plan.md).
 > **Estado (2026-11-13):** `Sg-Frontend` está *healthy* y escribe `access.log` real en el
 > volumen `frontend-logs`; el agente Wazuh lo lee y `100250` ya disparó 36 veces con una
 > ráfaga `429`. `Sg-Backend` tiene imagen construida y dependencias actualizadas, pero
-> **no arranca** hasta cargar las claves de Supabase/JWT en `.env`; `Sg-AI` todavía
-> **no se inicia** (volumen del modelo vacío). `Sg-Security` es la VM externa
+> **no arranca** hasta cargar las claves de Supabase/JWT en `.env`; `Sg-AI` está
+> **healthy** con `qwen2.5:3b` (1,9 GB), sin puerto publicado y solo en `costamarindo-ai`.
+> `Sg-Security` es la VM externa
 > `sg-security` (`172.18.18.220`, Ubuntu 24.04 + Wazuh 4.14.10), con agente **002**
 > activo; el FIM guarda estado pero Wazuh 4.14 no emite alerta por archivo en este
 > all-in-one. `Sg-DB` es Supabase Cloud, no un contenedor. Tailscale se difiere hasta
@@ -109,7 +110,12 @@ sh infra/scripts/pull-model.sh            # qwen2.5:3b (decisión D4)
 sh infra/scripts/pull-model.sh llama3.2:3b
 ```
 
-Una sola vez: el volumen conserva el modelo entre reinicios.
+Una sola vez: el volumen conserva el modelo entre reinicios. En este equipo el modelo ya está
+descargado; `docker exec sg-ai ollama list` debe mostrar `qwen2.5:3b`. En Windows sin Bash, el
+equivalente es conectar `bridge`, ejecutar `docker exec sg-ai ollama pull qwen2.5:3b` y
+desconectar. El backend usa `OLLAMA_URL=http://sg-ai:11434`, `connect_timeout=0.75 s` y
+`read_timeout=20 s`. `backend` no tiene `depends_on` de `ai`: si Ollama está caído, el backend
+arranca y `/api/dialog` responde del banco de respaldo.
 
 ## Reglas
 

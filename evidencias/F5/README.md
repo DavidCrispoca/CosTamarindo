@@ -3,7 +3,7 @@
 > **División:** Backend · **Nodo:** `Sg-Backend`
 > **Fecha:** 2026-11-06
 > **Estado:** ✅ API, pruebas, imagen y despliegue en Compose verificados
-> **Pruebas:** 43/43 (`pytest`) · 3 corridas E2E consecutivas en verde
+> **Pruebas:** 43/43 (`pytest`) en la fecha · hoy 53 tras F7 · 3 corridas E2E consecutivas en verde
 
 ---
 
@@ -19,7 +19,7 @@
 | `POST /api/session/start` | nonce, clave HMAC derivada y TTL |
 | `POST /api/score` | validación autoritativa del puntaje |
 | `GET /api/leaderboard` | top 5 y posición propia |
-| `POST /api/dialog` | contrato, saneo y respaldo del NPC (sin Ollama todavía) |
+| `POST /api/dialog` | contrato, saneo y respaldo del NPC (Ollama se conectó en F7) |
 
 Contratos completos en [`docs/api.md`](../../docs/api.md).
 

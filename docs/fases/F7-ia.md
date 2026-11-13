@@ -1,7 +1,8 @@
 # F7 · Nodo de IA y NPC con Ollama — plan por fases
 
 > **División:** IA · **Nodo:** `Sg-AI`
-> **Estado:** ⬜ plan definido; nodo todavía no iniciado
+> **Estado:** 🚧 F7.0–F7.3 cerradas; F7.4 implementada pendiente de prueba en Unity/WebGL;
+> F7.5 parcial (tests y evidencias listos)
 > **Depende de:** [F6](F6.md) (compose), F5 (backend), F4 (auth)
 > **Handoff:** [`../handoff/ia.md`](../handoff/ia.md)
 > **Backlog:** [`Plan.md` §8](../../Plan.md) (`IA-01`…`IA-07`)
@@ -24,18 +25,19 @@ Dejar el NPC de la Palenquera funcionando de punta a punta:
 
 | Pieza | Estado real |
 | :--- | :--- |
-| Servicio `ai` en Compose | ✅ definido con perfil `ai`, red interna y `mem_limit: 4g`; ⬜ no iniciado |
-| Volumen `costamarindo-ai-models` | ⬜ vacío (4 KB) |
-| `POST /api/dialog` | ✅ contrato, saneo, rate limit y fallback; ⬜ no llama a Ollama |
-| Prompt del NPC | ⬜ no existe |
-| Cliente Ollama en backend | ⬜ no existe |
-| Bocadillo en Unity | ⬜ no existe |
-| Pruebas del diálogo | ⬜ no existen |
-| Evidencia F7 | ⬜ no existe |
+| Servicio `ai` en Compose | ✅ healthy en `10.83.0.2`, red `costamarindo-ai` interna, `mem_limit: 4g` |
+| Volumen `costamarindo-ai-models` | ✅ `qwen2.5:3b` (1,9 GB) descargado |
+| `POST /api/dialog` | ✅ contrato, guardrails, rate limit, fallback y llamada real a Ollama |
+| Prompt del NPC | ✅ `backend/app/ai/prompts.py` |
+| Cliente Ollama en backend | ✅ `backend/app/providers/ollama.py` |
+| Bocadillo en Unity | ✅ `NpcDialogueController` (runtime UI); ⬜ falta probarlo en WebGL |
+| Pruebas del diálogo | ✅ `backend/tests/test_dialog.py`; 53 tests en verde |
+| Evidencia F7 | ✅ `evidencias/F7/01`–`05` y `README.md` |
 
-**Bloqueo conocido:** el backend no arranca completo hasta tener las claves de Supabase/JWT en
-`.env`. La IA se puede levantar y probar por separado; la prueba real de `/api/dialog` queda
-para cuando esas claves estén disponibles.
+**Estado 2026-11-13.** `Sg-AI` está operativo y el endpoint ya genera texto real. La prueba de
+extremo a extremo se hizo con un backend de prueba (repositorio en memoria + JWT firmado) porque
+el backend completo sigue bloqueado por las claves de Supabase/JWT. El bocadillo de Unity está
+implementado y usa respaldo local si no hay JWT real; falta compilarlo y verlo en WebGL.
 
 ---
 
@@ -97,15 +99,17 @@ lento, se documenta y se decide si se cambia de modelo antes de seguir.
 
 **Objetivo:** conectar el backend con Ollama sin romper el contrato actual (`IA-02`, `IA-04`).
 
-- Crear `backend/app/ai/prompts.py` con el system prompt fijo de la Palenquera:
-  español, máximo 3 frases, solo seguridad, sin datos personales y con la entrada delimitada
-  como `<jugador>…</jugador>`.
-- Crear `backend/app/providers/ollama.py` con un cliente HTTP async, timeout de 20 s,
-  semáforo de 1 request concurrente y `num_predict` acotado.
-- Añadir configuración: `OLLAMA_URL=http://ai:11434`, `OLLAMA_MODEL=qwen2.5:3b`,
-  `OLLAMA_TIMEOUT_SECONDS=20`.
-- Hacer `build_reply` asíncrono y esperar la llamada desde `routers/dialog.py`.
-- Ante timeout, error HTTP o modelo ausente, devolver el fallback por contexto.
+- ✅ `backend/app/ai/prompts.py` con el system prompt de la Palenquera: español, máximo 2 frases,
+  solo juego/seguridad, ejemplos de tono y la entrada delimitada como `<jugador>…</jugador>`.
+- ✅ `backend/app/providers/ollama.py` con cliente HTTP async, `connect_timeout=0.75 s`,
+  `read_timeout=20 s`, semáforo de 1 request concurrente y `num_predict` acotado.
+- ✅ Configuración: `OLLAMA_URL=http://sg-ai:11434`, `OLLAMA_MODEL=qwen2.5:3b`,
+  `OLLAMA_TIMEOUT_SECONDS=20`, `OLLAMA_MAX_CONCURRENCY=1`.
+- ✅ `build_reply` es asíncrono y `routers/dialog.py` espera la llamada.
+- ✅ Ante timeout, error HTTP, red inalcanzable o respuesta vacía, devuelve el fallback por
+  contexto/ítem.
+- ✅ El servicio `backend` no tiene `depends_on` de `ai`: si Ollama está caído, arranca y usa el
+  respaldo. La IA nunca bloquea el juego.
 
 **Entregable:** `/api/dialog` responde con Ollama cuando está disponible y con el banco de
 respaldo cuando no lo está.
@@ -113,8 +117,8 @@ respaldo cuando no lo está.
 **Puerta:** una petición normal devuelve texto del modelo; una petición con Ollama apagado
 sigue respondiendo sin error 500.
 
-> **Bloqueo:** la prueba real necesita las claves de Supabase/JWT del backend. Mientras falten,
-> se implementa y se prueba con mock; el smoke test real queda pendiente.
+> **Prueba real:** se ejecutó con un backend de prueba (repositorio en memoria + JWT firmado)
+> para aislar el diálogo de Supabase. Resultados en `evidencias/F7/03-endpoint-real.txt`.
 
 ---
 
@@ -122,15 +126,14 @@ sigue respondiendo sin error 500.
 
 **Objetivo:** cerrar `IA-03`, `IA-04` y `IA-05`.
 
-- Mantener `sanitize_input` y `filter_output`; añadir límite de entrada y validación del contexto.
-- Detectar inyección antes de construir el prompt y registrar `dialog_blocked` sin guardar el
-  texto del jugador.
-- Envolver la entrada con delimitadores explícitos; nunca concatenarla como instrucción.
-- Limitar la salida a 300 caracteres y eliminar `<`/`>` para no romper TextMeshPro.
-- Mantener 10 peticiones/minuto por usuario y un solo request concurrente al modelo.
-- Registrar `dialog_fallback` con un motivo corto (`timeout`, `http_error`, `model_missing`,
-  `rate_limited`) sin filtrar secretos.
-- Verificar que el fallback responde en menos de 1 s.
+- ✅ `sanitize_input` y `filter_output` con límite de entrada y validación del contexto.
+- ✅ Inyección detectada antes del prompt; se registra `dialog_blocked` sin guardar el texto.
+- ✅ Entrada envuelta en `<jugador>…</jugador>`; nunca se concatena como instrucción.
+- ✅ Salida limitada a 300 caracteres y sin `<`/`>` para no romper TextMeshPro.
+- ✅ 10 peticiones/minuto por usuario y un solo request concurrente al modelo.
+- ✅ `dialog_fallback` con motivo corto (`timeout`, `http_error`, `unreachable`,
+  `empty_response`, `disabled`) sin filtrar secretos.
+- ✅ Fallback real con `sg-ai` detenido: 797/758/757 ms (`evidencias/F7/05-fallback.txt`).
 
 **Entregable:** guardrails conectados al flujo real y eventos de auditoría.
 
@@ -142,18 +145,21 @@ sigue respondiendo sin error 500.
 
 **Objetivo:** llevar la IA al juego (`IA-07` + integración de Frontend).
 
-- Añadir `context` opcional a `DialogRequest` y documentarlo en `docs/api.md`.
-- Crear `unity/Assets/Scripts/UI/DialogClient.cs` para llamar a `/api/dialog` con el JWT.
-- Crear el controlador del bocadillo (`DialogBubble.cs` o `NpcDialogController.cs`) y conectarlo
-  al `GameManager`/`HudController`.
-- Enviar el contexto según el estado: inicio, captura, peligro, game over o libro.
-- Mostrar la respuesta, cerrar el bocadillo y usar el fallback local si la red falla.
-- No llamar a `session` ni a `score` desde el diálogo; no modificar el puntaje.
+- ✅ `context`, `item` y `kind` opcionales en `DialogRequest`, documentados en `docs/api.md` §4.
+- ✅ `AuthStub` intenta `/api/auth/login` y `/api/auth/register`, guarda el JWT solo en memoria y
+  cae al modo local si el backend no está desplegado.
+- ✅ `unity/Assets/Scripts/UI/NpcDialogueController.cs` crea el bocadillo en runtime y se engancha
+  a `GameManager.ItemCaught` y `MatchEnded`.
+- ✅ Envía `context` `captura`, `peligro` o `game_over`, más `item` y `kind`.
+- ✅ Comenta de vez en cuando (35 % de probabilidad, 9 s de enfriamiento), muestra la respuesta
+  durante 5,5 s y usa frases locales si no hay JWT o la red falla.
+- ✅ No llama a `session` ni a `score`; el puntaje no se toca.
 
-**Entregable:** el jugador escribe una pregunta, ve la respuesta en el bocadillo y puede seguir
-jugando.
+**Entregable:** el jugador ve comentarios de la Palenquera al atrapar ítems y al terminar la
+partida, sin bloquear el gameplay.
 
 **Puerta:** funciona en WebGL, el contexto cambia la respuesta y el puntaje no se altera.
+**Estado:** código implementado; falta compilar y probar en WebGL. `builds/webgl` sigue vacío.
 
 ---
 
@@ -161,22 +167,25 @@ jugando.
 
 **Objetivo:** demostrar `IA-06` y cerrar F7.
 
-- Crear `backend/tests/test_dialog.py` con:
+- ✅ `backend/tests/test_dialog.py` con:
   - respuesta normal con Ollama simulado;
   - inyección bloqueada y evento `dialog_blocked`;
-  - timeout y Ollama apagado;
+  - timeout y fallback;
   - rate limit;
   - filtro de salida con `<size=500>`;
-  - contexto inválido o ausente;
-  - prueba de que el diálogo no escribe en `game_sessions` ni en `scores`.
-- Ejecutar la suite completa y el smoke test real cuando el backend tenga claves.
-- Guardar en `evidencias/F7/` las salidas literales, la latencia y la captura del bocadillo.
-- Actualizar `Plan.md` §8, `docs/handoff/ia.md`, `README.md` y el estado de F7.
+  - contexto inválido y falta de texto/ítem;
+  - prueba de que el diálogo no escribe en `game_sessions` ni en `scores`;
+  - cliente Ollama con `httpx.MockTransport`.
+- ✅ Suite completa: **53 tests** en verde (`evidencias/F7/04-tests.txt`).
+- ✅ Smoke test real con `qwen2.5:3b` (`evidencias/F7/02` y `03`).
+- ✅ Fallback real con `sg-ai` detenido: 797/758/757 ms (`evidencias/F7/05-fallback.txt`).
+- ⬜ Falta la captura visual del bocadillo en WebGL.
+- ✅ `Plan.md` §8, `docs/handoff/ia.md`, `docs/api.md` y este plan actualizados.
 
 **Entregable:** `evidencias/F7/README.md` con el antes/después y los criterios cumplidos.
 
 **Puerta:** los 7 ítems del backlog (`IA-01`…`IA-07`) tienen evidencia y no queda ningún
-puerto de IA expuesto.
+puerto de IA expuesto. `IA-01`…`IA-06` cerrados; `IA-07` con test; falta evidencia visual.
 
 ---
 
@@ -198,15 +207,15 @@ Unity consume el contrato.
 
 ## 5. Criterios de aceptación de F7
 
-- [ ] `docker exec sg-ai ollama list` muestra `qwen2.5:3b`.
-- [ ] `sg-ai` no publica `11434` y conserva la red `ai` como `internal`.
-- [ ] `/api/dialog` responde con el modelo cuando está disponible.
-- [ ] Inyección bloqueada con `blocked: true` y `dialog_blocked`.
-- [ ] Ollama apagado devuelve fallback en menos de 1 s.
-- [ ] La salida no contiene `<`/`>` y mide 300 caracteres o menos.
+- [x] `docker exec sg-ai ollama list` muestra `qwen2.5:3b`.
+- [x] `sg-ai` no publica `11434` y conserva la red `ai` como `internal`.
+- [x] `/api/dialog` responde con el modelo cuando está disponible.
+- [x] Inyección bloqueada con `blocked: true` y `dialog_blocked`.
+- [x] Ollama apagado devuelve fallback sin error 500 y en < 1 s (797/758/757 ms).
+- [x] La salida no contiene `<`/`>` y mide 300 caracteres o menos.
 - [ ] Unity muestra el bocadillo y el puntaje no cambia.
-- [ ] Tests del backend en verde y evidencia en `evidencias/F7/`.
-- [ ] Cero APIs externas en runtime.
+- [x] Tests del backend en verde y evidencia en `evidencias/F7/`.
+- [x] Cero APIs externas en runtime.
 
 ---
 

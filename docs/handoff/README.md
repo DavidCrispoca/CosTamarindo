@@ -22,10 +22,10 @@ división por división. No reemplaza a `Plan.md`: lo hace accionable.
 | División | Nodo | Estado | Qué falta |
 | :--- | :--- | :--- | :--- |
 | **Frontend** | `Sg-Frontend` | 🚧 Nginx/TLS healthy; `builds/webgl` vacío en este clon | regenerar build, arte, UI y clientes de red |
-| **Backend** | `Sg-Backend` | 🚧 imagen construida y 43 tests; no arranca sin claves | cargar Supabase/JWT y `BE-06` |
+| **Backend** | `Sg-Backend` | 🚧 imagen construida y 53 tests; no arranca sin claves | cargar Supabase/JWT y validar arranque |
 | **DB** | `Sg-DB` | ✅ esquema, RLS, leaderboard, backup probado | proyecto PROD al desplegar |
 | **Security** | `Sg-Security` | 🟡 A.8.25 completo; A.8.15/A.8.20/A.8.24 parciales; SoA de 93 | cerrar ataques y controles restantes |
-| **IA** | `Sg-AI` | ⬜ no iniciado; compose y código listos; volumen vacío | levantar Ollama, modelo, prompt y guardrails |
+| **IA** | `Sg-AI` | 🚧 Ollama healthy, `qwen2.5:3b`, prompt y endpoint listos | compilar/probar bocadillo en WebGL |
 
 ---
 
@@ -75,7 +75,7 @@ regenerarse si `builds/webgl` está vacío.
 ### 2.3 Verificación rápida de que todo está sano
 
 ```powershell
-backend\.venv\Scripts\python.exe -m pytest backend        # 43 passed
+backend\.venv\Scripts\python.exe -m pytest backend        # 53 passed
 backend\.venv\Scripts\python.exe backend\scripts\check_db.py
 $env:CT_E2E_BASE = "https://juego.local"
 backend\.venv\Scripts\python.exe backend\scripts\e2e_check.py
@@ -151,7 +151,8 @@ improvisar.
 ```
 Frontend FE-03 -> FE-02 -> FE-01     (arte sano, no bloquea nada mas)
 Frontend FE-07                        (clientes de red; necesita API, ya lista)
-IA IA-02 -> IA-03 -> IA-05 -> IA-06    (prompt, guardrails, fallback, pruebas)
+IA IA-02 -> IA-03 -> IA-05 -> IA-06    (prompt, guardrails, fallback, pruebas; ✅)
+IA bocadillo WebGL                      (falta captura y prueba visual)
 Security SEC-01 -> SEC-02 -> SEC-03…  (plantilla, SoA, ataques)
 ```
 

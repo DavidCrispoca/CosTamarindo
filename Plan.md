@@ -70,15 +70,15 @@ terminado. Nada se da por hecho porque «funciona en el editor»: se verifica en
 | Escenas | `Game.unity` (índice 0), `Login.unity` (índice 1), `SampleScene` (índice 2, sobra) | `unity/ProjectSettings/EditorBuildSettings.asset` |
 | Gameplay offline | Completo: 3 vidas, 120 s, curva de dificultad, pausa, game over, Libro, feedback de captura, SFX sintetizado | `unity/Assets/Scripts/`, [`evidencias/F2/`](evidencias/F2/README.md) |
 | Tests PlayMode | **15/15** verdes (última corrida 2026-11-03; no re-ejecutados el 2026-11-06) | `unity/Assets/Tests/PlayMode/` |
-| Autenticación | ✅ real en el backend: usuario + PIN contra Supabase Auth, bloqueo 5 fallos → 60 s persistido, JWT propio de 30 min. El cliente Unity todavía usa el stub (`FE-07`) | `backend/app/services/auth_service.py` |
+| Autenticación | ✅ real en el backend: usuario + PIN contra Supabase Auth, bloqueo 5 fallos → 60 s persistido, JWT propio de 30 min. `AuthStub` ya intenta el backend y cae a local solo si no está desplegado | `backend/app/services/auth_service.py`, `unity/Assets/Scripts/Auth/AuthStub.cs` |
 | Arte de personaje y fondo | Palenquera y `bg_playa.png` importados y en la escena | `unity/Assets/Art/Characters/`, `.../Backgrounds/` |
 | Arte de ítems | ⚠️ **Regresión real**: los 4 sprites originales se borraron y la escena quedó con 4 referencias rotas. Hay 60 PNG nuevos sin cablear | ver §3.2 |
 | UI de Figma | 0 componentes exportados; `unity/Assets/Art/UI/` está **vacío** | — |
 | Build WebGL | 🚧 `builds/webgl` vacío en este clon; el build de 16,2 MB de 2026-10-28 no está presente | `builds/` (no versionado) |
 | Nginx / Sg-Frontend | Operativo: 443 (8081 solo con override de dev), TLS local con mkcert, CSP por hash, HSTS, proxy `/api/` | `infra/nginx/`, [`docs/fases/F3.md`](docs/fases/F3.md) |
-| Docker | Compose de 5 nodos declarado y validado. En esta sesión `sg-frontend` *healthy* y `sg-wazuh-agent` arriba; `sg-backend` no arranca sin claves; `sg-ai` no iniciado | `infra/docker-compose.yml`, [`evidencias/F6/`](evidencias/F6/README.md) |
-| Modelo de IA | `qwen2.5:3b` no descargado en esta sesión; `Sg-AI` aún no se inicia | [`evidencias/F6/`](evidencias/F6/README.md) §4 |
-| Backend | 🚧 API completa en `backend/` y 43/43 tests; imagen construida, pero no arranca sin las claves de Supabase/JWT en `.env` | [`evidencias/F5/`](evidencias/F5/README.md) |
+| Docker | Compose de 5 nodos declarado y validado. `sg-frontend`, `sg-wazuh-agent` y `sg-ai` arriba; `sg-backend` no arranca sin claves | `infra/docker-compose.yml`, [`evidencias/F6/`](evidencias/F6/README.md) |
+| Modelo de IA | ✅ `qwen2.5:3b` descargado (1,9 GB); `Sg-AI` healthy, sin puerto publicado | [`evidencias/F7/`](evidencias/F7/README.md) |
+| Backend | 🚧 API completa en `backend/` y 53/53 tests; imagen construida, pero no arranca sin las claves de Supabase/JWT en `.env` | [`evidencias/F5/`](evidencias/F5/README.md) |
 | Base de datos | ✅ Supabase DEV con esquema versionado, RLS cerrado, leaderboard y backup/restauración probados | [`evidencias/F4/`](evidencias/F4/README.md) |
 | Logs / SIEM | 🟡 Wazuh 4.14 en VM, agente **002**, reglas `100200–100250`, logs Nginx reales y `100250`; FIM guarda estado sin alerta por archivo; `backend.log` pendiente | `infra/wazuh/`, `infra/docker-compose.yml` |
 | Gitleaks (A.8.25) | ✅ Implementado, hook instalado y probado | [`evidencias/A.8.25/`](evidencias/A.8.25/README.md) |
@@ -145,7 +145,8 @@ de negocio. El cliente **nunca es fuente de verdad** (A.8.9): solo presenta.
 | Tokens (17 colores, 5 estilos) | ⛔ hardcodeados en el `SceneBuilder` |
 | Build WebGL | 🚧 vacío en este clon; el anterior (16,2 MB) era previo al arte actual |
 | Nginx + TLS + CSP | ✅ operativo |
-| Leaderboard, bocadillo de diálogo, envío de puntaje | ⛔ no existen en el cliente |
+| Leaderboard y envío de puntaje | ⛔ no existen en el cliente |
+| Bocadillo del NPC | ✅ `NpcDialogueController` en runtime; falta probar en WebGL |
 
 ### 4.2 Backlog
 
@@ -159,7 +160,7 @@ de negocio. El cliente **nunca es fuente de verdad** (A.8.9): solo presenta.
 | **FE-06** | Aplicar el kit a HUD, pausa, game over, Libro y Login; reemplazar corazones de LiberationSans por el sprite | FE-05 | HUD sin placeholders tipográficos; consola limpia |
 | **FE-07** | Cliente de red: `ApiClient`, `SessionClient`, `ScoreSigner`, `LeaderboardClient`, `DialogueClient` (`UnityWebRequest`, token en memoria) | BE-02…BE-05 | Flujo real contra `https://juego.local/api/` sin secretos en el cliente |
 | **FE-08** | Pantalla de leaderboard (top 5 + posición propia) y estados vacío/error/timeout | FE-07 | Se ve el top 5 tras enviar un puntaje |
-| **FE-09** | Bocadillo del NPC: “escribiendo…”, historial corto, sin bloquear gameplay, fallback visible | FE-07, IA-03 | El juego no se congela ni con Ollama caído |
+| **FE-09** | Bocadillo del NPC: “escribiendo…”, historial corto, sin bloquear gameplay, fallback visible | FE-07, IA-03 | ✅ Código runtime con fallback local; falta build WebGL y captura |
 | **FE-10** | Hacer `Login` obligatorio (build index 0) y encadenar `Login → Game` | FE-07 | Sin sesión no se juega; logout limpia memoria |
 | **FE-11** | Playtest de 10–15 min y ajuste de `spawnInterval` / `fallSpeed` | FE-01 | Curva de dificultad validada por una persona real |
 | **FE-12** | Rebuild Release + medición (tamaño, tiempo de carga, errores de consola) | FE-01, FE-07…FE-10 | ≤ 30 MB, < 10 s, 0 errores, 0 warnings |
@@ -194,8 +195,9 @@ contratos en [`docs/api.md`](docs/api.md).
 
 ### 5.2 Backlog
 
-**Estado 2026-11-06:** cerradas `BE-01`…`BE-05` y `BE-07`…`BE-11`. `BE-06` queda con el
-contrato y el respaldo implementados; la conexión con Ollama es `IA-02`…`IA-04`.
+**Estado 2026-11-13:** cerradas `BE-01`…`BE-05` y `BE-07`…`BE-11`. `BE-06` ya llama a Ollama
+con prompt versionado, timeout y fallback; los 53 tests del backend pasan. El arranque real del
+contenedor sigue bloqueado por las claves de Supabase/JWT.
 
 | ID | Tarea | Depende de | DoD |
 | :--- | :--- | :--- | :--- |
@@ -325,18 +327,26 @@ El modelo se descarga por procedimiento explícito, no en caliente.
 
 ### 8.1 Estado actual
 
-- `sg-ai` **no iniciado** en esta sesión; sin puerto publicado, solo en `costamarindo-ai`.
-- Modelo `qwen2.5:3b` pendiente de descargar; el volumen `costamarindo-ai-models` está vacío.
-- `infra/scripts/pull-model.sh` implementa la conexión temporal a `bridge` para descargar.
-- `POST /api/dialog` existe con saneo, rate limit, banco de respaldo y log `dialog_blocked`;
-  **todavía no llama a Ollama** ni tiene prompt versionado ni UI de bocadillo.
+- `sg-ai` **levantado y healthy** en `10.83.0.2`; sin puerto publicado, solo en
+  `costamarindo-ai` (`internal: true`).
+- Modelo `qwen2.5:3b` descargado (1,9 GB) en el volumen `costamarindo-ai-models`.
+- `IA-01` medido: frío ~7,3 s; caliente ~1,6–2,1 s con el prompt real; RAM ~3,43 GiB de 4 GiB.
+- `backend/app/ai/prompts.py` contiene el prompt versionado de la Palenquera.
+- `backend/app/providers/ollama.py` implementa el cliente async con timeout y semáforo.
+- `POST /api/dialog` ya llama a Ollama, mantiene guardrails, rate limit y fallback por ítem/contexto.
+- `NpcDialogueController` crea el bocadillo en runtime y comenta capturas/peligros con 35 % de
+  probabilidad y 9 s de enfriamiento. Si no hay JWT real, usa frases locales.
+- `AuthStub` intenta `/api/auth/login` y `/api/auth/register`; si el backend no está desplegado,
+  cae al modo local de desarrollo.
+- **Pendiente:** probar el bocadillo dentro de Unity/WebGL y completar las claves de Supabase/JWT
+  para el arranque real del backend.
 
 ### 8.2 Backlog
 
 | ID | Tarea | Depende de | DoD |
 | :--- | :--- | :--- | :--- |
 | **IA-01** | Medir latencia y CPU reales de `qwen2.5:3b` dentro del contenedor | — | Número documentado; decisión de modelo confirmada o corregida |
-| **IA-02** | System prompt fijo de la Palenquera: español, ≤ 3 frases, solo seguridad, entrada delimitada como dato | — | Prompt versionado en `backend/app/ai/` |
+| **IA-02** | System prompt fijo de la Palenquera: español, ≤ 2 frases, solo juego/seguridad, entrada delimitada como dato | — | Prompt versionado en `backend/app/ai/` |
 | **IA-03** | Guardrails: detección de inyección, delimitadores `<jugador>…</jugador>`, filtro de salida (`<`, `>`, longitud) | IA-02 | Inyección bloqueada y registrada como `dialog_blocked` |
 | **IA-04** | Timeout 20 s, 1 request concurrente, cola y rate limit por usuario | BE-06 | Sin caída del backend con carga |
 | **IA-05** | Banco de respuestas por contexto (inicio, captura, peligro, game over, libro) | IA-02 | Fallback < 1 s y en personaje |
@@ -344,8 +354,11 @@ El modelo se descarga por procedimiento explícito, no en caliente.
 | **IA-07** | Confirmar que la respuesta no altera puntaje ni estado de partida | FE-09 | Test que lo demuestra |
 
 > **Ejecución por fases:** [`docs/fases/F7-ia.md`](docs/fases/F7-ia.md) define las seis fases
-> (F7.0–F7.5), sus puertas y la evidencia esperada. La primera acción es F7.1: levantar `sg-ai`,
-> descargar `qwen2.5:3b` y medir `IA-01` antes de tocar el prompt.
+> (F7.0–F7.5), sus puertas y la evidencia esperada.
+>
+> **Cierre 2026-11-13:** `IA-01` medido; `IA-02`–`IA-05` implementados; `IA-06` con 53 tests y
+> smoke test real; `IA-07` cubierto por test de no escritura en `scores`/`game_sessions`. Falta
+> la captura del bocadillo en WebGL y el arranque del backend con claves reales.
 
 ### 8.3 Criterio de terminado de la división
 
@@ -365,9 +378,9 @@ El modelo se descarga por procedimiento explícito, no en caliente.
 | **F2** | Vertical slice jugable | **Frontend** | — | ✅ offline cerrado |
 | **F3** | Build WebGL + Nginx | **Frontend** | Security (TLS/CSP) | ✅ cerrada (build a regenerar) |
 | **F4** | Supabase: Auth, esquema y leaderboard | **DB** | Backend (rate limit), Frontend (AuthClient) | ✅ cerrada en DEV |
-| **F5** | Backend FastAPI + puntaje firmado | **Backend** | DB (service_role), Frontend (clientes) | ✅ cerrada (diálogo IA pendiente) |
-| **F6** | Infraestructura Docker de 5 nodos | *Transversal*: un nodo por división | Security (aislamiento) | 🚧 frontend + agente arriba; backend sin claves; IA sin iniciar |
-| **F7** | NPC con Ollama | **IA** | Backend (endpoint), Frontend (bocadillo) | ⬜ pendiente |
+| **F5** | Backend FastAPI + puntaje firmado | **Backend** | DB (service_role), Frontend (clientes) | ✅ cerrada (diálogo IA conectado) |
+| **F6** | Infraestructura Docker de 5 nodos | *Transversal*: un nodo por división | Security (aislamiento) | 🚧 frontend + agente + IA arriba; backend sin claves |
+| **F7** | NPC con Ollama | **IA** | Backend (endpoint), Frontend (bocadillo) | 🚧 backend y nodo listos; falta bocadillo WebGL |
 | **F8** | Controles ISO, ataques y evidencias | **Security** | Las cuatro restantes | 🚧 A.8.25 completo; A.8.15/A.8.20/A.8.24 parciales |
 | **F9** | Despliegue final y entrega | *Transversal* | Las cinco | ⬜ pendiente |
 
@@ -381,7 +394,7 @@ división cierra el suyo.
 | Nodo | División dueña | Estado | Qué falta |
 | :--- | :--- | :--- | :--- |
 | `Sg-Frontend` | Frontend | ✅ healthy | Rebuild, `override` prod (BE-11) |
-| `Sg-AI` | IA | ⬜ no iniciado | Ollama, modelo y guardrails (IA-02…IA-06) |
+| `Sg-AI` | IA | ✅ healthy; `qwen2.5:3b` y guardrails listos | Probar bocadillo en WebGL y cerrar evidencia visual |
 | `Sg-Backend` | Backend | 🚧 imagen construida; no arranca sin claves de Supabase/JWT | Completar `.env` y healthcheck (BE-08) |
 | `Sg-Security` | Security | 🟡 cerrado operativamente: VM `172.18.18.220`, agente **002** Active, logs Nginx reales y `100250` con 36 alertas; A.8.20/A.8.24/A.8.15 con evidencia parcial | `backend.log`, alerta FIM end-to-end, prueba de aislamiento desde contenedor y tailnet (SEC-08) |
 | `Sg-DB` | DB | ✅ operativo | Proyecto PROD al desplegar (DB-08) |
@@ -558,9 +571,9 @@ CosTamarindo/
 │   ├── arquitectura.md         # nodos, redes, compose y flujo del equipo
 │   ├── api.md                  # contratos del backend (F5)
 │   ├── soa.md                  # Declaración de Aplicabilidad (F8)
-│   └── fases/                  # bitácora por fase (F0, F1, F2, F3, F6)
+│   └── fases/                  # bitácora por fase (F0–F7)
 ├── unity/                      # proyecto Unity 6 (Frontend)
-├── backend/                    # FastAPI (Backend) — hoy vacío
+├── backend/                    # FastAPI (Backend) + IA del NPC
 │   ├── app/                    # routers, modelos, seguridad, logging, ai
 │   ├── sql/                    # esquema versionado (DB)
 │   └── tests/

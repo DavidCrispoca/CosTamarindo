@@ -2,8 +2,8 @@
 
 > **Estado (2026-11-13):** `Sg-Frontend` está *healthy* y escribe logs reales; `Sg-Backend`
 > tiene imagen construida y dependencias actualizadas, pero **no arranca** hasta cargar las
-> claves de Supabase/JWT en `.env`; `Sg-AI` todavía **no se inicia** (el volumen del modelo
-> está vacío). `Sg-Security` es la **VM externa** `sg-security` (`172.18.18.220`, Ubuntu
+> claves de Supabase/JWT en `.env`; `Sg-AI` está **healthy** con `qwen2.5:3b` (1,9 GB) y el
+> endpoint de diálogo ya llama a Ollama. `Sg-Security` es la **VM externa** `sg-security` (`172.18.18.220`, Ubuntu
 > 24.04 + Wazuh 4.14.10), con el agente **002** activo y `100250` con 36 alertas sobre logs
 > reales de Nginx. El FIM guarda estado en `002.db`, pero Wazuh 4.14 no emite la alerta por
 > archivo en este all-in-one. La VM anterior `sg-jacome-security` se descartó; el servicio
@@ -71,7 +71,7 @@ Cada nodo tiene una **división dueña** con su propio backlog en `Plan.md`:
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
 | **Sg-Frontend** | `nginx:1.29-alpine` | Sirve el build WebGL, termina TLS, aplica CSP/HSTS, rate limit y proxy `/api/` | `dmz`, `app` | **443** (público), 8081 (solo dev local) | build montado `../builds/webgl` (ro), certs (ro), logs | 128 MB | A.8.19, A.8.20, A.8.24 |
 | **Sg-Backend** | Python 3.12 + FastAPI/Uvicorn (imagen propia, multi-stage, usuario `app`) | Valida JWT, firma HMAC, nonce, TTL y plausibilidad; único que escribe en la BD (`service_role`); único que llama a la IA | `app`, `data`, `ai`, `mgmt` | 8000 (**solo interno**) | ninguna: estado en Postgres | 512 MB | A.8.24, A.8.28, A.8.5, A.8.15 |
-| **Sg-AI** | `ollama/ollama` | NPC: diálogos en español con `qwen2.5:3b` | `ai` (**`internal: true`**) | 11434 (**solo interno**) | volumen `sg-ai-models` (~2,5 GB) | 4 GB | A.8.20, A.8.28 |
+| **Sg-AI** | `ollama/ollama` | NPC: diálogos en español con `qwen2.5:3b` | `ai` (**`internal: true`**) | 11434 (**solo interno**) | volumen `costamarindo-ai-models` (~2,5 GB) | 4 GB | A.8.20, A.8.28 |
 | **Sg-Security** | VM Ubuntu 24.04 + Wazuh 4.14.10 (manager/indexer/dashboard) + SonarQube bajo demanda | SIEM: recibe logs, reglas 100200–100250, FIM del webroot | `siem` (solo el agente) | 443 dashboard (**solo Default Switch/tailnet**), 1514/1515 (agentes) | volúmenes de la VM | fuera del host del juego | A.8.15, A.8.25 |
 | **Sg-DB** | **Supabase Cloud** (Postgres 15 + GoTrue) | Identidad, leaderboard, `game_sessions` | — (salida 443 desde `data`) | 443 salida | gestionada por Supabase + `pg_dump` diario | — | A.8.5, A.8.28, A.8.13 |
 
