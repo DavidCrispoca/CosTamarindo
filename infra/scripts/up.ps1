@@ -29,10 +29,16 @@ function Resolve-Docker {
 
 $docker = Resolve-Docker
 $infraDir = Split-Path -Parent $PSScriptRoot
+$rootDir = Split-Path -Parent $infraDir
 $composePath = Join-Path $infraDir 'docker-compose.yml'
 $overridePath = Join-Path $infraDir 'docker-compose.override.yml'
+$rootEnv = Join-Path $rootDir '.env'
 
-$arguments = @('compose', '-f', $composePath)
+$arguments = @('compose')
+if (Test-Path $rootEnv) {
+    $arguments += @('--env-file', $rootEnv)
+}
+$arguments += @('-f', $composePath)
 if (-not $Prod -and (Test-Path $overridePath)) {
     $arguments += @('-f', $overridePath)
 }
