@@ -37,7 +37,8 @@ Dejar el NPC de la Palenquera funcionando de punta a punta:
 **Estado 2026-11-13.** `Sg-AI` está operativo y el endpoint ya genera texto real. La prueba de
 extremo a extremo se hizo con un backend de prueba (repositorio en memoria + JWT firmado) porque
 el backend completo sigue bloqueado por las claves de Supabase/JWT. El bocadillo de Unity está
-implementado y usa respaldo local si no hay JWT real; falta compilarlo y verlo en WebGL.
+implementado y usa respaldo local si no hay JWT real; los scripts ya compilan, falta el build
+WebGL y la prueba visual.
 
 ---
 
@@ -159,7 +160,8 @@ sigue respondiendo sin error 500.
 partida, sin bloquear el gameplay.
 
 **Puerta:** funciona en WebGL, el contexto cambia la respuesta y el puntaje no se altera.
-**Estado:** código implementado; falta compilar y probar en WebGL. `builds/webgl` sigue vacío.
+**Estado:** código implementado y compilado en batchmode (exit 0, sin `error CS`); falta generar
+el build WebGL y probar el bocadillo en el navegador. `builds/webgl` sigue vacío.
 
 ---
 

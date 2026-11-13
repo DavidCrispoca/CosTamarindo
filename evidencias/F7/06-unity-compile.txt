@@ -1,0 +1,21 @@
+Compilación de scripts de Unity (sin generar WebGL)
+Fecha: 2026-11-13
+Editor: Unity 6000.3.27f1
+Método: copia del proyecto en %TEMP%\opencode\unity-compile para no tocar los .meta del repo.
+
+Comando:
+  Unity.exe -batchmode -nographics -quit -projectPath <copia> -logFile compile.log
+
+Resultado del log:
+  Scripting: domain reloads=1, domain reload time=10020 ms, compile time=20484 ms, other=94 ms
+  CompileScripts: 20483.762ms
+  Exiting batchmode successfully now!
+  Exiting without the bug reporter.
+  Application will terminate with return code 0
+
+Comprobación:
+  Sin líneas "error CS", "Compilation failed" ni "Scripts have compiler errors".
+
+Limitación:
+  Esto valida que los scripts compilan. No genera el build WebGL ni ejecuta el juego;
+  falta el build y la captura del bocadillo en el navegador.

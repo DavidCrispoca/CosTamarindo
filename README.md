@@ -50,8 +50,8 @@ backlog y criterio de terminado en [`Plan.md`](Plan.md) §4–§8.
 1. **Frontend**: regenerar `builds/webgl`, cablear el arte, UI de Figma, clientes de red y
    login obligatorio.
 2. **Backend**: cargar las claves de Supabase/JWT y validar el arranque completo.
-3. **IA**: compilar el bocadillo en WebGL y guardar la captura; el nodo, el prompt y el endpoint
-   ya están listos.
+3. **IA**: generar el build WebGL y guardar la captura del bocadillo; el nodo, el prompt, el
+   endpoint y la compilación C# ya están listos.
 4. **Security**: cerrar A.8.15/A.8.20/A.8.24 y los 6 controles restantes con ataque y evidencia.
 5. **Entrega**: build final, E2E de navegador, informe, runbook y demo.
 

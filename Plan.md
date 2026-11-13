@@ -338,8 +338,9 @@ El modelo se descarga por procedimiento explícito, no en caliente.
   probabilidad y 9 s de enfriamiento. Si no hay JWT real, usa frases locales.
 - `AuthStub` intenta `/api/auth/login` y `/api/auth/register`; si el backend no está desplegado,
   cae al modo local de desarrollo.
-- **Pendiente:** probar el bocadillo dentro de Unity/WebGL y completar las claves de Supabase/JWT
-  para el arranque real del backend.
+- **Pendiente:** generar el build WebGL y probar el bocadillo en el navegador; completar las
+  claves de Supabase/JWT para el arranque real del backend. Los scripts C# ya compilaron en
+  batchmode (exit 0, sin `error CS`).
 
 ### 8.2 Backlog
 

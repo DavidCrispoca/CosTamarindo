@@ -63,7 +63,12 @@ de generación.
 backend no está desplegado, cae al modo local de desarrollo. Un PIN incorrecto del backend no
 cae al modo local.
 
-**Pendiente:** compilar y probar en WebGL. `builds/webgl` está vacío.
+`06-unity-compile.txt` valida la compilación en batchmode con Unity 6000.3.27f1: **exit 0**,
+`CompileScripts: 20483.762ms` y sin `error CS`. Se compiló una copia en `%TEMP%` para no tocar
+los `.meta` del repo.
+
+**Pendiente:** generar el build WebGL y probar el bocadillo en el navegador. `builds/webgl` está
+vacío.
 
 ---
 

@@ -65,7 +65,9 @@ para no depender de Supabase. Ver `evidencias/F7/03-endpoint-real.txt`.
 
 ### 2.2 Probar el bocadillo en Unity/WebGL
 
-`NpcDialogueController` se crea solo en la escena `Game` después de cargarla. Para verlo:
+`NpcDialogueController` se crea solo en la escena `Game` después de cargarla. Los scripts ya
+compilaron en batchmode con Unity 6000.3.27f1 (exit 0, sin `error CS`; ver
+`evidencias/F7/06-unity-compile.txt`). Para verlo en el juego:
 
 1. Generar el build WebGL en `builds/webgl` (hoy está vacío).
 2. Entrar por `https://juego.local/` y autenticarse.
