@@ -1,0 +1,38 @@
+﻿rule=100250 matches=36
+{
+  "timestamp": "2026-11-13T14:10:55.071-0500",
+  "rule": {
+    "level": 5,
+    "description": "CosTamarindo: Nginx aplico rate limit (HTTP 429)",
+    "id": "100250",
+    "firedtimes": 36,
+    "mail": false,
+    "groups": [
+      "costamarindo"
+    ]
+  },
+  "agent": {
+    "id": "002",
+    "name": "sg-game-host",
+    "ip": "10.85.0.2"
+  },
+  "manager": {
+    "name": "sg-security"
+  },
+  "id": "1794597055.59190",
+  "full_log": "{\"time\":\"2026-11-13T19:11:13+00:00\",\"remote_addr\":\"10.80.0.1\",\"request\":\"GET /api/health HTTP/1.1\",\"status\":429,\"bytes\":162,\"referer\":\"\",\"user_agent\":\"curl/8.22.0\",\"request_id\":\"17d0065c46f530112f807010bd99594d\",\"request_time\":0}",
+  "decoder": {
+    "name": "json"
+  },
+  "data": {
+    "status": "429",
+    "time": "2026-11-13T19:11:13+00:00",
+    "remote_addr": "10.80.0.1",
+    "request": "GET /api/health HTTP/1.1",
+    "bytes": "162",
+    "user_agent": "curl/8.22.0",
+    "request_id": "17d0065c46f530112f807010bd99594d",
+    "request_time": "0"
+  },
+  "location": "/var/log/nginx/access.log"
+}

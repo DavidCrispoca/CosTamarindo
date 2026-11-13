@@ -3,7 +3,9 @@
 > **División:** Security · **Nodo:** `Sg-Security`
 > **Backlog:** `Plan.md` §7 (`SEC-01`…`SEC-14`)
 > **Evidencia existente:** [`../../evidencias/`](../../evidencias/)
-> **Estado:** 1 de 10 controles evidenciado (A.8.25). La API y la base ya están listas para atacar.
+> **Estado:** A.8.25 completo; A.8.15, A.8.20 y A.8.24 con evidencia parcial. La API tiene
+> código y tests, pero el backend no arranca hasta cargar las claves de Supabase/JWT; el
+> build WebGL no está presente en este clon.
 
 ---
 
@@ -13,12 +15,12 @@ Todo lo que sigue funciona **ahora**, con el entorno levantado:
 
 | Superficie | Dónde | Estado |
 | :--- | :--- | :--- |
-| API | `https://juego.local/api/*` | ✅ operativa |
-| Auth | `/api/auth/register`, `/login`, `/refresh` | ✅ real contra Supabase |
-| Puntaje | `/api/session/start` + `/api/score` | ✅ HMAC, nonce, TTL, plausibilidad |
-| Diálogo | `/api/dialog` | ✅ saneo y rate limit; **sin Ollama** (responde del banco) |
+| API | `https://juego.local/api/*` | 🚧 código y tests listos; backend no arranca sin claves |
+| Auth | `/api/auth/register`, `/login`, `/refresh` | 🚧 contrato listo; depende del backend |
+| Puntaje | `/api/session/start` + `/api/score` | 🚧 HMAC, nonce, TTL y tests; falta ataque real |
+| Diálogo | `/api/dialog` | 🚧 saneo y rate limit; sin Ollama (responde del banco) |
 | Base | PostgREST (`/rest/v1/`) | ✅ cerrado: `anon` recibe 401 |
-| Frontend | build WebGL | ✅ servido por Nginx |
+| Frontend | build WebGL | 🚧 Nginx y TLS operativos; `builds/webgl` vacío |
 
 Lo que **todavía no** se puede atacar y por qué:
 
@@ -27,7 +29,7 @@ Lo que **todavía no** se puede atacar y por qué:
 | A.8.9 (editar IndexedDB) | depende de `FE-07`: hoy el cliente no envía puntajes |
 | A.8.12 (consola y `strings`) | depende del build final (`FE-12`) |
 | A.8.19 (reemplazar `.wasm`) | depende de `FE-12` y de `SHA256SUMS` |
-| A.8.15 (Wazuh) | el perfil `security` está declarado pero apagado |
+| A.8.15 (Wazuh) | Wazuh está activo y `100250` dispara; falta `backend.log` y la alerta FIM por archivo |
 
 ---
 
@@ -35,15 +37,15 @@ Lo que **todavía no** se puede atacar y por qué:
 
 | # | Control | Implementación | Evidencia | Falta |
 | :--- | :--- | :--- | :--- | :--- |
-| 1 | **A.8.24** Criptografía | HMAC-SHA256 + nonce + TTL + TLS | ⬜ | ataque con Burp y captura de `bad_signature` |
+| 1 | **A.8.24** Criptografía | HMAC-SHA256 + nonce + TTL + TLS local mkcert | 🚧 | ataque con Burp y captura de `bad_signature`; cifrado en reposo |
 | 2 | **A.8.5** Autenticación | Supabase Auth + bloqueo 5/60 s + PIN débil rechazado | ⬜ | fuerza bruta, JWT manipulado, captura del 423 |
 | 3 | **A.8.9** Configuración | servidor autoritativo; cliente no escribe | ⬜ | edición de IndexedDB (tras `FE-07`) |
-| 4 | **A.8.20** Redes | 5 redes Docker, un solo puerto público | 🚧 | `nmap` formal y captura |
+| 4 | **A.8.20** Redes | 5 redes Docker, un solo puerto público | 🚧 | `nmap` host+VM hecho; falta contenedor |
 | 5 | **A.8.12** DLP | sin secretos en cliente; IP enmascarada en logs | ⬜ | consola + `strings` del build |
-| 6 | **A.8.15** Logging | JSON a stdout con `request_id` | 🚧 | Wazuh, reglas 100100/100101, FIM |
+| 6 | **A.8.15** Logging | JSON a stdout con `request_id` | 🚧 | Wazuh activo, `100250` (36); falta `backend.log` y alerta FIM |
 | 7 | **A.8.28** Codificación segura | Pydantic, SQL parametrizado, saneo, RLS | ⬜ | SQLi, XSS/rich text, prompt injection |
 | 8 | **A.8.31** Separación | guard `assert_environment` + claim `env` | ⬜ | token DEV contra PROD (necesita PROD) |
-| 9 | **A.8.25** SDLC | Gitleaks + hook + historial | ✅ | CI (GitHub Actions) |
+| 9 | **A.8.25** SDLC | Gitleaks + hook + historial | ✅ | CI en `.github/workflows/security.yml` |
 | 10 | **A.8.19** Instalación | — | ⬜ | `SHA256SUMS` + GPG + FIM |
 
 **Nivel 2 ya cubierto sin querer:** A.8.13 (copia de seguridad) tiene evidencia real en
@@ -205,19 +207,24 @@ usarlo contra PROD → `401 invalid_token`.
 
 ### 3.13 A.8.15 — logs y Wazuh
 
-Hoy los eventos salen como JSON a stdout y `docker logs` los muestra. Falta:
+El nodo Wazuh ya está activo y el agente **002** está en el grupo `game`. Lo que falta:
 
-1. Encender el perfil: `powershell -File infra/scripts/up.ps1 security`.
-2. Reglas `100100` (score rechazado) y `100101` (5 rechazos en 120 s desde la misma IP).
-3. FIM sobre `/usr/share/nginx/html`.
-4. `wazuh-logtest` para validar el decoder JSON antes de atacar.
+1. El perfil `security` del host ya está levantado; si se reinicia, usar
+   `powershell -File infra/scripts/up.ps1 security`.
+2. Reglas `100200–100250` (no `100100/100101`): `100250` ya disparó 36 veces con una
+   ráfaga `429`; las reglas de negocio esperan `backend.log`.
+3. FIM sobre `/fim/webgl` (en el host, `builds/webgl`), no sobre
+   `/usr/share/nginx/html`; el manager guarda estado en `002.db`.
+4. `wazuh-logtest` ya se usó para validar el decoder JSON; falta la alerta FIM por archivo,
+   que es una limitación de Wazuh 4.14 all-in-one.
+5. Evidencia actual: [`../../evidencias/A.8.15/`](../../evidencias/A.8.15/README.md).
 
 ---
 
 ## 4. Formato de evidencia (obligatorio)
 
 Cada control va en `evidencias/<control>/` con esta estructura. Copiar
-[`_plantilla-evidencia.md`](_plantilla-evidencia.md).
+[`evidencias/_plantilla/README.md`](../../evidencias/_plantilla/README.md).
 
 | Archivo | Contenido |
 | :--- | :--- |

@@ -1,0 +1,33 @@
+﻿# Certificado local de juego.local
+# fecha: 2026-11-13
+
+## CA local de mkcert en el almacen del usuario
+
+
+Subject    : CN=mkcert YOANN2004\yoann@Yoann2004 (Yoann Esteban Jácome García), OU=YOANN2004\yoann@Yoann2004 (Yoann 
+             Esteban Jácome García), O=mkcert development CA
+Issuer     : CN=mkcert YOANN2004\yoann@Yoann2004 (Yoann Esteban Jácome García), OU=YOANN2004\yoann@Yoann2004 (Yoann 
+             Esteban Jácome García), O=mkcert development CA
+NotBefore  : 13/11/2026 2:07:47 p. m.
+NotAfter   : 13/11/2036 2:07:47 p. m.
+Thumbprint : B89A34A49D0F3F34B7EC14D07297B897A986F59C
+
+
+
+
+## Archivos generados
+
+Name                Length LastWriteTime           
+----                ------ -------------           
+juego.local-key.pem   1708 13/11/2026 2:07:47 p. m.
+juego.local.pem       1679 13/11/2026 2:07:47 p. m.
+
+
+
+## SANs y vigencia
+subject=O=mkcert development certificate, OU=YOANN2004\\yoann@Yoann2004 (Yoann Esteban J├ícome Garc├¡a)
+issuer=O=mkcert development CA, OU=YOANN2004\\yoann@Yoann2004 (Yoann Esteban J├ícome Garc├¡a), CN=mkcert YOANN2004\\yoann@Yoann2004 (Yoann Esteban J├ícome Garc├¡a)
+notBefore=Nov 13 19:07:47 2026 GMT
+notAfter=Feb 13 19:07:47 2029 GMT
+X509v3 Subject Alternative Name: 
+    DNS:juego.local, DNS:localhost, IP Address:127.0.0.1, IP Address:0:0:0:0:0:0:0:1

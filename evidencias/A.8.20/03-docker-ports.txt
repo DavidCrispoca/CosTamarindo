@@ -1,0 +1,27 @@
+﻿# Puertos publicados vs expuestos
+# fecha: 2026-11-13
+
+## Contenedores en ejecucion
+NAMES            STATUS                   PORTS
+sg-frontend      Up 7 minutes (healthy)   0.0.0.0:443->443/tcp, [::]:443->443/tcp
+sg-wazuh-agent   Up 46 seconds            
+
+## Configuracion declarada en Compose (todos los perfiles)
+- frontend: ports=[443:443] expose=[(ninguno)]
+- backend: ports=[(ninguno)] expose=[8000]
+- ai: ports=[(ninguno)] expose=[11434]
+- wazuh-agent: ports=[(ninguno)] expose=[(ninguno)]
+- security: ports=[(ninguno)] expose=[(ninguno)]
+
+## Prueba de alcance desde el host
+nmap -sT -Pn --unprivileged -p 8000,11434 127.0.0.1
+Starting Nmap 7.80 ( https://nmap.org ) at 2026-11-13 14:16 Hora est. PacÝfico, SudamÚrica
+WARNING: Could not import all necessary Npcap functions. You may need to upgrade to the latest version from https://npcap.org. Resorting to connect() mode -- Nmap may not function completely
+Nmap scan report for juego.local (127.0.0.1)
+Host is up.
+
+PORT      STATE    SERVICE
+8000/tcp  filtered http-alt
+11434/tcp filtered unknown
+
+Nmap done: 1 IP address (1 host up) scanned in 3.05 seconds

@@ -1,0 +1,36 @@
+﻿# Cabeceras TLS/HTTP de Sg-Frontend
+# fecha: 2026-11-13
+# comando: curl --ssl-no-revoke -D - -o NUL https://juego.local/
+
+HTTP/1.1 403 Forbidden
+Server: nginx
+Date: Fri, 13 Nov 2026 19:15:08 GMT
+Content-Type: text/html
+Content-Length: 146
+Connection: keep-alive
+X-Content-Type-Options: nosniff
+X-Frame-Options: DENY
+Referrer-Policy: no-referrer
+Permissions-Policy: geolocation=(), microphone=(), camera=()
+Cross-Origin-Opener-Policy: same-origin
+Content-Security-Policy: script-src 'self' 'wasm-unsafe-eval' 'sha256-1ntox3z/2O16VrZEMiYZhT/BnU7bFWrGH/JO1/vl80M='; default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; worker-src 'self' blob:; object-src 'none'; base-uri 'none'; frame-ancestors 'none'
+Strict-Transport-Security: max-age=31536000
+Cache-Control: public, max-age=604800
+
+
+# comando: curl --ssl-no-revoke -D - -o NUL https://juego.local/api/health
+
+HTTP/1.1 502 Bad Gateway
+Server: nginx
+Date: Fri, 13 Nov 2026 19:15:12 GMT
+Content-Type: text/html
+Content-Length: 150
+Connection: keep-alive
+X-Content-Type-Options: nosniff
+X-Frame-Options: DENY
+Referrer-Policy: no-referrer
+Permissions-Policy: geolocation=(), microphone=(), camera=()
+Cross-Origin-Opener-Policy: same-origin
+Content-Security-Policy: script-src 'self' 'wasm-unsafe-eval' 'sha256-1ntox3z/2O16VrZEMiYZhT/BnU7bFWrGH/JO1/vl80M='; default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; worker-src 'self' blob:; object-src 'none'; base-uri 'none'; frame-ancestors 'none'
+Strict-Transport-Security: max-age=31536000
+
