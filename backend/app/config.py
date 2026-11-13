@@ -52,6 +52,16 @@ class Settings(BaseSettings):
     backend_port: int = 8000
     cors_allowed_origins: str = "https://juego.local"
 
+    # IA (Sg-AI). El backend es el único que habla con Ollama; el puerto 11434
+    # nunca se publica. Si la IA falla, el diálogo usa el banco de respaldo.
+    ollama_url: str = "http://sg-ai:11434"
+    ollama_model: str = "qwen2.5:3b"
+    ollama_timeout_seconds: int = Field(default=20, ge=1, le=120)
+    ollama_connect_timeout_seconds: float = Field(default=0.75, gt=0, le=5)
+    ollama_max_concurrency: int = Field(default=1, ge=1, le=4)
+    ollama_num_predict: int = Field(default=120, ge=16, le=512)
+    ollama_temperature: float = Field(default=0.8, ge=0.0, le=2.0)
+
     # Observabilidad
     log_level: str = "INFO"
 

@@ -168,22 +168,35 @@ Sin token devuelve el top; con token agrega la fila propia marcada.
 
 ### 4.1 `POST /api/dialog`
 
-Requiere `Bearer`.
+Requiere `Bearer`. Sirve para una pregunta del jugador o para un evento de la partida.
 
 ```json
-{ "text": "¿qué es el phishing?" }
+{ "text": "¿qué es el phishing?", "context": "defecto" }
+```
+
+```json
+{ "context": "captura", "item": "Tamarindo", "kind": "good" }
 ```
 
 ```json
 { "reply": "…", "blocked": false }
 ```
 
-- Máximo 200 caracteres y 10 peticiones por minuto y usuario.
+- `text` es opcional si se envía `item`; juntos no pueden superar 200 caracteres de texto
+  y 40 de nombre de ítem.
+- `context` admite `inicio`, `captura`, `peligro`, `game_over`, `libro` y `defecto`.
+- `kind` admite `good`, `danger` y `trash`; se usa para que el comentario sea pertinente.
+- Máximo 10 peticiones por minuto y usuario.
 - Se eliminan `<` y `>` y los caracteres de control antes de cualquier uso.
 - Un patrón de inyección devuelve `blocked: true`, se registra como `dialog_blocked` y
   responde con el texto de respaldo.
-- **La llamada a Ollama todavía no está conectada**: esta versión responde del banco de
-  respaldos. Es la tarea `IA-02`…`IA-04`. El contrato no cambia cuando se conecte.
+- La entrada del jugador se envuelve en `<jugador>…</jugador>` y se trata como dato, nunca
+  como instrucción.
+- El backend llama a Ollama en `Sg-AI` con `connect_timeout=0.75 s`, `read_timeout=20 s` y un
+  solo request concurrente. Si Ollama falla, responde el banco de respaldo por contexto/ítem en
+  menos de 1 s y registra `dialog_fallback`.
+- La respuesta se filtra (sin `<`/`>`, máximo 300 caracteres) antes de devolverla.
+- El NPC es cosmético: este endpoint no toca `game_sessions` ni `scores`.
 
 ---
 
@@ -226,7 +239,8 @@ Se emiten como JSON a stdout:
 `app_start`, `db_ready`, `db_warmup_retry`, `db_warmup_failed`, `register_ok`,
 `register_rejected`, `register_failed`, `login_ok`, `login_fail`, `login_blocked`,
 `token_refresh`, `logout`, `session_start`, `score_accepted`, `score_rejected`,
-`dialog_blocked`, `health_degraded`, `database_error`, `unhandled_error`.
+`dialog_blocked`, `dialog_fallback`, `dialog_ok`, `health_degraded`, `database_error`,
+`unhandled_error`.
 
 Campos: `ts`, `level`, `event`, `request_id`, `user_id`, y el detalle del evento. La IP
 se registra enmascarada (último octeto a cero).

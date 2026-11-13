@@ -87,9 +87,8 @@ services:
       - ai
       - mgmt
 
-    depends_on:
-      ai:
-        condition: service_healthy
+    # Sin depends_on de `ai`: si Ollama está caído, el backend igual arranca y
+    # /api/dialog responde del banco de respaldo. La IA nunca bloquea el juego.
 
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8000/api/health').status==200 else 1)"]
