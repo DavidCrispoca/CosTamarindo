@@ -343,6 +343,10 @@ El modelo se descarga por procedimiento explícito, no en caliente.
 | **IA-06** | Pruebas: normal, injection, Ollama apagado, respuesta lenta | IA-03, IA-05 | 4 casos documentados con salida literal |
 | **IA-07** | Confirmar que la respuesta no altera puntaje ni estado de partida | FE-09 | Test que lo demuestra |
 
+> **Ejecución por fases:** [`docs/fases/F7-ia.md`](docs/fases/F7-ia.md) define las seis fases
+> (F7.0–F7.5), sus puertas y la evidencia esperada. La primera acción es F7.1: levantar `sg-ai`,
+> descargar `qwen2.5:3b` y medir `IA-01` antes de tocar el prompt.
+
 ### 8.3 Criterio de terminado de la división
 
 - Respuestas en personaje y en español.

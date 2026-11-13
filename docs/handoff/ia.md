@@ -2,6 +2,7 @@
 
 > **División:** IA · **Nodo:** `Sg-AI`
 > **Backlog:** `Plan.md` §8 (`IA-01`…`IA-07`)
+> **Fases:** [`../fases/F7-ia.md`](../fases/F7-ia.md) (F7.0–F7.5)
 > **Contrato:** [`../api.md`](../api.md) §4 · **Código a tocar:** `backend/app/services/dialog_service.py`
 > **Estado:** nodo **no iniciado**; el código del endpoint y los guardrails están listos, pero
 > `sg-ai` no está levantado y el volumen del modelo está vacío. El endpoint puede responder del
