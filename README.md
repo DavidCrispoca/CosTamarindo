@@ -20,16 +20,16 @@ backlog y criterio de terminado en [`Plan.md`](Plan.md) §4–§8.
 
 | División | Nodo | Estado real (2026-11-13) | Documento |
 | :--- | :--- | :--- | :--- |
-| **Frontend** | `Sg-Frontend` | 🚧 Nginx/TLS *healthy*; `builds/webgl` vacío → `403`; arte sin cablear | [`Plan.md` §4](Plan.md) |
+| **Frontend** | `Sg-Frontend` | 🟡 Nginx/TLS *healthy*; build WebGL generado; arte sin cablear | [`Plan.md` §4](Plan.md) |
 | **Backend** | `Sg-Backend` | 🚧 API y 53/53 tests; imagen construida, no arranca sin claves | [`Plan.md` §5](Plan.md) |
 | **DB** | `Sg-DB` | ✅ Supabase DEV con RLS y backup probado | [`Plan.md` §6](Plan.md) |
 | **Security** | `Sg-Security` | 🟡 A.8.25 completo; A.8.15/A.8.20/A.8.24 parciales; SoA de 93 controles | [`evidencias/`](evidencias/) |
-| **IA** | `Sg-AI` | 🚧 Ollama healthy, `qwen2.5:3b` y endpoint listos; falta bocadillo WebGL | [`Plan.md` §8](Plan.md) |
+| **IA** | `Sg-AI` | ✅ Ollama healthy, `qwen2.5:3b`, endpoint y pensamiento WebGL probados; falta backend real | [`Plan.md` §8](Plan.md) |
 
 ### Qué funciona hoy
 
 - **Nginx / `Sg-Frontend`** sirve en <https://juego.local> con TLS de mkcert, CSP por hash
-  y HSTS; el `403` de la raíz es porque `builds/webgl` está vacío en este clon.
+  y HSTS; el build WebGL ya está generado y la raíz responde `200`.
 - **Bucle jugable offline** implementado: menú → partida → 3 vidas → game over → reintento,
   con Libro de colección, feedback de captura y SFX sintetizado. **15/15** tests PlayMode
   verdes (última corrida 2026-11-03).
@@ -50,8 +50,8 @@ backlog y criterio de terminado en [`Plan.md`](Plan.md) §4–§8.
 1. **Frontend**: regenerar `builds/webgl`, cablear el arte, UI de Figma, clientes de red y
    login obligatorio.
 2. **Backend**: cargar las claves de Supabase/JWT y validar el arranque completo.
-3. **IA**: generar el build WebGL y guardar la captura del bocadillo; el nodo, el prompt, el
-   endpoint y la compilación C# ya están listos.
+3. **IA**: validar con el backend real; el nodo, el prompt, el build WebGL, la captura del
+   pensamiento anclado al sprite, el endpoint y la compilación C# ya están listos.
 4. **Security**: cerrar A.8.15/A.8.20/A.8.24 y los 6 controles restantes con ataque y evidencia.
 5. **Entrega**: build final, E2E de navegador, informe, runbook y demo.
 

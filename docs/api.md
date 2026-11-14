@@ -179,11 +179,15 @@ Requiere `Bearer`. Sirve para una pregunta del jugador o para un evento de la pa
 ```
 
 ```json
+{ "context": "game_over", "text": "La partida terminó" }
+```
+
+```json
 { "reply": "…", "blocked": false }
 ```
 
 - `text` es opcional si se envía `item`; juntos no pueden superar 200 caracteres de texto
-  y 40 de nombre de ítem.
+  y 40 de nombre de ítem. En `game_over` no hay ítem, así que el cliente envía un texto de evento.
 - `context` admite `inicio`, `captura`, `peligro`, `game_over`, `libro` y `defecto`.
 - `kind` admite `good`, `danger` y `trash`; se usa para que el comentario sea pertinente.
 - Máximo 10 peticiones por minuto y usuario.

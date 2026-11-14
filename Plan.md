@@ -35,7 +35,7 @@ Un videojuego 2D jugable en el navegador (Unity 6 → WebGL) servido por Nginx, 
       navegador limpio.
 - [ ] Registro/login con usuario + PIN → partida → envío de puntaje aceptado → top 5 visible.
 - [ ] Puntaje alterado, replay y sesión expirada rechazados y registrados en logs.
-- [ ] NPC responde con Ollama; con Ollama caído el juego devuelve respuesta de respaldo y sigue
+- [x] NPC responde con Ollama; con Ollama caído el juego devuelve respuesta de respaldo y sigue
       funcionando.
 - [ ] `docker compose up` levanta el entorno completo; desde fuera solo el puerto 443 está expuesto.
 - [ ] Un archivo de evidencia por cada uno de los 10 controles en `evidencias/`.
@@ -74,10 +74,10 @@ terminado. Nada se da por hecho porque «funciona en el editor»: se verifica en
 | Arte de personaje y fondo | Palenquera y `bg_playa.png` importados y en la escena | `unity/Assets/Art/Characters/`, `.../Backgrounds/` |
 | Arte de ítems | ⚠️ **Regresión real**: los 4 sprites originales se borraron y la escena quedó con 4 referencias rotas. Hay 60 PNG nuevos sin cablear | ver §3.2 |
 | UI de Figma | 0 componentes exportados; `unity/Assets/Art/UI/` está **vacío** | — |
-| Build WebGL | 🚧 `builds/webgl` vacío en este clon; el build de 16,2 MB de 2026-10-28 no está presente | `builds/` (no versionado) |
+| Build WebGL | ✅ `builds/webgl` generado (16,2 MB) y servido en `https://juego.local/` con CSP regenerada | `builds/` (no versionado) |
 | Nginx / Sg-Frontend | Operativo: 443 (8081 solo con override de dev), TLS local con mkcert, CSP por hash, HSTS, proxy `/api/` | `infra/nginx/`, [`docs/fases/F3.md`](docs/fases/F3.md) |
 | Docker | Compose de 5 nodos declarado y validado. `sg-frontend`, `sg-wazuh-agent` y `sg-ai` arriba; `sg-backend` no arranca sin claves | `infra/docker-compose.yml`, [`evidencias/F6/`](evidencias/F6/README.md) |
-| Modelo de IA | ✅ `qwen2.5:3b` descargado (1,9 GB); `Sg-AI` healthy, sin puerto publicado | [`evidencias/F7/`](evidencias/F7/README.md) |
+| Modelo de IA | ✅ `qwen2.5:3b` descargado (1,9 GB); `Sg-AI` healthy, sin puerto publicado; NPC probado en WebGL | [`evidencias/F7/`](evidencias/F7/README.md) |
 | Backend | 🚧 API completa en `backend/` y 53/53 tests; imagen construida, pero no arranca sin las claves de Supabase/JWT en `.env` | [`evidencias/F5/`](evidencias/F5/README.md) |
 | Base de datos | ✅ Supabase DEV con esquema versionado, RLS cerrado, leaderboard y backup/restauración probados | [`evidencias/F4/`](evidencias/F4/README.md) |
 | Logs / SIEM | 🟡 Wazuh 4.14 en VM, agente **002**, reglas `100200–100250`, logs Nginx reales y `100250`; FIM guarda estado sin alerta por archivo; `backend.log` pendiente | `infra/wazuh/`, `infra/docker-compose.yml` |
@@ -118,9 +118,9 @@ porque afectan a la planificación:
    compose solo tenía `Sg-Frontend`; `docs/fases/F2.md` decía que jugador y fondo eran
    placeholders; `docs/fases/F6.md` y `infra/README.md` no reflejaban la verificación del
    2026-11-03. Todo eso quedó corregido en esta misma pasada.
-7. **El build de 16,2 MB no está en este clon** y, cuando existió, era previo al arte actual.
-   `builds/webgl` está vacío y `https://juego.local/` devuelve `403`; hay que regenerarlo
-   después de cerrar `FE-02` y repetir cualquier medición de peso.
+7. **El build de 16,2 MB no estaba en este clon** y, cuando existió, era previo al arte actual.
+   Ya se regeneró: `builds/webgl` se sirve en `https://juego.local/` con `200`. Falta cerrar
+   `FE-02` (arte) y repetir la medición de peso con el arte definitivo.
 
 ---
 
@@ -143,10 +143,10 @@ de negocio. El cliente **nunca es fuente de verdad** (A.8.9): solo presenta.
 | Ítems con arte | ⛔ referencias rotas (§3.2.1) |
 | Componentes de UI de Figma | ⛔ 0/~30 |
 | Tokens (17 colores, 5 estilos) | ⛔ hardcodeados en el `SceneBuilder` |
-| Build WebGL | 🚧 vacío en este clon; el anterior (16,2 MB) era previo al arte actual |
+| Build WebGL | ✅ generado (16,2 MB) y servido; el arte sigue pendiente de FE-01/FE-02 |
 | Nginx + TLS + CSP | ✅ operativo |
 | Leaderboard y envío de puntaje | ⛔ no existen en el cliente |
-| Bocadillo del NPC | ✅ `NpcDialogueController` en runtime; falta probar en WebGL |
+| Bocadillo del NPC | ✅ Pensamiento en runtime anclado al sprite, build WebGL y captura |
 
 ### 4.2 Backlog
 
@@ -160,7 +160,7 @@ de negocio. El cliente **nunca es fuente de verdad** (A.8.9): solo presenta.
 | **FE-06** | Aplicar el kit a HUD, pausa, game over, Libro y Login; reemplazar corazones de LiberationSans por el sprite | FE-05 | HUD sin placeholders tipográficos; consola limpia |
 | **FE-07** | Cliente de red: `ApiClient`, `SessionClient`, `ScoreSigner`, `LeaderboardClient`, `DialogueClient` (`UnityWebRequest`, token en memoria) | BE-02…BE-05 | Flujo real contra `https://juego.local/api/` sin secretos en el cliente |
 | **FE-08** | Pantalla de leaderboard (top 5 + posición propia) y estados vacío/error/timeout | FE-07 | Se ve el top 5 tras enviar un puntaje |
-| **FE-09** | Bocadillo del NPC: “escribiendo…”, historial corto, sin bloquear gameplay, fallback visible | FE-07, IA-03 | ✅ Código runtime con fallback local; falta build WebGL y captura |
+| **FE-09** | Bocadillo del NPC: “escribiendo…”, historial corto, sin bloquear gameplay, fallback visible | FE-07, IA-03 | 🟡 Pensamiento runtime anclado al sprite, build y captura F7; faltan “escribiendo…” e historial |
 | **FE-10** | Hacer `Login` obligatorio (build index 0) y encadenar `Login → Game` | FE-07 | Sin sesión no se juega; logout limpia memoria |
 | **FE-11** | Playtest de 10–15 min y ajuste de `spawnInterval` / `fallSpeed` | FE-01 | Curva de dificultad validada por una persona real |
 | **FE-12** | Rebuild Release + medición (tamaño, tiempo de carga, errores de consola) | FE-01, FE-07…FE-10 | ≤ 30 MB, < 10 s, 0 errores, 0 warnings |
@@ -338,9 +338,10 @@ El modelo se descarga por procedimiento explícito, no en caliente.
   probabilidad y 9 s de enfriamiento. Si no hay JWT real, usa frases locales.
 - `AuthStub` intenta `/api/auth/login` y `/api/auth/register`; si el backend no está desplegado,
   cae al modo local de desarrollo.
-- **Pendiente:** generar el build WebGL y probar el bocadillo en el navegador; completar las
-  claves de Supabase/JWT para el arranque real del backend. Los scripts C# ya compilaron en
+- **Hecho:** build WebGL generado, publicado y probado con backend temporal + Ollama real;
+  el bocadillo aparece en capturas y el puntaje no cambia. Los scripts C# compilaron en
   batchmode (exit 0, sin `error CS`).
+- **Pendiente:** completar las claves de Supabase/JWT y validar el backend real (Santiago).
 
 ### 8.2 Backlog
 
@@ -358,8 +359,8 @@ El modelo se descarga por procedimiento explícito, no en caliente.
 > (F7.0–F7.5), sus puertas y la evidencia esperada.
 >
 > **Cierre 2026-11-13:** `IA-01` medido; `IA-02`–`IA-05` implementados; `IA-06` con 53 tests y
-> smoke test real; `IA-07` cubierto por test de no escritura en `scores`/`game_sessions`. Falta
-> la captura del bocadillo en WebGL y el arranque del backend con claves reales.
+> smoke test real; `IA-07` cubierto por test de no escritura y por la simulación WebGL. El
+> bocadillo ya tiene captura; falta el arranque del backend con claves reales y Supabase.
 
 ### 8.3 Criterio de terminado de la división
 
@@ -377,25 +378,25 @@ El modelo se descarga por procedimiento explícito, no en caliente.
 | **F0** | Repositorio y baseline | *Transversal* (Security) | Frontend | ✅ cerrada |
 | **F1** | Pipeline Figma → Unity (arte y UI) | **Frontend** | — | 🚧 ~25 % real (§3.2) |
 | **F2** | Vertical slice jugable | **Frontend** | — | ✅ offline cerrado |
-| **F3** | Build WebGL + Nginx | **Frontend** | Security (TLS/CSP) | ✅ cerrada (build a regenerar) |
+| **F3** | Build WebGL + Nginx | **Frontend** | Security (TLS/CSP) | ✅ cerrada; build regenerado y servido |
 | **F4** | Supabase: Auth, esquema y leaderboard | **DB** | Backend (rate limit), Frontend (AuthClient) | ✅ cerrada en DEV |
 | **F5** | Backend FastAPI + puntaje firmado | **Backend** | DB (service_role), Frontend (clientes) | ✅ cerrada (diálogo IA conectado) |
 | **F6** | Infraestructura Docker de 5 nodos | *Transversal*: un nodo por división | Security (aislamiento) | 🚧 frontend + agente + IA arriba; backend sin claves |
-| **F7** | NPC con Ollama | **IA** | Backend (endpoint), Frontend (bocadillo) | 🚧 backend y nodo listos; falta bocadillo WebGL |
+| **F7** | NPC con Ollama | **IA** | Backend (endpoint), Frontend (bocadillo) | ✅ simulación WebGL con backend temporal; falta validación Supabase |
 | **F8** | Controles ISO, ataques y evidencias | **Security** | Las cuatro restantes | 🚧 A.8.25 completo; A.8.15/A.8.20/A.8.24 parciales |
 | **F9** | Despliegue final y entrega | *Transversal* | Las cinco | ⬜ pendiente |
 
 **Lectura de la matriz.** F1, F2 y F3 son **Frontend** y están casi cerradas. **F4 (DB) y
-F5 (Backend) ya están cerradas.** Lo que falta de verdad es F1/FE-07 del Frontend, F7 (IA) y
-F8 (Security). F6 no es una fase de una sola división: es la suma de los cinco nodos, y cada
-división cierra el suyo.
+F5 (Backend) ya están cerradas.** Lo que falta de verdad es F1/FE-07 del Frontend, la validación
+de F7 (IA) con Supabase y F8 (Security). F6 no es una fase de una sola división: es la suma de
+los cinco nodos, y cada división cierra el suyo.
 
 ### 9.1 Reparto de F6 por división
 
 | Nodo | División dueña | Estado | Qué falta |
 | :--- | :--- | :--- | :--- |
-| `Sg-Frontend` | Frontend | ✅ healthy | Rebuild, `override` prod (BE-11) |
-| `Sg-AI` | IA | ✅ healthy; `qwen2.5:3b` y guardrails listos | Probar bocadillo en WebGL y cerrar evidencia visual |
+| `Sg-Frontend` | Frontend | ✅ healthy; build WebGL servido | Integrar NPC, cablear arte/UI y FE-10 |
+| `Sg-AI` | IA | ✅ healthy; `qwen2.5:3b`, guardrails y bocadillo WebGL probados | Validar con el backend real y Supabase |
 | `Sg-Backend` | Backend | 🚧 imagen construida; no arranca sin claves de Supabase/JWT | Completar `.env` y healthcheck (BE-08) |
 | `Sg-Security` | Security | 🟡 cerrado operativamente: VM `172.18.18.220`, agente **002** Active, logs Nginx reales y `100250` con 36 alertas; A.8.20/A.8.24/A.8.15 con evidencia parcial | `backend.log`, alerta FIM end-to-end, prueba de aislamiento desde contenedor y tailnet (SEC-08) |
 | `Sg-DB` | DB | ✅ operativo | Proyecto PROD al desplegar (DB-08) |
@@ -530,7 +531,7 @@ autenticación, evidencias de ataque y corrección.
 - [ ] Login usuario + PIN con bloqueo por intentos, contra Supabase real.
 - [ ] Leaderboard top 5 + posición propia.
 - [ ] Puntaje firmado con HMAC y validado en servidor.
-- [ ] NPC con Ollama + fallback.
+- [x] NPC con Ollama + fallback (simulación WebGL).
 - [ ] 5 nodos operativos y aislados (Frontend, Backend, DB, Security, IA).
 - [ ] 10 controles con evidencia de ataque y corrección.
 - [ ] SoA completa.

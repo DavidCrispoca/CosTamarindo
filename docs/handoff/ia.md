@@ -4,8 +4,8 @@
 > **Backlog:** `Plan.md` §8 (`IA-01`…`IA-07`)
 > **Fases:** [`../fases/F7-ia.md`](../fases/F7-ia.md) (F7.0–F7.5)
 > **Contrato:** [`../api.md`](../api.md) §4 · **Código:** `backend/app/ai/`, `backend/app/providers/ollama.py`
-> **Estado:** 🚧 nodo operativo y backend conectado; bocadillo de Unity implementado, pendiente de
-> probar en WebGL. El backend completo sigue bloqueado por las claves de Supabase/JWT.
+> **Estado:** ✅ nodo operativo, bocadillo de Unity probado en WebGL con Ollama real y fallback.
+> El backend completo sigue bloqueado por las claves de Supabase/JWT.
 
 ---
 
@@ -25,9 +25,9 @@
 | Rate limit | ✅ 10/min por usuario (en memoria) | `dialog_service.DialogGuard` |
 | Respaldo | ✅ banco por contexto e ítem | `dialog_service.FALLBACKS` / `ITEM_FALLBACKS` |
 | Logs | ✅ `dialog_blocked`, `dialog_fallback`, `dialog_ok` | mismo módulo |
-| UI Unity | ✅ `NpcDialogueController` crea el bocadillo en runtime | `unity/Assets/Scripts/UI/` |
+| UI Unity | ✅ `NpcDialogueController` crea el pensamiento anclado al sprite en runtime y se engancha a `sceneLoaded` | `unity/Assets/Scripts/UI/` |
 | Auth Unity | ✅ intenta backend y cae a local si no está desplegado | `unity/Assets/Scripts/Auth/AuthStub.cs` |
-| Evidencia | ✅ `evidencias/F7/01`–`05` y `README.md` | `evidencias/F7/` |
+| Evidencia | ✅ `evidencias/F7/01`–`12` y `README.md` | `evidencias/F7/` |
 
 > **Readiness 2026-11-13.** Para volver a levantar el nodo:
 >
@@ -47,7 +47,7 @@
 
 ---
 
-## 2. Lo que falta
+## 2. Cómo validar y cerrar
 
 ### 2.1 Backend con claves reales
 
@@ -63,16 +63,21 @@ docker compose --env-file .env -f infra/docker-compose.yml ps backend
 El endpoint de diálogo se probó con un backend de prueba (repositorio en memoria + JWT firmado)
 para no depender de Supabase. Ver `evidencias/F7/03-endpoint-real.txt`.
 
-### 2.2 Probar el bocadillo en Unity/WebGL
+### 2.2 Bocadillo en Unity/WebGL (hecho)
 
-`NpcDialogueController` se crea solo en la escena `Game` después de cargarla. Los scripts ya
-compilaron en batchmode con Unity 6000.3.27f1 (exit 0, sin `error CS`; ver
-`evidencias/F7/06-unity-compile.txt`). Para verlo en el juego:
+`NpcDialogueController` se crea en la escena `Game`, incluso cuando `Game` se carga después de
+`Login` (hook en `SceneManager.sceneLoaded`). Los scripts compilaron en batchmode con Unity
+6000.3.27f1 (exit 0, sin `error CS`; ver `evidencias/F7/06-unity-compile.txt`). Para verlo:
 
-1. Generar el build WebGL en `builds/webgl` (hoy está vacío).
-2. Entrar por `https://juego.local/` y autenticarse.
+1. El build WebGL está generado en `builds/webgl` y servido por Nginx.
+2. El build oficial arranca en `Game`; para probar login real hay que usar un build temporal con
+   `Login` primero o implementar FE-10.
 3. Jugar y esperar una captura; el comentario aparece con 35 % de probabilidad y 9 s de
-   enfriamiento.
+   enfriamiento. El `game_over` siempre dispara el pensamiento final.
+
+El cuadro se ancla al `SpriteRenderer` del jugador: queda encima de la cabeza, con tres puntos
+que bajan hacia el personaje, y se recalcula en `LateUpdate` para seguir el movimiento. En
+`game_over` se coloca arriba del panel final para no tapar el resumen.
 
 Si no hay JWT real (backend caído), el controlador usa frases locales. Para probar la IA real
 hace falta que `AuthStub` haya obtenido un token del backend.
@@ -85,8 +90,12 @@ generación completa. Evidencia en `evidencias/F7/05-fallback.txt`.
 
 ### 2.4 Evidencia visual y cierre
 
-Falta una captura del bocadillo en WebGL y actualizar `IA-07` con esa prueba. El test de
-`/api/dialog` ya demuestra que no escribe en `scores` ni en `game_sessions`.
+Hecho: el contenido de Ollama se capturó en WebGL (`07-webgl-bocadillo-real.png` y
+`08-webgl-game-over-real.png`, con el diseño anterior del panel). El layout actual de pensamiento
+está en `11-webgl-pensamiento.png` y `12-webgl-pensamiento-game-over.png`; esas capturas usan
+fallback local porque el build oficial arranca en `Game`. La partida de prueba mantuvo el puntaje
+215 antes y después del bocadillo. El test de `/api/dialog` y la simulación demuestran que no
+escribe en `scores` ni en `game_sessions`.
 
 ---
 
@@ -167,7 +176,7 @@ con Ollama apagado el juego responde en **< 1 s** sin dejar de ser jugable.
 | `IA-04` | ✅ timeout, semáforo y rate limit | `backend/app/providers/ollama.py` |
 | `IA-05` | ✅ fallback por contexto/ítem | `dialog_service.py` |
 | `IA-06` | ✅ 53 tests + smoke real | `evidencias/F7/04-tests.txt` |
-| `IA-07` | ✅ test de no escritura en `scores`/`sessions`; ⬜ captura visual | `test_dialog.py` |
+| `IA-07` | ✅ test de no escritura + captura visual con Ollama real | `test_dialog.py`, `evidencias/F7/07` y `08` |
 
-`FE-09` (bocadillo en Unity) está implementado en `NpcDialogueController`; falta el build WebGL
-y la captura de pantalla.
+`FE-09` (bocadillo en Unity) está implementado y probado en WebGL. Quedan para Frontend el
+estado “escribiendo…”, el historial corto y la integración en su rama.

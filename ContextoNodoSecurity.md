@@ -10,7 +10,8 @@
 > **Estado:** `Sg-Security` **cerrado operativamente** y con el primer bloque de evidencias
 > independientes. La VM está `Running`, el agente `002` está **Active** y el manager recibe
 > logs reales de Nginx. Tailscale queda para cuando estén los cinco nodos; `Sg-AI` ya está
-> operativo con `qwen2.5:3b` y el backend conectado, aunque falta el bocadillo en WebGL.
+> operativo con `qwen2.5:3b`, el backend conectado y el bocadillo probado en WebGL con un
+> backend temporal; falta validarlo con Supabase real.
 >
 > **Alcance:** recuperar y operar la VM `sg-security`, integrarla como nodo `Sg-Security`
 > del juego y dejar Wazuh, UFW, agente, reglas, logs y evidencias en un estado
@@ -596,12 +597,12 @@ El backlog completo y los controles restantes están en `Plan.md` §7.
   confirma el estado en `002.db`. Es una limitación de la versión, no de la regla.
 - El backend no arranca porque faltan las claves de Supabase/JWT en el `.env` real.
 - Tailscale se difiere hasta tener los cinco nodos; `Sg-AI` está healthy y el endpoint de
-  diálogo ya llama a Ollama. Falta compilar y probar el bocadillo en WebGL.
+  diálogo ya llama a Ollama. El bocadillo ya está probado en WebGL con backend temporal;
+  falta validarlo con el backend real de Supabase.
 - `multipass info/exec` falla por DNS/KVP (`sg-security.mshome.net` apunta a la IP
   vieja); el acceso operativo es SSH directo a `172.18.18.220`.
-- `builds/webgl` está vacío en este clon; `https://juego.local/` devuelve `403`.
-  No afecta a TLS ni a las cabeceras, pero impide la demo completa hasta regenerar
-  el build.
+- `builds/webgl` ya está generado y `https://juego.local/` responde `200`; el arte sigue
+  pendiente de `FE-02`. La demo completa ya se puede hacer con el build actual.
 
 ---
 

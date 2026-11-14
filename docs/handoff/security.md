@@ -20,7 +20,7 @@ Todo lo que sigue funciona **ahora**, con el entorno levantado:
 | Puntaje | `/api/session/start` + `/api/score` | 🚧 HMAC, nonce, TTL y tests; falta ataque real |
 | Diálogo | `/api/dialog` | ✅ saneo, rate limit, Ollama y fallback; inyección bloqueada |
 | Base | PostgREST (`/rest/v1/`) | ✅ cerrado: `anon` recibe 401 |
-| Frontend | build WebGL | 🚧 Nginx y TLS operativos; `builds/webgl` vacío |
+| Frontend | build WebGL | ✅ Nginx y TLS operativos; build generado y sirviendo en `https://juego.local/` |
 
 Lo que **todavía no** se puede atacar y por qué:
 

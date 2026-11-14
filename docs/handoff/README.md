@@ -13,6 +13,8 @@ división por división. No reemplaza a `Plan.md`: lo hace accionable.
 | [`frontend.md`](frontend.md) | integrar Unity con la API, reparar el arte y cerrar `FE-01`…`FE-14` |
 | [`security.md`](security.md) | atacar y evidenciar los 10 controles (`SEC-01`…`SEC-14`) |
 | [`ia.md`](ia.md) | conectar Ollama al NPC sin romper el puntaje (`IA-01`…`IA-07`) |
+| [`handoff-santiago-backend.md`](handoff-santiago-backend.md) | cargar Supabase/JWT, reconstruir el backend y validar `/api/dialog` real |
+| [`handoff-alejandra-frontend.md`](handoff-alejandra-frontend.md) | integrar el NPC, regenerar WebGL y validar el bocadillo en su rama |
 | [`evidencias/_plantilla/README.md`](../../evidencias/_plantilla/README.md) | formato obligatorio de una carpeta de evidencia |
 
 ---
@@ -21,11 +23,11 @@ división por división. No reemplaza a `Plan.md`: lo hace accionable.
 
 | División | Nodo | Estado | Qué falta |
 | :--- | :--- | :--- | :--- |
-| **Frontend** | `Sg-Frontend` | 🚧 Nginx/TLS healthy; `builds/webgl` vacío en este clon | regenerar build, arte, UI y clientes de red |
+| **Frontend** | `Sg-Frontend` | 🟡 Nginx/TLS healthy; build WebGL generado; arte/UI pendientes | integrar NPC, arte, UI y clientes de red |
 | **Backend** | `Sg-Backend` | 🚧 imagen construida y 53 tests; no arranca sin claves | cargar Supabase/JWT y validar arranque |
 | **DB** | `Sg-DB` | ✅ esquema, RLS, leaderboard, backup probado | proyecto PROD al desplegar |
 | **Security** | `Sg-Security` | 🟡 A.8.25 completo; A.8.15/A.8.20/A.8.24 parciales; SoA de 93 | cerrar ataques y controles restantes |
-| **IA** | `Sg-AI` | 🚧 Ollama healthy, `qwen2.5:3b`, prompt y endpoint listos | compilar/probar bocadillo en WebGL |
+| **IA** | `Sg-AI` | ✅ Ollama healthy, `qwen2.5:3b`, prompt, endpoint y bocadillo probado en WebGL | validar con backend real/Supabase |
 
 ---
 
@@ -69,8 +71,7 @@ curl.exe --ssl-no-revoke https://juego.local/api/health
 
 Resultado esperado: `sg-frontend` en `healthy` y `{"status":"ok","env":"dev","database":true}`.
 `sg-ai` y `sg-backend` requieren, respectivamente, descargar el modelo y cargar las claves
-de Supabase/JWT; sin eso quedan detenidos o no arrancan. El build WebGL también debe
-regenerarse si `builds/webgl` está vacío.
+de Supabase/JWT; sin eso quedan detenidos o no arrancan. El build WebGL ya está generado; regenerarlo si se cambia Unity.
 
 ### 2.3 Verificación rápida de que todo está sano
 
@@ -140,7 +141,7 @@ fuentes), el proyecto Unity (`unity/` sin `Library/`).
 **No entra:** `.env`, `infra/tls/`, `infra/backups/`, `builds/`, `.venv/`, `__pycache__/`,
 `node_modules/`, `unity/Library/`, `Proceso.md` (bitácora interna).
 
-Un clon limpio + `.env` + `pip install -r requirements-dev.txt` alcanza para correr las 43
+Un clon limpio + `.env` + `pip install -r requirements-dev.txt` alcanza para correr las 53
 pruebas. Si alguna prueba falla en un clon nuevo, es un archivo que falta: avisar antes de
 improvisar.
 
@@ -152,7 +153,7 @@ improvisar.
 Frontend FE-03 -> FE-02 -> FE-01     (arte sano, no bloquea nada mas)
 Frontend FE-07                        (clientes de red; necesita API, ya lista)
 IA IA-02 -> IA-03 -> IA-05 -> IA-06    (prompt, guardrails, fallback, pruebas; ✅)
-IA bocadillo WebGL                      (falta captura y prueba visual)
+IA bocadillo WebGL                      (✅ probado; integrar en Frontend)
 Security SEC-01 -> SEC-02 -> SEC-03…  (plantilla, SoA, ataques)
 ```
 

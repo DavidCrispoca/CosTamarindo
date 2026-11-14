@@ -16,8 +16,8 @@
 | Personaje y fondo de Figma | ✅ en escena | `Assets/Art/Characters/`, `.../Backgrounds/` |
 | Tipografías SDF | ✅ | `Assets/Art/Fonts/` |
 | Escena de login con bloqueo | ✅ intenta backend y cae a local | `Assets/Scenes/Login.unity`, `Auth/AuthStub.cs` |
-| Build + Nginx + TLS | ✅ (build WebGL a regenerar) | `builds/webgl`, `infra/nginx/` |
-| Bocadillo del NPC | ✅ código runtime; ⬜ falta probar en WebGL | `Assets/Scripts/UI/NpcDialogueController.cs` |
+| Build + Nginx + TLS | ✅ build generado y servido; regenerar si cambia Unity | `builds/webgl`, `infra/nginx/` |
+| Pensamiento del NPC | ✅ runtime anclado al sprite, probado en WebGL | `Assets/Scripts/UI/NpcDialogueController.cs` |
 | 15 pruebas PlayMode | ✅ | `Assets/Tests/PlayMode/` |
 
 ---
@@ -125,7 +125,7 @@ para “cuadrar”**: si un playtest real los supera, se ajusta el servidor con 
 | `FE-05` | 10 prefabs de UI (`WoodButton`, `HandInput`, `PinSlot`, `Heart`, `DialogBubble`, `LeaderRow`…) |
 | `FE-06` | aplicar el kit a HUD, pausa, game over, Libro y Login; corazones con sprite |
 | `FE-08` | pantalla de leaderboard con estados vacío/error/timeout |
-| `FE-09` | ✅ bocadillo del NPC en `NpcDialogueController`; falta build WebGL y captura |
+| `FE-09` | 🟡 pensamiento runtime anclado al sprite, build y captura F7; faltan “escribiendo…” e historial |
 | `FE-10` | `Login` a build index 0 y encadenado `Login → Game` |
 | `FE-11` | playtest de 10–15 min y ajuste de `spawnInterval` / `fallSpeed` |
 | `FE-12` | rebuild Release + medición (≤ 30 MB, < 10 s, 0 errores) |
