@@ -28,6 +28,10 @@ COPY --from=builder /opt/venv /opt/venv
 WORKDIR /app
 COPY --chown=app:app app ./app
 
+# A.8.15: el volumen de logs que lee el agente Wazuh debe ser escribible por
+# el usuario `app`. Al montar un volumen vacío, Docker hereda este dueño.
+RUN mkdir -p /var/log/costamarindo && chown app:app /var/log/costamarindo
+
 USER app
 EXPOSE 8000
 

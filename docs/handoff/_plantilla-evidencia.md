@@ -1,7 +1,8 @@
 # Plantilla de evidencia · control ISO/IEC 27001:2022
 
-> Copiar esta estructura en `evidencias/<control>/README.md`, por ejemplo
-> `evidencias/A.8.24/README.md`.
+> **Nota 2026-11-13:** la plantilla vigente, con checklist de cierre y artefactos, es
+> [`evidencias/_plantilla/README.md`](../../evidencias/_plantilla/README.md). Este archivo se
+> conserva como referencia histórica y comparte la misma regla.
 >
 > **Regla:** la evidencia se produce **ejecutando** el ataque. Un control se verifica
 > ejecutándolo, no leyendo su configuración.

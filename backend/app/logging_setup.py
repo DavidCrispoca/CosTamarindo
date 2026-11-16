@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import json
 import logging
+import os
 import sys
 import uuid
 from contextvars import ContextVar
@@ -58,6 +59,24 @@ def configure_logging(level: str = "INFO") -> None:
     handler.setFormatter(JsonFormatter())
     root.addHandler(handler)
     root.setLevel(level.upper())
+
+    # A.8.15: copia en archivo para que el agente Wazuh la lea desde el
+    # volumen compartido. Si LOG_DIR no existe o no se puede escribir, el
+    # backend sigue funcionando solo con stdout: Wazuh nunca bloquea el juego.
+    log_dir = os.getenv("LOG_DIR")
+    if log_dir:
+        try:
+            os.makedirs(log_dir, exist_ok=True)
+            file_handler = logging.FileHandler(
+                os.path.join(log_dir, "backend.log"), encoding="utf-8"
+            )
+            file_handler.setFormatter(JsonFormatter())
+            root.addHandler(file_handler)
+        except OSError:
+            root.warning(
+                "LOG_DIR no escribible; se continua solo con stdout",
+                extra={"event": "log_file_unavailable", "fields": {"log_dir": log_dir}},
+            )
     # Uvicorn trae sus propios handlers; se reemplazan por el JSON.
     for name in ("uvicorn", "uvicorn.error", "uvicorn.access"):
         logger = logging.getLogger(name)

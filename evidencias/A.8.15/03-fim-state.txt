@@ -1,0 +1,23 @@
+﻿=== manager 002.db ===
+db: /var/ossec/queue/db/002.db
+tables: ciscat_results, fim_entry, metadata, pm_event, sca_check, sca_check_compliance, sca_check_rules, sca_policy, sca_scan_info, scan_info, sqlite_sequence, sync_info, sys_browser_extensions, sys_groups, sys_hotfixes, sys_hwinfo, sys_netaddr, sys_netiface, sys_netproto, sys_osinfo, sys_ports, sys_processes, sys_programs, sys_services, sys_users
+
+-- fim_entry rows=1 --
+full_path: /fim/webgl/.fim-evidence-test
+type: file
+date: 1794597207
+changes: 1
+size: 30
+perm: rwxrwxrwx
+md5: 28f8129384d4885318b116fc5576d401
+sha1: 3809c8e6bbf5eda8de0387b4c692672c5800097f
+sha256: 1f0fc6114071feeaccc6545d52216c92445599fe2e386b1ae3a2a5d3a5aa2496
+---
+=== manager fim.db ===
+db: /var/ossec/queue/fim/db/fim.db
+tables: file_entry
+=== alerta FIM para /fim/webgl (0 esperado) ===
+0
+
+=== agent fim.db ===
+tables: ['file_entry'] file_entry ['path', 'mode', 'last_event', 'scanned', 'options', 'checksum', 'dev', 'inode', 'size', 'perm', 'attributes', 'uid', 'gid', 'user_name', 'group_name', 'hash_md5', 'hash_sha1', 'hash_sha256', 'mtime', 'db_status_field_dm'] webgl rows: 1 {'path': '/fim/webgl/.fim-evidence-test', 'mode': 0, 'last_event': 1794597207, 'scanned': 1, 'options': 139775, 'checksum': '5a570669226da3c2e783e2a563036a32bc528025', 'dev': 69, 'inode': 7318349396921705, 'size': 30, 'perm': 'rwxrwxrwx', 'attributes': '', 'uid': '0', 'gid': '0', 'user_name': 'root', 'group_name': 'root', 'hash_md5': '28f8129384d4885318b116fc5576d401', 'hash_sha1': '3809c8e6bbf5eda8de0387b4c692672c5800097f', 'hash_sha256': '1f0fc6114071feeaccc6545d52216c92445599fe2e386b1ae3a2a5d3a5aa2496', 'mtime': 1794597202, 'db_status_field_dm': 1}

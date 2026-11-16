@@ -1,0 +1,61 @@
+﻿# Evidencia Sg-Security - estado Wazuh
+# Fecha de captura: 2026-11-13T14:15:15-05:00
+
+## Servicios
+active
+active
+active
+
+## Agentes
+
+Wazuh agent_control. List of available agents:
+   ID: 000, Name: sg-security (server), IP: 127.0.0.1, Active/Local
+   ID: 002, Name: sg-game-host, IP: any, Active
+
+List of agentless devices:
+
+
+## Detalle del agente 002
+
+Wazuh agent_control. Agent information:
+   Agent ID:   002
+   Agent Name: sg-game-host
+   IP address: any
+   Status:     Active
+
+   Operating system:    Linux |4199448b753f |6.18.33.2-microsoft-standard-WSL2 |#1 SMP PREEMPT_DYNAMIC Thu Jun 18 21:54:43 UTC 2026 |x86_64
+   Client version:      Wazuh v4.14.10
+   Configuration hash:  efee68fb57616fa72927e085b64d92f3
+   Shared file hash:    2e1f6dff753829c5c2e426be9fc32f6c
+   Last keep alive:     1794597307
+
+   Syscheck last started at:  Fri Nov 13 14:13:27 2026
+   Syscheck last ended at:    Fri Nov 13 14:13:27 2026
+
+
+## UFW
+Status: active
+
+     To                         Action      From
+     --                         ------      ----
+[ 1] 22/tcp                     ALLOW IN    172.19.224.0/20           
+[ 2] 1514/tcp                   ALLOW IN    172.19.224.0/20           
+[ 3] 1515/tcp                   ALLOW IN    172.19.224.0/20           
+[ 4] 443/tcp                    ALLOW IN    172.19.224.0/20           
+[ 5] 22/tcp                     ALLOW IN    172.18.16.0/20            
+[ 6] 443/tcp                    ALLOW IN    172.18.16.0/20            
+[ 7] 1514/tcp                   ALLOW IN    172.18.16.0/20            
+[ 8] 1515/tcp                   ALLOW IN    172.18.16.0/20            
+
+
+## Puertos en escucha (extracto)
+LISTEN 0      2048            127.0.0.1:55000      0.0.0.0:*    users:(("python3",pid=26837,fd=47))                     
+LISTEN 0      511               0.0.0.0:443        0.0.0.0:*    users:(("node",pid=33498,fd=19))                        
+LISTEN 0      4096              0.0.0.0:22         0.0.0.0:*    users:(("sshd",pid=33410,fd=3),("systemd",pid=1,fd=195))
+LISTEN 0      128               0.0.0.0:1515       0.0.0.0:*    users:(("wazuh-authd",pid=26880,fd=6))                  
+LISTEN 0      128               0.0.0.0:1514       0.0.0.0:*    users:(("wazuh-remoted",pid=27020,fd=4))                
+LISTEN 0      4096   [::ffff:127.0.0.1]:9200             *:*    users:(("java",pid=33540,fd=622))                       
+LISTEN 0      4096                 [::]:22            [::]:*    users:(("sshd",pid=33410,fd=4),("systemd",pid=1,fd=196))
+
+## Conteo de alertas 100250 del dia
+100250=36

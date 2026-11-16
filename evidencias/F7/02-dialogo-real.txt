@@ -1,0 +1,9 @@
+CASE=captura/Tamarindo MS=1601
+¡Qué buenos tamarindos! Como pa' un juguito.
+---
+CASE=peligro/Bomba MS=2149
+¡Ay! Esa bomba no era para tocar, perdiste una vida. ¡Tienes cuidado!
+---
+CASE=defecto/- MS=1667
+Phishing es cuando intentan robar información usando engaños. ¡Cuida tu correo y tu red!
+---

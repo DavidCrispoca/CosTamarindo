@@ -5,10 +5,13 @@ from __future__ import annotations
 import uuid
 from typing import Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 USERNAME_PATTERN = r"^[A-Za-z0-9_]{3,16}$"
 PIN_PATTERN = r"^[0-9]{4,6}$"
+
+DialogContext = Literal["inicio", "captura", "peligro", "game_over", "libro", "defecto"]
+DialogKind = Literal["good", "danger", "trash"]
 
 
 class RegisterRequest(BaseModel):
@@ -84,7 +87,17 @@ class LeaderboardResponse(BaseModel):
 
 
 class DialogRequest(BaseModel):
-    text: str = Field(min_length=1, max_length=200)
+    # `text` puede ir vacío cuando Unity envía solo el evento de una captura.
+    text: str = Field(default="", max_length=200)
+    context: DialogContext = "defecto"
+    item: str | None = Field(default=None, max_length=40)
+    kind: DialogKind | None = None
+
+    @model_validator(mode="after")
+    def _requires_text_or_item(self) -> "DialogRequest":
+        if not self.text.strip() and not (self.item and self.item.strip()):
+            raise ValueError("text o item requerido")
+        return self
 
 
 class DialogResponse(BaseModel):

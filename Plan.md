@@ -35,7 +35,7 @@ Un videojuego 2D jugable en el navegador (Unity 6 → WebGL) servido por Nginx, 
       navegador limpio.
 - [ ] Registro/login con usuario + PIN → partida → envío de puntaje aceptado → top 5 visible.
 - [ ] Puntaje alterado, replay y sesión expirada rechazados y registrados en logs.
-- [ ] NPC responde con Ollama; con Ollama caído el juego devuelve respuesta de respaldo y sigue
+- [x] NPC responde con Ollama; con Ollama caído el juego devuelve respuesta de respaldo y sigue
       funcionando.
 - [ ] `docker compose up` levanta el entorno completo; desde fuera solo el puerto 443 está expuesto.
 - [ ] Un archivo de evidencia por cada uno de los 10 controles en `evidencias/`.
@@ -70,21 +70,21 @@ terminado. Nada se da por hecho porque «funciona en el editor»: se verifica en
 | Escenas | `Game.unity` (índice 0), `Login.unity` (índice 1), `SampleScene` (índice 2, sobra) | `unity/ProjectSettings/EditorBuildSettings.asset` |
 | Gameplay offline | Completo: 3 vidas, 120 s, curva de dificultad, pausa, game over, Libro, feedback de captura, SFX sintetizado | `unity/Assets/Scripts/`, [`evidencias/F2/`](evidencias/F2/README.md) |
 | Tests PlayMode | **15/15** verdes (última corrida 2026-11-03; no re-ejecutados el 2026-11-06) | `unity/Assets/Tests/PlayMode/` |
-| Autenticación | ✅ real en el backend: usuario + PIN contra Supabase Auth, bloqueo 5 fallos → 60 s persistido, JWT propio de 30 min. El cliente Unity todavía usa el stub (`FE-07`) | `backend/app/services/auth_service.py` |
+| Autenticación | ✅ real en el backend: usuario + PIN contra Supabase Auth, bloqueo 5 fallos → 60 s persistido, JWT propio de 30 min. `AuthStub` ya intenta el backend y cae a local solo si no está desplegado | `backend/app/services/auth_service.py`, `unity/Assets/Scripts/Auth/AuthStub.cs` |
 | Arte de personaje y fondo | Palenquera y `bg_playa.png` importados y en la escena | `unity/Assets/Art/Characters/`, `.../Backgrounds/` |
 | Arte de ítems | ⚠️ **Regresión real**: los 4 sprites originales se borraron y la escena quedó con 4 referencias rotas. Hay 60 PNG nuevos sin cablear | ver §3.2 |
 | UI de Figma | 0 componentes exportados; `unity/Assets/Art/UI/` está **vacío** | — |
-| Build WebGL | 16,2 MB en `builds/webgl` (generado 2026-10-28, **con el arte anterior**) | `builds/` (no versionado) |
-| Nginx / Sg-Frontend | Operativo: 443 + 8081, TLS mkcert, CSP por hash, HSTS, proxy `/api/` | `infra/nginx/`, [`docs/fases/F3.md`](docs/fases/F3.md) |
-| Docker | Compose de 5 nodos declarado y validado. `sg-frontend` y `sg-ai` *healthy*; `backend` y `security` tras perfiles | `infra/docker-compose.yml`, [`evidencias/F6/`](evidencias/F6/README.md) |
-| Modelo de IA | `qwen2.5:3b` (1,9 GB) descargado en el volumen `costamarindo-ai-models`; `sg-ai` aislado en red `ai` | [`evidencias/F6/`](evidencias/F6/README.md) §4 |
-| Backend | ✅ API completa en `backend/`, desplegada en `sg-backend` (healthy) y con 43/43 tests | [`evidencias/F5/`](evidencias/F5/README.md) |
+| Build WebGL | ✅ `builds/webgl` generado (16,2 MB) y servido en `https://juego.local/` con CSP regenerada | `builds/` (no versionado) |
+| Nginx / Sg-Frontend | Operativo: 443 (8081 solo con override de dev), TLS local con mkcert, CSP por hash, HSTS, proxy `/api/` | `infra/nginx/`, [`docs/fases/F3.md`](docs/fases/F3.md) |
+| Docker | Compose de 5 nodos declarado y validado. `sg-frontend`, `sg-wazuh-agent` y `sg-ai` arriba; `sg-backend` no arranca sin claves | `infra/docker-compose.yml`, [`evidencias/F6/`](evidencias/F6/README.md) |
+| Modelo de IA | ✅ `qwen2.5:3b` descargado (1,9 GB); `Sg-AI` healthy, sin puerto publicado; NPC probado en WebGL | [`evidencias/F7/`](evidencias/F7/README.md) |
+| Backend | 🚧 API completa en `backend/` y 53/53 tests; imagen construida, pero no arranca sin las claves de Supabase/JWT en `.env` | [`evidencias/F5/`](evidencias/F5/README.md) |
 | Base de datos | ✅ Supabase DEV con esquema versionado, RLS cerrado, leaderboard y backup/restauración probados | [`evidencias/F4/`](evidencias/F4/README.md) |
-| Logs / SIEM | Sin Wazuh activo ni reglas; solo se declara en el compose | `infra/docker-compose.yml` |
+| Logs / SIEM | 🟡 Wazuh 4.14 en VM, agente **002**, reglas `100200–100250`, logs Nginx reales y `100250`; FIM guarda estado sin alerta por archivo; `backend.log` pendiente | `infra/wazuh/`, `infra/docker-compose.yml` |
 | Gitleaks (A.8.25) | ✅ Implementado, hook instalado y probado | [`evidencias/A.8.25/`](evidencias/A.8.25/README.md) |
-| Otros 9 controles ISO | ⬜ Sin implementar ni evidenciar | — |
-| CI | **No existe** (`.github/` ausente) | — |
-| SoA / informe / `docs/api.md` | **No existen** | — |
+| Otros 9 controles ISO | 🟡 A.8.15/A.8.20/A.8.24 parciales; 6 sin implementar ni evidenciar | [`evidencias/`](evidencias/) |
+| CI | ✅ Gitleaks + tests + `pip-audit` + Compose; falta primera ejecución remota | [`.github/workflows/security.yml`](.github/workflows/security.yml) |
+| SoA / informe / `docs/api.md` | SoA ✅ (93 controles); `docs/api.md` ✅; informe final ⬜ | [`docs/soa.md`](docs/soa.md), [`docs/api.md`](docs/api.md) |
 | Remoto Git | `main` publicada; árbol de trabajo **sucio** (§3.2) | `git status` |
 
 ### 3.2 Hallazgos que corrigen la documentación anterior
@@ -118,8 +118,9 @@ porque afectan a la planificación:
    compose solo tenía `Sg-Frontend`; `docs/fases/F2.md` decía que jugador y fondo eran
    placeholders; `docs/fases/F6.md` y `infra/README.md` no reflejaban la verificación del
    2026-11-03. Todo eso quedó corregido en esta misma pasada.
-7. **El build de 16,2 MB está desactualizado** respecto del arte actual: se generó antes del
-   borrado de los sprites. Cualquier medición de peso debe repetirse tras cerrar `FE-02`.
+7. **El build de 16,2 MB no estaba en este clon** y, cuando existió, era previo al arte actual.
+   Ya se regeneró: `builds/webgl` se sirve en `https://juego.local/` con `200`. Falta cerrar
+   `FE-02` (arte) y repetir la medición de peso con el arte definitivo.
 
 ---
 
@@ -142,9 +143,10 @@ de negocio. El cliente **nunca es fuente de verdad** (A.8.9): solo presenta.
 | Ítems con arte | ⛔ referencias rotas (§3.2.1) |
 | Componentes de UI de Figma | ⛔ 0/~30 |
 | Tokens (17 colores, 5 estilos) | ⛔ hardcodeados en el `SceneBuilder` |
-| Build WebGL | 🚧 16,2 MB pero previo al arte actual |
+| Build WebGL | ✅ generado (16,2 MB) y servido; el arte sigue pendiente de FE-01/FE-02 |
 | Nginx + TLS + CSP | ✅ operativo |
-| Leaderboard, bocadillo de diálogo, envío de puntaje | ⛔ no existen en el cliente |
+| Leaderboard y envío de puntaje | ⛔ no existen en el cliente |
+| Bocadillo del NPC | ✅ Pensamiento en runtime anclado al sprite, build WebGL y captura |
 
 ### 4.2 Backlog
 
@@ -158,7 +160,7 @@ de negocio. El cliente **nunca es fuente de verdad** (A.8.9): solo presenta.
 | **FE-06** | Aplicar el kit a HUD, pausa, game over, Libro y Login; reemplazar corazones de LiberationSans por el sprite | FE-05 | HUD sin placeholders tipográficos; consola limpia |
 | **FE-07** | Cliente de red: `ApiClient`, `SessionClient`, `ScoreSigner`, `LeaderboardClient`, `DialogueClient` (`UnityWebRequest`, token en memoria) | BE-02…BE-05 | Flujo real contra `https://juego.local/api/` sin secretos en el cliente |
 | **FE-08** | Pantalla de leaderboard (top 5 + posición propia) y estados vacío/error/timeout | FE-07 | Se ve el top 5 tras enviar un puntaje |
-| **FE-09** | Bocadillo del NPC: “escribiendo…”, historial corto, sin bloquear gameplay, fallback visible | FE-07, IA-03 | El juego no se congela ni con Ollama caído |
+| **FE-09** | Bocadillo del NPC: “escribiendo…”, historial corto, sin bloquear gameplay, fallback visible | FE-07, IA-03 | 🟡 Pensamiento runtime anclado al sprite, build y captura F7; faltan “escribiendo…” e historial |
 | **FE-10** | Hacer `Login` obligatorio (build index 0) y encadenar `Login → Game` | FE-07 | Sin sesión no se juega; logout limpia memoria |
 | **FE-11** | Playtest de 10–15 min y ajuste de `spawnInterval` / `fallSpeed` | FE-01 | Curva de dificultad validada por una persona real |
 | **FE-12** | Rebuild Release + medición (tamaño, tiempo de carga, errores de consola) | FE-01, FE-07…FE-10 | ≤ 30 MB, < 10 s, 0 errores, 0 warnings |
@@ -185,15 +187,17 @@ documentación interactiva en producción.
 
 ### 5.1 Estado actual
 
-✅ **Implementado y desplegado.** `backend/` contiene la API completa con 43 pruebas
-herméticas, imagen multi-stage sin privilegios y healthcheck real. Corre como
-`sg-backend` (healthy) sin publicar el 8000. Evidencia en
-[`evidencias/F5/`](evidencias/F5/README.md) y contratos en [`docs/api.md`](docs/api.md).
+🚧 **API implementada; falta configuración para arrancar.** `backend/` contiene la API
+completa con 43 pruebas herméticas, imagen multi-stage sin privilegios y healthcheck real.
+La imagen se construyó, pero `sg-backend` no arranca hasta cargar las claves de
+Supabase/JWT en el `.env`. Evidencia en [`evidencias/F5/`](evidencias/F5/README.md) y
+contratos en [`docs/api.md`](docs/api.md).
 
 ### 5.2 Backlog
 
-**Estado 2026-11-06:** cerradas `BE-01`…`BE-05` y `BE-07`…`BE-11`. `BE-06` queda con el
-contrato y el respaldo implementados; la conexión con Ollama es `IA-02`…`IA-04`.
+**Estado 2026-11-13:** cerradas `BE-01`…`BE-05` y `BE-07`…`BE-11`. `BE-06` ya llama a Ollama
+con prompt versionado, timeout y fallback; los 53 tests del backend pasan. El arranque real del
+contenedor sigue bloqueado por las claves de Supabase/JWT.
 
 | ID | Tarea | Depende de | DoD |
 | :--- | :--- | :--- | :--- |
@@ -272,10 +276,17 @@ con «antes vulnerable → ataque reproducible → corrección → verificación
 | Control | Estado | Dónde |
 | :--- | :--- | :--- |
 | **A.8.25** SDLC seguro (Gitleaks) | ✅ | [`evidencias/A.8.25/`](evidencias/A.8.25/README.md) |
-| A.8.24 Criptografía | 🚧 solo TLS/headers en Nginx | `infra/nginx/` |
-| A.8.20 Redes | 🚧 compose y aislamiento con `docker compose port`; falta `nmap` | [`evidencias/F6/`](evidencias/F6/README.md) |
-| A.8.15 Logging | 🚧 logs Nginx en JSON; sin Wazuh ni reglas | `infra/nginx/nginx.conf` |
+| A.8.24 Criptografía | 🟡 TLS local con mkcert (TLS 1.2/1.3), HSTS/CSP y cabeceras verificadas; falta cifrado en reposo y gestión de claves | [`evidencias/A.8.24/`](evidencias/A.8.24/README.md) |
+| A.8.20 Redes | 🟡 `nmap` host+VM, `ports`/`expose` y redes internas verificadas; falta prueba desde otro contenedor | [`evidencias/A.8.20/`](evidencias/A.8.20/README.md) |
+| A.8.15 Logging | 🟡 VM `172.18.18.220` y agente **002** activos; logs reales de Nginx y `100250` con 36 alertas. FIM guarda estado en `002.db` pero Wazuh 4.14 no emite alerta por archivo; `backend.log` pendiente de claves; tailnet pendiente | [`evidencias/A.8.15/`](evidencias/A.8.15/README.md) |
 | Resto (A.8.5, A.8.9, A.8.12, A.8.28, A.8.31, A.8.19) | ⬜ | — |
+
+**Bloque independiente 2026-11-13.** Se cerraron `SEC-01` (plantilla de evidencia y scripts
+de ataque), `SEC-02` (SoA de 93 controles y matriz de riesgos), `SEC-06`/A.8.20 parcial,
+`SEC-08`/A.8.15 parcial, `SEC-12` (auditoría de dependencias; SonarQube diferido) y `SEC-13`
+(CI de Gitleaks + tests + `pip-audit`). Evidencias: [`evidencias/_plantilla/`](evidencias/_plantilla/README.md),
+[`evidencias/ataques/`](evidencias/ataques/README.md), [`docs/soa.md`](docs/soa.md),
+[`evidencias/SEC-12/`](evidencias/SEC-12/README.md) y [`evidencias/SEC-13/`](evidencias/SEC-13/README.md).
 
 ### 7.2 Backlog
 
@@ -288,7 +299,7 @@ con «antes vulnerable → ataque reproducible → corrección → verificación
 | **SEC-05** | A.8.9: editar IndexedDB (`PlayerPrefs`) para subir vidas/puntaje | FE-07 | El puntaje no cambia; el servidor ignora el cliente |
 | **SEC-06** | A.8.20: `nmap` desde host y desde otro contenedor; puertos cerrados | BE-08 | `:8000` y `:11434` inalcanzables; evidencia literal |
 | **SEC-07** | A.8.12: consola del navegador + `strings` del `.wasm`/`.data` | FE-12 | Sin logs, secretos ni URLs internas |
-| **SEC-08** | A.8.15: Wazuh activo con reglas 100100/100101 y FIM del webroot | BE-03, SEC-01 | Alerta correlacionada por IP |
+| **SEC-08** | A.8.15: Wazuh activo con reglas 100200–100250 y FIM del webroot | BE-03, SEC-01 | Alerta correlacionada por `user_id`/`username` (la IP va enmascarada) |
 | **SEC-09** | A.8.28: SQLi en username, XSS/rich text en leaderboard, prompt injection | BE-06, FE-08 | Entradas neutralizadas; `dialog_blocked` registrado |
 | **SEC-10** | A.8.31: token DEV contra PROD; defines de entorno en Unity | DB-08, FE-07 | Rechazo por claves distintas |
 | **SEC-11** | A.8.19: `SHA256SUMS` firmado con GPG + verificación en despliegue + FIM | FE-12 | Falla el hash si se reemplaza el `.wasm` |
@@ -316,22 +327,40 @@ El modelo se descarga por procedimiento explícito, no en caliente.
 
 ### 8.1 Estado actual
 
-- `sg-ai` **healthy**, sin puerto publicado, solo en `costamarindo-ai`.
-- Modelo `qwen2.5:3b` (1,9 GB) presente en el volumen `costamarindo-ai-models`.
-- `infra/scripts/pull-model.sh` implementa la conexión temporal a `bridge` para descargar.
-- **No existe** endpoint de diálogo, ni prompt, ni guardrails, ni UI de bocadillo.
+- `sg-ai` **levantado y healthy** en `10.83.0.2`; sin puerto publicado, solo en
+  `costamarindo-ai` (`internal: true`).
+- Modelo `qwen2.5:3b` descargado (1,9 GB) en el volumen `costamarindo-ai-models`.
+- `IA-01` medido: frío ~7,3 s; caliente ~1,6–2,1 s con el prompt real; RAM ~3,43 GiB de 4 GiB.
+- `backend/app/ai/prompts.py` contiene el prompt versionado de la Palenquera.
+- `backend/app/providers/ollama.py` implementa el cliente async con timeout y semáforo.
+- `POST /api/dialog` ya llama a Ollama, mantiene guardrails, rate limit y fallback por ítem/contexto.
+- `NpcDialogueController` crea el bocadillo en runtime y comenta capturas/peligros con 35 % de
+  probabilidad y 9 s de enfriamiento. Si no hay JWT real, usa frases locales.
+- `AuthStub` intenta `/api/auth/login` y `/api/auth/register`; si el backend no está desplegado,
+  cae al modo local de desarrollo.
+- **Hecho:** build WebGL generado, publicado y probado con backend temporal + Ollama real;
+  el bocadillo aparece en capturas y el puntaje no cambia. Los scripts C# compilaron en
+  batchmode (exit 0, sin `error CS`).
+- **Pendiente:** completar las claves de Supabase/JWT y validar el backend real (Santiago).
 
 ### 8.2 Backlog
 
 | ID | Tarea | Depende de | DoD |
 | :--- | :--- | :--- | :--- |
 | **IA-01** | Medir latencia y CPU reales de `qwen2.5:3b` dentro del contenedor | — | Número documentado; decisión de modelo confirmada o corregida |
-| **IA-02** | System prompt fijo de la Palenquera: español, ≤ 3 frases, solo seguridad, entrada delimitada como dato | — | Prompt versionado en `backend/app/ai/` |
+| **IA-02** | System prompt fijo de la Palenquera: español, ≤ 2 frases, solo juego/seguridad, entrada delimitada como dato | — | Prompt versionado en `backend/app/ai/` |
 | **IA-03** | Guardrails: detección de inyección, delimitadores `<jugador>…</jugador>`, filtro de salida (`<`, `>`, longitud) | IA-02 | Inyección bloqueada y registrada como `dialog_blocked` |
 | **IA-04** | Timeout 20 s, 1 request concurrente, cola y rate limit por usuario | BE-06 | Sin caída del backend con carga |
 | **IA-05** | Banco de respuestas por contexto (inicio, captura, peligro, game over, libro) | IA-02 | Fallback < 1 s y en personaje |
 | **IA-06** | Pruebas: normal, injection, Ollama apagado, respuesta lenta | IA-03, IA-05 | 4 casos documentados con salida literal |
 | **IA-07** | Confirmar que la respuesta no altera puntaje ni estado de partida | FE-09 | Test que lo demuestra |
+
+> **Ejecución por fases:** [`docs/fases/F7-ia.md`](docs/fases/F7-ia.md) define las seis fases
+> (F7.0–F7.5), sus puertas y la evidencia esperada.
+>
+> **Cierre 2026-11-13:** `IA-01` medido; `IA-02`–`IA-05` implementados; `IA-06` con 53 tests y
+> smoke test real; `IA-07` cubierto por test de no escritura y por la simulación WebGL. El
+> bocadillo ya tiene captura; falta el arranque del backend con claves reales y Supabase.
 
 ### 8.3 Criterio de terminado de la división
 
@@ -349,27 +378,27 @@ El modelo se descarga por procedimiento explícito, no en caliente.
 | **F0** | Repositorio y baseline | *Transversal* (Security) | Frontend | ✅ cerrada |
 | **F1** | Pipeline Figma → Unity (arte y UI) | **Frontend** | — | 🚧 ~25 % real (§3.2) |
 | **F2** | Vertical slice jugable | **Frontend** | — | ✅ offline cerrado |
-| **F3** | Build WebGL + Nginx | **Frontend** | Security (TLS/CSP) | ✅ cerrada (build a regenerar) |
+| **F3** | Build WebGL + Nginx | **Frontend** | Security (TLS/CSP) | ✅ cerrada; build regenerado y servido |
 | **F4** | Supabase: Auth, esquema y leaderboard | **DB** | Backend (rate limit), Frontend (AuthClient) | ✅ cerrada en DEV |
-| **F5** | Backend FastAPI + puntaje firmado | **Backend** | DB (service_role), Frontend (clientes) | ✅ cerrada (diálogo IA pendiente) |
-| **F6** | Infraestructura Docker de 5 nodos | *Transversal*: un nodo por división | Security (aislamiento) | 🚧 3 de 4 contenedores arriba |
-| **F7** | NPC con Ollama | **IA** | Backend (endpoint), Frontend (bocadillo) | ⬜ pendiente |
-| **F8** | Controles ISO, ataques y evidencias | **Security** | Las cuatro restantes | 🚧 1 de 10 controles |
+| **F5** | Backend FastAPI + puntaje firmado | **Backend** | DB (service_role), Frontend (clientes) | ✅ cerrada (diálogo IA conectado) |
+| **F6** | Infraestructura Docker de 5 nodos | *Transversal*: un nodo por división | Security (aislamiento) | 🚧 frontend + agente + IA arriba; backend sin claves |
+| **F7** | NPC con Ollama | **IA** | Backend (endpoint), Frontend (bocadillo) | ✅ simulación WebGL con backend temporal; falta validación Supabase |
+| **F8** | Controles ISO, ataques y evidencias | **Security** | Las cuatro restantes | 🚧 A.8.25 completo; A.8.15/A.8.20/A.8.24 parciales |
 | **F9** | Despliegue final y entrega | *Transversal* | Las cinco | ⬜ pendiente |
 
 **Lectura de la matriz.** F1, F2 y F3 son **Frontend** y están casi cerradas. **F4 (DB) y
-F5 (Backend) ya están cerradas.** Lo que falta de verdad es F1/FE-07 del Frontend, F7 (IA) y
-F8 (Security). F6 no es una fase de una sola división: es la suma de los cinco nodos, y cada
-división cierra el suyo.
+F5 (Backend) ya están cerradas.** Lo que falta de verdad es F1/FE-07 del Frontend, la validación
+de F7 (IA) con Supabase y F8 (Security). F6 no es una fase de una sola división: es la suma de
+los cinco nodos, y cada división cierra el suyo.
 
 ### 9.1 Reparto de F6 por división
 
 | Nodo | División dueña | Estado | Qué falta |
 | :--- | :--- | :--- | :--- |
-| `Sg-Frontend` | Frontend | ✅ healthy | Rebuild, `override` prod (BE-11) |
-| `Sg-AI` | IA | ✅ healthy | Endpoint y guardrails (IA-02…IA-06) |
-| `Sg-Backend` | Backend | ✅ healthy | Nada: imagen, API y healthcheck en verde |
-| `Sg-Security` | Security | 🚧 declarado, perfil `security` | Reglas Wazuh y FIM (SEC-08) |
+| `Sg-Frontend` | Frontend | ✅ healthy; build WebGL servido | Integrar NPC, cablear arte/UI y FE-10 |
+| `Sg-AI` | IA | ✅ healthy; `qwen2.5:3b`, guardrails y bocadillo WebGL probados | Validar con el backend real y Supabase |
+| `Sg-Backend` | Backend | 🚧 imagen construida; no arranca sin claves de Supabase/JWT | Completar `.env` y healthcheck (BE-08) |
+| `Sg-Security` | Security | 🟡 cerrado operativamente: VM `172.18.18.220`, agente **002** Active, logs Nginx reales y `100250` con 36 alertas; A.8.20/A.8.24/A.8.15 con evidencia parcial | `backend.log`, alerta FIM end-to-end, prueba de aislamiento desde contenedor y tailnet (SEC-08) |
 | `Sg-DB` | DB | ✅ operativo | Proyecto PROD al desplegar (DB-08) |
 
 ---
@@ -502,7 +531,7 @@ autenticación, evidencias de ataque y corrección.
 - [ ] Login usuario + PIN con bloqueo por intentos, contra Supabase real.
 - [ ] Leaderboard top 5 + posición propia.
 - [ ] Puntaje firmado con HMAC y validado en servidor.
-- [ ] NPC con Ollama + fallback.
+- [x] NPC con Ollama + fallback (simulación WebGL).
 - [ ] 5 nodos operativos y aislados (Frontend, Backend, DB, Security, IA).
 - [ ] 10 controles con evidencia de ataque y corrección.
 - [ ] SoA completa.
@@ -525,7 +554,9 @@ accionable y lo que no debe tocarse:
 | IA | [`docs/handoff/ia.md`](docs/handoff/ia.md) | punto exacto de conexión con Ollama, guardrails, pruebas y límites |
 
 Plantilla obligatoria de evidencia:
-[`docs/handoff/_plantilla-evidencia.md`](docs/handoff/_plantilla-evidencia.md).
+[`evidencias/_plantilla/README.md`](evidencias/_plantilla/README.md). La copia histórica
+[`docs/handoff/_plantilla-evidencia.md`](docs/handoff/_plantilla-evidencia.md) se conserva
+como referencia.
 
 ---
 
@@ -542,9 +573,9 @@ CosTamarindo/
 │   ├── arquitectura.md         # nodos, redes, compose y flujo del equipo
 │   ├── api.md                  # contratos del backend (F5)
 │   ├── soa.md                  # Declaración de Aplicabilidad (F8)
-│   └── fases/                  # bitácora por fase (F0, F1, F2, F3, F6)
+│   └── fases/                  # bitácora por fase (F0–F7)
 ├── unity/                      # proyecto Unity 6 (Frontend)
-├── backend/                    # FastAPI (Backend) — hoy vacío
+├── backend/                    # FastAPI (Backend) + IA del NPC
 │   ├── app/                    # routers, modelos, seguridad, logging, ai
 │   ├── sql/                    # esquema versionado (DB)
 │   └── tests/

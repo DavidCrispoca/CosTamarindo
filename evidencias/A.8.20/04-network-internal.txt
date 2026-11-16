@@ -1,0 +1,9 @@
+﻿# Redes internas de Docker
+# fecha: 2026-11-13
+
+- costamarindo-dmz internal=False subnets=10.80.0.0/16
+- costamarindo-app internal=True subnets=10.81.0.0/16
+- costamarindo-data internal=False subnets=10.82.0.0/16
+- costamarindo-ai internal=True subnets=10.83.0.0/16
+- costamarindo-mgmt internal=True subnets=10.84.0.0/16
+- costamarindo-siem internal=False subnets=10.85.0.0/16

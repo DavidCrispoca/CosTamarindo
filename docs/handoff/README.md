@@ -1,7 +1,7 @@
 # Handoff · CosTamarindo 2D
 
 > **Para quién:** las personas que toman Frontend, Security e IA.
-> **Estado del proyecto:** 2026-11-06.
+> **Estado del proyecto:** 2026-11-13.
 > **Fuente de verdad del avance:** [`../../Plan.md`](../../Plan.md).
 > **Contratos de la API:** [`../api.md`](../api.md).
 
@@ -13,7 +13,9 @@ división por división. No reemplaza a `Plan.md`: lo hace accionable.
 | [`frontend.md`](frontend.md) | integrar Unity con la API, reparar el arte y cerrar `FE-01`…`FE-14` |
 | [`security.md`](security.md) | atacar y evidenciar los 10 controles (`SEC-01`…`SEC-14`) |
 | [`ia.md`](ia.md) | conectar Ollama al NPC sin romper el puntaje (`IA-01`…`IA-07`) |
-| [`_plantilla-evidencia.md`](_plantilla-evidencia.md) | formato obligatorio de una carpeta de evidencia |
+| [`handoff-santiago-backend.md`](handoff-santiago-backend.md) | cargar Supabase/JWT, reconstruir el backend y validar `/api/dialog` real |
+| [`handoff-alejandra-frontend.md`](handoff-alejandra-frontend.md) | integrar el NPC, regenerar WebGL y validar el bocadillo en su rama |
+| [`evidencias/_plantilla/README.md`](../../evidencias/_plantilla/README.md) | formato obligatorio de una carpeta de evidencia |
 
 ---
 
@@ -21,11 +23,11 @@ división por división. No reemplaza a `Plan.md`: lo hace accionable.
 
 | División | Nodo | Estado | Qué falta |
 | :--- | :--- | :--- | :--- |
-| **Frontend** | `Sg-Frontend` | 🚧 jugable offline; build de 16,2 MB desactualizado | arte de ítems cableado, UI de Figma, clientes de red, login obligatorio |
-| **Backend** | `Sg-Backend` | ✅ healthy, 43 tests, E2E en verde | solo `BE-06` completo, que depende de IA |
+| **Frontend** | `Sg-Frontend` | 🟡 Nginx/TLS healthy; build WebGL generado; arte/UI pendientes | integrar NPC, arte, UI y clientes de red |
+| **Backend** | `Sg-Backend` | 🚧 imagen construida y 53 tests; no arranca sin claves | cargar Supabase/JWT y validar arranque |
 | **DB** | `Sg-DB` | ✅ esquema, RLS, leaderboard, backup probado | proyecto PROD al desplegar |
-| **Security** | `Sg-Security` | 🚧 1 de 10 controles evidenciados (A.8.25) | nueve controles con ataque y evidencia |
-| **IA** | `Sg-AI` | 🚧 nodo y modelo operativos, sin endpoint conectado | prompt, guardrails, fallback y pruebas |
+| **Security** | `Sg-Security` | 🟡 A.8.25 completo; A.8.15/A.8.20/A.8.24 parciales; SoA de 93 | cerrar ataques y controles restantes |
+| **IA** | `Sg-AI` | ✅ Ollama healthy, `qwen2.5:3b`, prompt, endpoint y bocadillo probado en WebGL | validar con backend real/Supabase |
 
 ---
 
@@ -67,13 +69,14 @@ powershell -File infra/scripts/up.ps1 backend
 curl.exe --ssl-no-revoke https://juego.local/api/health
 ```
 
-Resultado esperado: `sg-frontend`, `sg-ai` y `sg-backend` en `healthy`, y
-`{"status":"ok","env":"dev","database":true}`.
+Resultado esperado: `sg-frontend` en `healthy` y `{"status":"ok","env":"dev","database":true}`.
+`sg-ai` y `sg-backend` requieren, respectivamente, descargar el modelo y cargar las claves
+de Supabase/JWT; sin eso quedan detenidos o no arrancan. El build WebGL ya está generado; regenerarlo si se cambia Unity.
 
 ### 2.3 Verificación rápida de que todo está sano
 
 ```powershell
-backend\.venv\Scripts\python.exe -m pytest backend        # 43 passed
+backend\.venv\Scripts\python.exe -m pytest backend        # 53 passed
 backend\.venv\Scripts\python.exe backend\scripts\check_db.py
 $env:CT_E2E_BASE = "https://juego.local"
 backend\.venv\Scripts\python.exe backend\scripts\e2e_check.py
@@ -145,7 +148,7 @@ fuentes), el proyecto Unity (`unity/` sin `Library/`).
 **No entra:** `.env`, `infra/tls/`, `infra/backups/`, `builds/`, `.venv/`, `__pycache__/`,
 `node_modules/`, `unity/Library/`, `Proceso.md` (bitácora interna).
 
-Un clon limpio + `.env` + `pip install -r requirements-dev.txt` alcanza para correr las 43
+Un clon limpio + `.env` + `pip install -r requirements-dev.txt` alcanza para correr las 53
 pruebas. Si alguna prueba falla en un clon nuevo, es un archivo que falta: avisar antes de
 improvisar.
 
@@ -156,7 +159,8 @@ improvisar.
 ```
 Frontend FE-03 -> FE-02 -> FE-01     (arte sano, no bloquea nada mas)
 Frontend FE-07                        (clientes de red; necesita API, ya lista)
-IA IA-02 -> IA-03 -> IA-05 -> IA-06    (prompt, guardrails, fallback, pruebas)
+IA IA-02 -> IA-03 -> IA-05 -> IA-06    (prompt, guardrails, fallback, pruebas; ✅)
+IA bocadillo WebGL                      (✅ probado; integrar en Frontend)
 Security SEC-01 -> SEC-02 -> SEC-03…  (plantilla, SoA, ataques)
 ```
 

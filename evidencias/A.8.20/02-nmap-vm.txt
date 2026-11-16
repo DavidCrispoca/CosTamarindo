@@ -1,0 +1,18 @@
+﻿# nmap desde el host hacia la VM sg-security
+# fecha: 2026-11-13
+# comando: nmap -sT -Pn --unprivileged -p 22,443,1514,1515,55000,9200 172.18.18.220
+
+Starting Nmap 7.80 ( https://nmap.org ) at 2026-11-13 14:15 Hora est. PacÝfico, SudamÚrica
+WARNING: Could not import all necessary Npcap functions. You may need to upgrade to the latest version from https://npcap.org. Resorting to connect() mode -- Nmap may not function completely
+Nmap scan report for 172.18.18.220
+Host is up (0.00067s latency).
+
+PORT      STATE    SERVICE
+22/tcp    open     ssh
+443/tcp   open     https
+1514/tcp  open     fujitsu-dtcns
+1515/tcp  open     ifor-protocol
+9200/tcp  filtered wap-wsp
+55000/tcp filtered unknown
+
+Nmap done: 1 IP address (1 host up) scanned in 1.31 seconds

@@ -10,6 +10,7 @@ from fastapi import Depends, Request
 from .config import Settings
 from .errors import InvalidToken
 from .logging_setup import user_id_var
+from .providers.ollama import OllamaClient
 from .providers.supabase_auth import SupabaseAuth
 from .repositories import Repository
 from .security import TokenError, decode_access_token
@@ -38,6 +39,10 @@ def get_repository(request: Request) -> Repository:
 
 def get_auth_provider(request: Request) -> SupabaseAuth:
     return request.app.state.auth_provider
+
+
+def get_ollama(request: Request) -> OllamaClient | None:
+    return getattr(request.app.state, "ollama", None)
 
 
 def get_auth_service(

@@ -20,6 +20,9 @@ services:
     image: nginx:1.29-alpine
     container_name: sg-frontend
     restart: unless-stopped
+    # La imagen oficial deja access.log/error.log como symlinks a stdout.
+    # El agente Wazuh necesita archivos regulares en el volumen compartido.
+    command: ["/bin/sh", "-c", "rm -f /var/log/nginx/access.log /var/log/nginx/error.log && touch /var/log/nginx/access.log /var/log/nginx/error.log && exec nginx -g 'daemon off;'"]
 
     ports:
       - "443:443"     # HTTPS del juego (juego.local)
@@ -31,6 +34,7 @@ services:
       - ./nginx/conf.d:/etc/nginx/conf.d:ro
       - ./nginx/snippets:/etc/nginx/snippets:ro
       - ./tls:/etc/nginx/certs:ro
+      - frontend-logs:/var/log/nginx   # A.8.15: el agente Wazuh lee el access log
 
     networks:
       - dmz
@@ -69,15 +73,22 @@ services:
     env_file:
       - ../.env
 
+    environment:
+      # Escribe una copia JSON en el volumen que lee el agente Wazuh.
+      # Si el volumen no está disponible, responde a la API usando solo stdout.
+      LOG_DIR: /var/log/costamarindo
+
+    volumes:
+      - backend-logs:/var/log/costamarindo
+
     networks:
       - app
       - data
       - ai
       - mgmt
 
-    depends_on:
-      ai:
-        condition: service_healthy
+    # Sin depends_on de `ai`: si Ollama está caído, el backend igual arranca y
+    # /api/dialog responde del banco de respaldo. La IA nunca bloquea el juego.
 
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8000/api/health').status==200 else 1)"]
@@ -134,9 +145,13 @@ services:
   # ── SEGURIDAD ─────────────────────────────────────────────────────────
   # Perfil `security`: se enciende en F8, cuando haya logs que ingerir.
   # No arranca con `docker compose up` a propósito (consume ~3 GB).
+  #
+  # Respaldo local del SIEM. En la demo se usa la VM `sg-security`;
+  # NO encender este servicio y la VM al mismo tiempo. Por eso vive en el
+  # perfil `security-local`: `--profile security` solo levanta el agente.
   security:
-    profiles: ["security"]
-    image: wazuh/wazuh-manager:4.9.0
+    profiles: ["security-local"]
+    image: wazuh/wazuh-manager:4.14.10
     container_name: sg-security
     restart: unless-stopped
 
@@ -155,6 +170,50 @@ services:
         max-size: "10m"
         max-file: "3"
 
+  # ── AGENTE WAZUH DEL HOST DEL JUEGO ───────────────────────────────────
+  # Perfil `security`. No se levanta con `docker compose up`: si Wazuh o la
+  # VM no están, el juego sigue funcionando. La conexión la inicia el agente
+  # hacia el manager (1514/tcp) y el authd (1515/tcp).
+  #
+  # `mgmt` es internal; `siem` existe solo para que el agente tenga salida
+  # hacia la VM (Default Switch mientras no haya tailnet, o Tailscale después).
+  wazuh-agent:
+    image: wazuh/wazuh-agent:4.14.10
+    container_name: sg-wazuh-agent
+    profiles: ["security"]
+    restart: unless-stopped
+
+    environment:
+      # Sin valor real en el repo. Definir WAZUH_MANAGER en el .env del host.
+      # El default 127.0.0.1 evita romper `docker compose config` cuando el
+      # perfil security no se usa; el agente solo falla si se enciende sin IP.
+      WAZUH_MANAGER: "${WAZUH_MANAGER:-127.0.0.1}"
+      # La imagen 4.14.10 lee WAZUH_MANAGER_SERVER (no WAZUH_MANAGER) para
+      # escribir <address> en ossec.conf. Se mantienen ambos por compatibilidad.
+      WAZUH_MANAGER_SERVER: "${WAZUH_MANAGER:-127.0.0.1}"
+      WAZUH_MANAGER_PORT: "1514"
+      WAZUH_AGENT_NAME: "sg-game-host"
+      WAZUH_REGISTRATION_SERVER: "${WAZUH_MANAGER:-127.0.0.1}"
+      WAZUH_AGENT_GROUP: "game"
+      WAZUH_REGISTRATION_PASSWORD: "${WAZUH_REGISTRATION_PASSWORD:-}"
+
+    volumes:
+      - ../builds/webgl:/fim/webgl:ro
+      - frontend-logs:/var/log/nginx:ro
+      - backend-logs:/var/log/costamarindo:ro
+
+    networks:
+      - mgmt
+      - siem
+
+    mem_limit: 256m
+
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
 # ── Redes ───────────────────────────────────────────────────────────────
 #   dmz  : entrada pública (frontend).
 #   app  : frontend ↔ backend.
@@ -163,28 +222,57 @@ services:
 #   ai   : backend → Ollama. `internal` = sin salida a Internet: el modelo se
 #          descarga en el build del entorno, no en runtime.
 #   mgmt : envío de logs al SIEM. `internal` también.
+#   siem : salida del agente Wazuh hacia la VM Sg-Security (Default Switch o
+#          Tailscale). No publica puertos.
 
 networks:
+  # Subredes explícitas para no chocar con el Default Switch de Hyper-V
+  # (puede usar 172.19.0.0/16, 172.30.0.0/16, etc.) ni con el bridge de Docker.
   dmz:
     name: costamarindo-dmz
+    ipam:
+      config:
+        - subnet: 10.80.0.0/16
 
   app:
     name: costamarindo-app
     internal: true
+    ipam:
+      config:
+        - subnet: 10.81.0.0/16
 
   data:
     name: costamarindo-data
+    ipam:
+      config:
+        - subnet: 10.82.0.0/16
 
   ai:
     name: costamarindo-ai
     internal: true
+    ipam:
+      config:
+        - subnet: 10.83.0.0/16
 
   mgmt:
     name: costamarindo-mgmt
     internal: true
+    ipam:
+      config:
+        - subnet: 10.84.0.0/16
+
+  siem:
+    name: costamarindo-siem
+    ipam:
+      config:
+        - subnet: 10.85.0.0/16
 
 volumes:
   sg-ai-models:
     name: costamarindo-ai-models
   wazuh-data:
     name: costamarindo-wazuh-data
+  frontend-logs:
+    name: costamarindo-frontend-logs
+  backend-logs:
+    name: costamarindo-backend-logs

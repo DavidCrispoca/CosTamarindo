@@ -21,8 +21,15 @@ if [ "${ENV:-dev}" != "prod" ] && [ -f docker-compose.override.yml ]; then
   FILES="$FILES -f docker-compose.override.yml"
 fi
 
+# El .env de la raíz es la fuente de secretos; Compose lo usa para interpolar
+# WAZUH_MANAGER / WAZUH_REGISTRATION_PASSWORD en el perfil security.
+ENV_ARG=""
+if [ -f ../.env ]; then
+  ENV_ARG="--env-file ../.env"
+fi
+
 # shellcheck disable=SC2086
-docker compose $FILES $PROFILES up -d --wait
+docker compose $ENV_ARG $FILES $PROFILES up -d --wait
 
 echo ""
 echo "Estado:"

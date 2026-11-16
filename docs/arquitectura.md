@@ -1,7 +1,14 @@
 # Arquitectura de infraestructura — CosTamarindo 2D
 
-> **Estado (2026-11-06):** los cinco nodos están **declarados y validados** en Compose.
-> `Sg-Frontend`, `Sg-AI` y `Sg-Backend` corren *healthy*; `Sg-Security` se enciende en F8.
+> **Estado (2026-11-13):** `Sg-Frontend` está *healthy* y escribe logs reales; `Sg-Backend`
+> tiene imagen construida y dependencias actualizadas, pero **no arranca** hasta cargar las
+> claves de Supabase/JWT en `.env`; `Sg-AI` está **healthy** con `qwen2.5:3b` (1,9 GB) y el
+> endpoint de diálogo ya llama a Ollama. `Sg-Security` es la **VM externa** `sg-security` (`172.18.18.220`, Ubuntu
+> 24.04 + Wazuh 4.14.10), con el agente **002** activo y `100250` con 36 alertas sobre logs
+> reales de Nginx. El FIM guarda estado en `002.db`, pero Wazuh 4.14 no emite la alerta por
+> archivo en este all-in-one. La VM anterior `sg-jacome-security` se descartó; el servicio
+> `security` del compose queda como respaldo local. Tailscale se difiere hasta tener los
+> cinco nodos. TLS local con mkcert y cabeceras verificadas (A.8.24).
 > `Sg-DB` es Supabase Cloud (excepción D3) y ya tiene esquema, RLS y backups.
 > **Alcance:** cómo se levanta, se opera y se comparte el entorno de 5 nodos.
 > **Decisiones de referencia:** `Plan.md` §11.5 (D1–D8).
@@ -35,9 +42,13 @@ la IA y con la base de datos.
  +----------+-----------------+      +-----------+-----------------+
             | logs                             | logs
  +----------v----------------------------------v-------------------+
- | MGMT - red: mgmt        [ Sg-Security ] perfil `security`       |
- | Wazuh manager + indexer + dashboard, SonarQube bajo demanda     |
- +-----------------------------------------------------------------+
+ | MGMT - red: mgmt        logs de frontend y backend              |
+ | SIEM - red: siem        [ sg-wazuh-agent ]  ── Tailscale ──┐    |
+ +------------------------------------------------------------|----+
+                                                              v
+                              VM sg-security (Sg-Security)
+                              Wazuh manager + indexer + dashboard 443
+                              (solo tailnet; reglas 100200-100250)
 ```
 
 Regla de oro: **el jugador solo ve `Sg-Frontend`**. Todo lo demás es inalcanzable desde fuera.
@@ -58,10 +69,10 @@ Cada nodo tiene una **división dueña** con su propio backlog en `Plan.md`:
 
 | Nodo | Tecnología | Qué hace | Redes | Puerto | Persistencia | Límite RAM | Control ISO |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **Sg-Frontend** | `nginx:1.27-alpine` | Sirve el build WebGL, termina TLS, aplica CSP/HSTS, rate limit y proxy `/api/` | `dmz`, `app` | **443** (público), 8080 (solo dev local) | build montado `../builds/webgl` (ro), certs (ro), logs | 128 MB | A.8.19, A.8.20, A.8.24 |
+| **Sg-Frontend** | `nginx:1.29-alpine` | Sirve el build WebGL, termina TLS, aplica CSP/HSTS, rate limit y proxy `/api/` | `dmz`, `app` | **443** (público), 8081 (solo dev local) | build montado `../builds/webgl` (ro), certs (ro), logs | 128 MB | A.8.19, A.8.20, A.8.24 |
 | **Sg-Backend** | Python 3.12 + FastAPI/Uvicorn (imagen propia, multi-stage, usuario `app`) | Valida JWT, firma HMAC, nonce, TTL y plausibilidad; único que escribe en la BD (`service_role`); único que llama a la IA | `app`, `data`, `ai`, `mgmt` | 8000 (**solo interno**) | ninguna: estado en Postgres | 512 MB | A.8.24, A.8.28, A.8.5, A.8.15 |
-| **Sg-AI** | `ollama/ollama` | NPC: diálogos en español con `qwen2.5:3b` | `ai` (**`internal: true`**) | 11434 (**solo interno**) | volumen `sg-ai-models` (~2,5 GB) | 4 GB | A.8.20, A.8.28 |
-| **Sg-Security** | Wazuh 4.x (+ SonarQube bajo demanda) | SIEM: recibe logs, reglas 100100/100101, FIM del webroot | `mgmt` (**`internal: true`**) | 5601 (dashboard, opcional por túnel) | volúmenes `wazuh-*` | 3 GB | A.8.15, A.8.25 |
+| **Sg-AI** | `ollama/ollama` | NPC: diálogos en español con `qwen2.5:3b` | `ai` (**`internal: true`**) | 11434 (**solo interno**) | volumen `costamarindo-ai-models` (~2,5 GB) | 4 GB | A.8.20, A.8.28 |
+| **Sg-Security** | VM Ubuntu 24.04 + Wazuh 4.14.10 (manager/indexer/dashboard) + SonarQube bajo demanda | SIEM: recibe logs, reglas 100200–100250, FIM del webroot | `siem` (solo el agente) | 443 dashboard (**solo Default Switch/tailnet**), 1514/1515 (agentes) | volúmenes de la VM | fuera del host del juego | A.8.15, A.8.25 |
 | **Sg-DB** | **Supabase Cloud** (Postgres 15 + GoTrue) | Identidad, leaderboard, `game_sessions` | — (salida 443 desde `data`) | 443 salida | gestionada por Supabase + `pg_dump` diario | — | A.8.5, A.8.28, A.8.13 |
 
 `Sg-DB` **no es un contenedor**: es una excepción documentada (decisión D3). Ahorra 6–8 GB de
@@ -78,7 +89,8 @@ RAM y elimina el riesgo de perder la base con el portátil. Se mitiga con keep-a
 | `app` | no | frontend, backend | frontend → backend | no |
 | `data` | no | backend | backend → Supabase (TLS 443) | **sí, solo backend** |
 | `ai` | **sí** | backend, ai | backend → Ollama | no |
-| `mgmt` | **sí** | backend, frontend, security | envío de logs al SIEM | no |
+| `mgmt` | **sí** | backend, frontend, `wazuh-agent` | logs entre contenedores | no |
+| `siem` | no | `wazuh-agent` | agente → VM `Sg-Security` (1514/1515/443) | **sí, solo hacia la VM/tailnet** |
 
 Consecuencias que se verifican en el DoD de F6:
 
@@ -98,16 +110,19 @@ infra/
 ├── .env.example                # copia de ../.env.example (referencia para compose)
 ├── nginx/
 │   ├── nginx.conf              # http: logs JSON, rate limit, gzip caliente
-│   ├── conf.d/costamarindo.conf# 8080 local + 443 TLS, .gz del build, proxy /api/
+│   ├── conf.d/costamarindo.conf# 8080 interno (8081 en dev) + 443 TLS, .gz, proxy /api/
 │   └── snippets/
 │       ├── security-headers.conf
 │       └── csp.conf            # GENERADO por tools/dev-server/csp.mjs
-├── certs/                      # mkcert (NO se versiona)
+├── tls/                        # mkcert (NO se versiona)
 ├── scripts/
 │   ├── up.sh / down.sh / logs.sh / deploy.sh
-│   ├── tls.sh                  # mkcert → infra/certs/juego.local*.pem
+│   ├── tls.ps1                 # mkcert → infra/tls/juego.local*.pem
 │   └── build_webgl.sh|.ps1
-└── wazuh/                      # reglas y decoders locales (F8)
+└── wazuh/                      # Sg-Security (F8)
+    ├── rules/costamarindo_rules.xml
+    ├── agent-group/game.conf
+    └── README.md
 ```
 
 `docker-compose.yml` se ejecuta **desde `infra/`**: las rutas del compose son relativas a ese
@@ -131,6 +146,7 @@ frontend:
     - ./nginx/conf.d:/etc/nginx/conf.d:ro
     - ./nginx/snippets:/etc/nginx/snippets:ro
     - ./tls:/etc/nginx/certs:ro
+    - frontend-logs:/var/log/nginx
   networks: [dmz, app, mgmt]
   healthcheck: wget -qO- http://localhost:8080/healthz
   restart: unless-stopped
@@ -139,13 +155,15 @@ frontend:
 
 Puertos: en `dev` se publica `443:443` y `8081:8080`; en `prod`, **solo** `443:443`. La
 separación dev/prod con `docker-compose.override.yml` todavía no existe (`Plan.md` → `BE-11`).
-El `docker-compose.yml` actual declara los **cinco servicios** (`frontend`, `backend`, `ai`,
-`security` y las cinco redes con `mem_limit` y healthcheck); `backend` y `security` viven detrás
-de perfiles porque dependen de F5 y F8.
+El `docker-compose.yml` actual declara los servicios `frontend`, `backend`, `ai`, `security` y
+`wazuh-agent`, las seis redes y los volúmenes, con `mem_limit` y healthcheck. `backend`,
+`security` y `wazuh-agent` viven detrás de perfiles porque dependen de F5 y F8.
 
-> Desajuste conocido: el servicio `frontend` está conectado a `app` y `mgmt`, pero `mgmt` es
-> `internal: true` y hoy no hay ningún servicio que reciba los logs. Hasta que exista `security`,
-> esa conexión no aporta nada y sí amplía la superficie del nodo público.
+> Desviación documentada (2026-11-10): `Sg-Security` ya no es el servicio `security` del compose,
+> sino la VM externa `sg-security` (reconstruida el 2026-11-10; la anterior
+> `sg-jacome-security` quedó inaccesible). El agente `wazuh-agent` se conecta a la VM por la red
+> `siem` (Default Switch mientras no exista la tailnet del juego). `security` queda como respaldo
+> local y **no debe encenderse a la vez** que la VM.
 
 ### 5.2 `backend`
 
@@ -153,6 +171,9 @@ de perfiles porque dependen de F5 y F8.
 backend:
   build: { context: ../backend, dockerfile: Dockerfile }
   env_file: ../.env
+  environment:
+    LOG_DIR: /var/log/costamarindo   # copia JSON para el agente Wazuh
+  volumes: [backend-logs:/var/log/costamarindo]
   expose: ["8000"]              # nunca `ports:`
   networks: [app, data, ai, mgmt]
   depends_on:
@@ -185,20 +206,47 @@ ai:
 El modelo se descarga una vez con `infra/scripts/pull-model.sh`
 (`docker compose exec ai ollama pull qwen2.5:3b`). La red `ai` es `internal: true`.
 
-### 5.4 `security` (perfil `security`)
+### 5.4 `Sg-Security` — VM externa + agente (perfil `security`)
+
+El nodo real es la VM **`sg-security`** (Ubuntu 24.04, Wazuh 4.14.10: manager, indexer y
+dashboard). No es un contenedor y no está en la ruta de la partida: si se cae, el juego sigue.
+El dashboard se abre por la tailnet o por túnel SSH; la VM **no publica 1514/1515/443 a Internet**.
+
+En esta sesión la VM está en **`172.18.18.220`**, el Default Switch en `172.18.16.1/20` y
+UFW permite `22/443/1514/1515` desde `172.18.16.0/20` y `172.19.224.0/20`; `55000/9200`
+escuchan en localhost. El agente es el **ID 002** (`sg-game-host`, grupo `game`). El frontend
+escribe `access.log` real y `100250` ya disparó 36 veces con una ráfaga `429`; el FIM detecta
+el cambio y lo guarda en `002.db`, pero Wazuh 4.14 no emite la alerta por archivo en este
+all-in-one.
+`backend.log` queda pendiente hasta que el backend tenga las claves de Supabase/JWT.
+
+Mientras la tailnet del juego no exista, la VM se alcanza por el Default Switch. Cuando estén
+los cinco nodos se crea la tailnet, se saca la VM de la tailnet vieja y se cambia
+`WAZUH_MANAGER` a su IP de Tailscale.
+
+El agente del host del juego:
 
 ```yaml
-security:
+wazuh-agent:
   profiles: ["security"]
-  image: wazuh/wazuh-manager:4.x
-  networks: [mgmt]
-  volumes: [wazuh-data:/var/ossec/data, ./wazuh:/etc/wazuh-local:ro]
-  restart: unless-stopped
-  mem_limit: 3g
+  image: wazuh/wazuh-agent:4.14.10
+  environment:
+    WAZUH_MANAGER: ${WAZUH_MANAGER:-127.0.0.1}
+    WAZUH_MANAGER_SERVER: ${WAZUH_MANAGER:-127.0.0.1}
+    WAZUH_AGENT_NAME: sg-game-host
+    WAZUH_AGENT_GROUP: game
+    WAZUH_REGISTRATION_PASSWORD: ${WAZUH_REGISTRATION_PASSWORD:-}
+  volumes:
+    - ../builds/webgl:/fim/webgl:ro
+    - frontend-logs:/var/log/nginx:ro
+    - backend-logs:/var/log/costamarindo:ro
+  networks: [mgmt, siem]
+  mem_limit: 256m
 ```
 
-Arranca solo con `docker compose --profile security up -d`. En F6 queda **definido y apagado**;
-se enciende en F8, cuando haya logs que ingerir y reglas que probar.
+El servicio `security` del compose (mismo Wazuh 4.14.10) queda como **respaldo local** en el perfil
+`security-local`: `docker compose --profile security-local up -d security`. No encenderlo a la vez
+que la VM.
 
 ### 5.5 `Sg-DB`
 
@@ -267,7 +315,7 @@ sin levantar el entorno.
 
 - `.env` real solo en la máquina de cada quien y en el servidor; `.env.example` versionado.
 - Claves `DEV` para desarrollo, `PROD` solo en el despliegue, nunca en el repo.
-- `infra/certs/` fuera de git; cada quien genera su certificado con `infra/scripts/tls.sh`.
+- `infra/tls/` fuera de git; cada quien genera su certificado con `infra/scripts/tls.ps1`.
 - Gitleaks en pre-commit antes de F8.
 
 ---

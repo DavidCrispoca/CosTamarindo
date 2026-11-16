@@ -1,0 +1,6 @@
+Fallback con sg-ai detenido.
+Backend de prueba: repositorio en memoria + JWT firmado.
+
+RUN=1 MS=797 RESP={"reply": "¡Qué buenos tamarindos! Como pa' un juguito.", "blocked": false}
+RUN=2 MS=758 RESP={"reply": "¡Qué buenos tamarindos! Como pa' un juguito.", "blocked": false}
+RUN=3 MS=757 RESP={"reply": "¡Qué buenos tamarindos! Como pa' un juguito.", "blocked": false}

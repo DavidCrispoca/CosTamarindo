@@ -1,0 +1,16 @@
+﻿# nmap desde el host hacia el frontend
+# fecha: 2026-11-13
+# comando: nmap -sT -Pn --unprivileged -p 443,8081,8000,11434 127.0.0.1
+
+Starting Nmap 7.80 ( https://nmap.org ) at 2026-11-13 14:15 Hora est. PacÝfico, SudamÚrica
+WARNING: Could not import all necessary Npcap functions. You may need to upgrade to the latest version from https://npcap.org. Resorting to connect() mode -- Nmap may not function completely
+Nmap scan report for juego.local (127.0.0.1)
+Host is up (0.0020s latency).
+
+PORT      STATE    SERVICE
+443/tcp   open     https
+8000/tcp  filtered http-alt
+8081/tcp  filtered blackice-icecap
+11434/tcp filtered unknown
+
+Nmap done: 1 IP address (1 host up) scanned in 1.27 seconds

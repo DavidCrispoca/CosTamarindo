@@ -17,6 +17,7 @@ from .config import Settings, get_settings
 from .db import Database
 from .errors import DomainError
 from .logging_setup import audit, configure_logging, new_request_id, request_id_var, user_id_var
+from .providers.ollama import OllamaClient
 from .providers.supabase_auth import SupabaseAuth
 from .repositories import Repository, SqlRepository
 from .routers import auth, dialog, health, leaderboard, score, session
@@ -29,6 +30,7 @@ def create_app(
     settings: Settings | None = None,
     repository: Repository | None = None,
     auth_provider: SupabaseAuth | None = None,
+    ollama: OllamaClient | None = None,
 ) -> FastAPI:
     settings = settings or get_settings()
     configure_logging(settings.log_level)
@@ -46,6 +48,17 @@ def create_app(
             base_url=settings.supabase_url,
             publishable_key=settings.supabase_publishable_key,
             secret_key=settings.supabase_secret_key,
+        )
+
+        created_ollama = ollama is None
+        app.state.ollama = ollama or OllamaClient(
+            base_url=settings.ollama_url,
+            model=settings.ollama_model,
+            timeout_seconds=settings.ollama_timeout_seconds,
+            connect_timeout_seconds=settings.ollama_connect_timeout_seconds,
+            max_concurrency=settings.ollama_max_concurrency,
+            num_predict=settings.ollama_num_predict,
+            temperature=settings.ollama_temperature,
         )
 
         # Calentamiento con reintentos: las primeras conexiones desde un
@@ -71,6 +84,8 @@ def create_app(
         try:
             yield
         finally:
+            if created_ollama and app.state.ollama is not None:
+                await app.state.ollama.aclose()
             if database is not None:
                 await database.dispose()
 

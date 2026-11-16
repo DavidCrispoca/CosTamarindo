@@ -1,0 +1,102 @@
+<!--
+  CosTamarindo 2D - reglas del nodo Sg-Security (Wazuh).
+
+  Rango reservado: 100200-100299.
+  No se reutilizan las reglas 100100/100101 del taller de Seguridad Informatica:
+  los eventos del juego son otros y las reglas se disenan contra el contrato
+  JSON de backend/app/logging_setup.py.
+
+  Campos que emite el backend:
+    ts, level, logger, event, request_id, user_id, reason, ip, username,
+    session_id, score, duration_ms, catches, length
+
+  La IP viene enmascarada (ultimo octeto a 0); por eso las correlaciones usan
+  user_id o username, nunca la IP.
+-->
+<group name="costamarindo,">
+
+  <!-- =====================================================================
+       A.8.24 / A.8.9 - puntaje firmado: firma, replay, TTL y plausibilidad
+       ===================================================================== -->
+  <rule id="100200" level="7">
+    <decoded_as>json</decoded_as>
+    <field name="event">^score_rejected$</field>
+    <description>CosTamarindo: puntaje rechazado (reason=$(reason))</description>
+  </rule>
+
+  <rule id="100201" level="10" frequency="5" timeframe="120">
+    <if_matched_sid>100200</if_matched_sid>
+    <same_field>user_id</same_field>
+    <description>CosTamarindo: 5 rechazos de puntaje en 120 s para el mismo usuario</description>
+  </rule>
+
+  <!-- =====================================================================
+       A.8.5 - autenticacion: fallos, bloqueo y fuerza bruta
+       ===================================================================== -->
+  <rule id="100210" level="5">
+    <decoded_as>json</decoded_as>
+    <field name="event">^login_fail$</field>
+    <description>CosTamarindo: login fallido (username=$(username))</description>
+  </rule>
+
+  <rule id="100211" level="10" frequency="5" timeframe="120">
+    <if_matched_sid>100210</if_matched_sid>
+    <same_field>username</same_field>
+    <description>CosTamarindo: 5 logins fallidos en 120 s para el mismo usuario</description>
+  </rule>
+
+  <rule id="100212" level="9">
+    <decoded_as>json</decoded_as>
+    <field name="event">^login_blocked$</field>
+    <description>CosTamarindo: cuenta bloqueada por intentos fallidos (username=$(username))</description>
+  </rule>
+
+  <!-- =====================================================================
+       A.8.28 - codificacion segura: registro rechazado e inyeccion de prompt
+       ===================================================================== -->
+  <rule id="100220" level="6">
+    <decoded_as>json</decoded_as>
+    <field name="event">^register_rejected$</field>
+    <description>CosTamarindo: registro rechazado (reason=$(reason))</description>
+  </rule>
+
+  <rule id="100221" level="9">
+    <decoded_as>json</decoded_as>
+    <field name="event">^dialog_blocked$</field>
+    <description>CosTamarindo: prompt injection bloqueado</description>
+  </rule>
+
+  <rule id="100222" level="12" frequency="10" timeframe="60">
+    <if_matched_sid>100221</if_matched_sid>
+    <same_field>user_id</same_field>
+    <description>CosTamarindo: 10 intentos de prompt injection en 60 s para el mismo usuario</description>
+  </rule>
+
+  <!-- =====================================================================
+       A.8.15 / A.8.19 - FIM del webroot montado en /fim/webgl
+       Se apoyan en las reglas de syscheck de Wazuh: 550 (modificado),
+       553 (eliminado) y 554 (agregado). En esta version no existen 551/552.
+       ===================================================================== -->
+  <rule id="100240" level="10">
+    <if_sid>550,553,554</if_sid>
+    <match>/fim/webgl</match>
+    <description>CosTamarindo: cambio en el webroot (FIM)</description>
+  </rule>
+
+  <rule id="100241" level="12">
+    <if_sid>553</if_sid>
+    <match>/fim/webgl</match>
+    <description>CosTamarindo: archivo eliminado del webroot (FIM)</description>
+  </rule>
+
+  <!-- =====================================================================
+       A.8.20 - rate limit de Nginx (log JSON propio de Sg-Frontend)
+       ===================================================================== -->
+  <rule id="100250" level="5">
+    <decoded_as>json</decoded_as>
+    <!-- `status` es un campo estatico del decoder JSON; se busca en el log crudo. -->
+    <regex>"status"\s*:\s*429</regex>
+    <description>CosTamarindo: Nginx aplico rate limit (HTTP 429)</description>
+  </rule>
+
+</group>
