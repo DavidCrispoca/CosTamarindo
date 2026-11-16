@@ -34,7 +34,7 @@ def _b64url(raw: bytes) -> str:
 
 
 def derive_pin_password(pin: str, username: str, pepper: str) -> str:
-    """Convierte el PIN de 4 digitos en la credencial que guarda GoTrue."""
+    """Convierte el PIN de 4 a 6 digitos en la credencial que guarda GoTrue."""
     message = f"{username.strip().lower()}:{pin}".encode()
     digest = hmac.new(pepper.encode(), message, hashlib.sha256).digest()
     return _b64url(digest)
@@ -65,9 +65,10 @@ def new_nonce() -> str:
     return secrets.token_urlsafe(18)
 
 
-# PIN de 4 digitos es de baja entropia por diseño (10.000 combinaciones), asi que
-# la defensa real es el bloqueo progresivo. Aun asi se rechazan los valores que
-# un atacante prueba primero; el coste es cero y quita el caso trivial.
+# PIN de 4 a 6 digitos es de baja entropia por diseño (hasta 1.000.000 de
+# combinaciones), asi que la defensa real es el bloqueo progresivo. Aun asi se
+# rechazan los valores que un atacante prueba primero; el coste es cero y quita
+# el caso trivial.
 WEAK_PINS: frozenset[str] = frozenset(
     {
         "0000", "1111", "2222", "3333", "4444", "5555", "6666", "7777", "8888", "9999",
@@ -79,6 +80,9 @@ WEAK_PINS: frozenset[str] = frozenset(
 
 def is_weak_pin(pin: str) -> bool:
     if pin in WEAK_PINS:
+        return True
+    if len(set(pin)) == 1:
+        # Todos los digitos iguales (0000, 11111, 666666, ...).
         return True
     digits = [int(char) for char in pin]
     ascending = all(digits[i] + 1 == digits[i + 1] for i in range(len(digits) - 1))

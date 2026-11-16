@@ -205,12 +205,37 @@ namespace CosTamarindo.EditorTools
             var gameOverPanel = CreateOverlayPanel(root, "GameOverPanel", out var overContent);
             CreateText(overContent, "Title", "¡Se acabó la pesca!", 76f, TextAlignmentOptions.Center, displayFont);
             var finalScore = CreateText(overContent, "FinalScore", "0", 120f, TextAlignmentOptions.Center, displayFont);
-            finalScore.rectTransform.anchoredPosition = new Vector2(0f, 10f);
+            finalScore.rectTransform.anchoredPosition = new Vector2(0f, 70f);
             var finalBest = CreateText(overContent, "FinalBest", "Récord 0", 40f, TextAlignmentOptions.Center, bodyFont);
-            finalBest.rectTransform.anchoredPosition = new Vector2(0f, -90f);
-            var breakdown = CreateText(overContent, "Breakdown", "", 34f, TextAlignmentOptions.Center, bodyFont);
-            breakdown.rectTransform.anchoredPosition = new Vector2(0f, -170f);
-            CreateButton(overContent, "RetryButton", "Reintentar", 46f, new Vector2(420f, 96f), new Vector2(0f, -280f), bodyFont);
+            finalBest.rectTransform.anchoredPosition = new Vector2(0f, -10f);
+            var breakdown = CreateText(overContent, "Breakdown", "", 30f, TextAlignmentOptions.Center, bodyFont);
+            breakdown.rectTransform.anchoredPosition = new Vector2(0f, -80f);
+
+            var submitStatus = CreateText(overContent, "SubmitStatus", "", 32f, TextAlignmentOptions.Center, bodyFont);
+            submitStatus.rectTransform.anchoredPosition = new Vector2(0f, -150f);
+            submitStatus.rectTransform.sizeDelta = new Vector2(680f, 70f);
+
+            // Reclamo top 5 (se activa en runtime si in_top5)
+            var claimPanel = new GameObject("ClaimPanel", typeof(RectTransform));
+            claimPanel.transform.SetParent(overContent, false);
+            var claimRt = claimPanel.GetComponent<RectTransform>();
+            claimRt.anchorMin = new Vector2(0.5f, 0.5f);
+            claimRt.anchorMax = new Vector2(0.5f, 0.5f);
+            claimRt.pivot = new Vector2(0.5f, 0.5f);
+            claimRt.anchoredPosition = new Vector2(0f, -230f);
+            claimRt.sizeDelta = new Vector2(680f, 220f);
+
+            var claimUser = CreateInputField(claimPanel.transform, "ClaimUsernameInput", "Nombre público (3-16)", 30f,
+                new Vector2(320f, 64f), new Vector2(-170f, 40f), bodyFont, false, 16);
+            var claimPin = CreateInputField(claimPanel.transform, "ClaimPinInput", "PIN (4-6 dígitos)", 30f,
+                new Vector2(320f, 64f), new Vector2(170f, 40f), bodyFont, true, 6);
+            var claimBtn = CreateButton(claimPanel.transform, "ClaimButton", "Reclamar", 40f, new Vector2(320f, 72f), new Vector2(0f, -30f), bodyFont);
+            var claimStatus = CreateText(claimPanel.transform, "ClaimStatus", "", 28f, TextAlignmentOptions.Center, bodyFont);
+            claimStatus.rectTransform.anchoredPosition = new Vector2(0f, -88f);
+            claimStatus.rectTransform.sizeDelta = new Vector2(680f, 60f);
+            claimPanel.SetActive(false);
+
+            CreateButton(overContent, "RetryButton", "Reintentar", 46f, new Vector2(420f, 96f), new Vector2(0f, -340f), bodyFont);
 
             // ── Controladores de UI ──
             var hud = canvasGo.AddComponent<HudController>();
@@ -225,6 +250,12 @@ namespace CosTamarindo.EditorTools
             SetObject(overlay, "finalScoreText", finalScore);
             SetObject(overlay, "finalBestText", finalBest);
             SetObject(overlay, "breakdownText", breakdown);
+            SetObject(overlay, "submitStatusText", submitStatus);
+            SetObject(overlay, "claimPanel", claimPanel);
+            SetObject(overlay, "claimUsernameInput", claimUser);
+            SetObject(overlay, "claimPinInput", claimPin);
+            SetObject(overlay, "claimButton", claimBtn);
+            SetObject(overlay, "claimStatusText", claimStatus);
 
             // ── Libro de la colección (F2) ──
             var bookButton = CreateButton(root, "BookButton", "Libro", 32f, new Vector2(160f, 64f), default, bodyFont);
@@ -341,6 +372,62 @@ namespace CosTamarindo.EditorTools
             textRt.offsetMax = Vector2.zero;
 
             return button;
+        }
+
+        private static TMP_InputField CreateInputField(Transform parent, string name, string placeholder, float fontSize,
+            Vector2 size, Vector2 position, TMP_FontAsset font = null, bool password = false, int charLimit = 0)
+        {
+            var go = new GameObject(name, typeof(RectTransform), typeof(Image), typeof(TMP_InputField));
+            go.transform.SetParent(parent, false);
+
+            var rt = go.GetComponent<RectTransform>();
+            rt.anchorMin = new Vector2(0.5f, 0.5f);
+            rt.anchorMax = new Vector2(0.5f, 0.5f);
+            rt.pivot = new Vector2(0.5f, 0.5f);
+            rt.sizeDelta = size;
+            rt.anchoredPosition = position;
+
+            var bg = go.GetComponent<Image>();
+            bg.color = new Color(1f, 1f, 1f, 0.92f);
+
+            var viewport = new GameObject("Text Area", typeof(RectTransform), typeof(RectMask2D));
+            viewport.transform.SetParent(go.transform, false);
+            var vprt = viewport.GetComponent<RectTransform>();
+            vprt.anchorMin = Vector2.zero;
+            vprt.anchorMax = Vector2.one;
+            vprt.offsetMin = new Vector2(12f, 8f);
+            vprt.offsetMax = new Vector2(-12f, -8f);
+
+            var placeholderText = CreateText(viewport.transform, "Placeholder", placeholder, fontSize, TextAlignmentOptions.Left, font);
+            placeholderText.color = new Color(Ink.r, Ink.g, Ink.b, 0.45f);
+            Stretch(placeholderText.rectTransform);
+
+            var inputText = CreateText(viewport.transform, "Text", "", fontSize, TextAlignmentOptions.Left, font);
+            inputText.color = Ink;
+            Stretch(inputText.rectTransform);
+
+            var input = go.GetComponent<TMP_InputField>();
+            input.textViewport = vprt;
+            input.textComponent = inputText;
+            input.placeholder = placeholderText;
+            input.fontAsset = font != null ? font : TMP_Settings.defaultFontAsset;
+            input.pointSize = fontSize;
+            if (charLimit > 0) input.characterLimit = charLimit;
+            if (password)
+            {
+                input.contentType = TMP_InputField.ContentType.Pin;
+                input.asteriskChar = '•';
+            }
+
+            return input;
+        }
+
+        private static void Stretch(RectTransform rt)
+        {
+            rt.anchorMin = Vector2.zero;
+            rt.anchorMax = Vector2.one;
+            rt.offsetMin = Vector2.zero;
+            rt.offsetMax = Vector2.zero;
         }
 
         private static void Anchor(RectTransform rt, Vector2 anchorMin, Vector2 anchorMax, Vector2 pivot, Vector2 position, Vector2 size)

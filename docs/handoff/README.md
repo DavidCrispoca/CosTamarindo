@@ -108,24 +108,31 @@ Para trabajar en Frontend **no hace falta** ninguna clave de Supabase: Unity sol
 
 ### 3.1 MCP de Supabase en OpenCode
 
-El MCP remoto se autentica con el **token personal** de la cuenta dueña del proyecto. En
-`opencode.json` del repositorio (ignorado por git):
+El MCP remoto (`https://mcp.supabase.com/mcp`) por defecto usa OAuth y abre el navegador para
+iniciar sesión con tu cuenta. Para **fijar la conexión a una cuenta concreta**
+(`est.david.crispoca@unimilitar.edu.co`) y no depender de la sesión OAuth que OpenCode tenga
+guardada, en `opencode.json` del repositorio (ignorado por git):
 
 ```json
 "supabase": {
   "type": "remote",
   "url": "https://mcp.supabase.com/mcp",
-  "headers": { "Authorization": "Bearer {env:SUPABASE_ACCESS_TOKEN}" }
+  "oauth": false,
+  "headers": { "Authorization": "Bearer {file:C:/Users/USUARIO/.config/opencode/.supabase-mcp-token}" }
 }
 ```
 
-Sin ese encabezado, OpenCode usa su sesión OAuth guardada, que puede pertenecer a **otra
-cuenta** y ver otros proyectos. Verificación rápida: `list_projects` debe devolver
-`CosTamarindo` (`jukyiwsteuzwrmzlgfme`, organización *Eunomia*).
+`"oauth": false` es obligatorio: sin él, OpenCode ignora el header y usa la sesión OAuth
+guardada. Además, si el servidor está definido en forma plana (`mcp.supabase`) y también bajo
+`mcp.servers.supabase`, la forma plana tiene prioridad; el header debe estar en la que gane.
 
-Si el MCP sigue mostrando otros proyectos, **reiniciar OpenCode**: los encabezados se leen al
-conectar, no en cada llamada. Mientras tanto, la Management API con el mismo token
-(`https://api.supabase.com/v1/projects/<ref>/database/query`) hace exactamente lo mismo.
+El token se genera en el dashboard de Supabase (`Account → Access Tokens`) **con la cuenta
+correcta iniciada** (los tokens acotados empiezan con `sbp_fc`). OpenCode **no** carga `.env`
+para resolver `{env:...}` (solo lee `process.env`), así que el token se guarda en un archivo
+fuera del repo (`~/.config/opencode/.supabase-mcp-token`, sin salto de línea final) y se
+referencia con `{file:...}`. Verificación: `list_projects` debe devolver `CosTamarindo`
+(`jukyiwsteuzwrmzlgfme`, organización *Eunomia*). Si el MCP muestra otros proyectos,
+**reiniciar OpenCode**: los encabezados se leen al conectar, no en cada llamada.
 
 ---
 

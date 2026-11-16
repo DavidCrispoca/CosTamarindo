@@ -1,9 +1,8 @@
 """Motor de base de datos.
 
-Se conecta por el pooler de Supabase en modo transaccion (6543). Ese modo no
-admite sentencias preparadas con nombre, por eso `statement_cache_size = 0`;
-sin eso asyncpg falla de forma intermitente con "prepared statement already
-exists".
+Se conecta por el pooler de Supabase en modo sesion (5432): el indicado para un
+backend con pool de conexiones persistentes (asyncpg + SQLAlchemy). Los caches
+de sentencias preparadas se desactivan por seguridad (ver create_engine).
 """
 
 from __future__ import annotations
@@ -26,11 +25,11 @@ def to_asyncpg_url(url: str) -> str:
 
 
 def create_engine(settings: Settings) -> AsyncEngine:
-    # El pooler de Supabase en modo transaccion no soporta sentencias preparadas
-    # con nombre. Hay dos cachés que hay que desactivar: la de asyncpg
-    # (statement_cache_size) y la del dialecto de SQLAlchemy
-    # (prepared_statement_cache_size). Sin la segunda aparece
-    # DuplicatePreparedStatementError de forma intermitente.
+    # Los caches de sentencias preparadas se desactivan por seguridad: el pooler
+    # de transaccion (6543) no soporta sentencias preparadas con nombre, asi que
+    # si algun dia se migra a ese pooler sin estos dos flags aparece
+    # DuplicatePreparedStatementError de forma intermitente. Con el pooler de
+    # sesion (5432) no hacen falta, pero tampoco perjudican.
     connect_args: dict[str, object] = {
         "statement_cache_size": 0,
         "prepared_statement_cache_size": 0,

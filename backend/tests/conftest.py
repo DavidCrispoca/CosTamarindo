@@ -17,7 +17,7 @@ from fastapi.testclient import TestClient
 from app.config import Settings
 from app.factory import create_app
 from app.providers.supabase_auth import AuthRejected, AuthTokens
-from app.repositories import GameSession, LeaderboardEntry, Profile
+from app.repositories import GameSession, LeaderboardEntry, Profile, StoredScore
 
 
 class InMemoryRepository:
@@ -39,7 +39,7 @@ class InMemoryRepository:
     async def get_profile(self, user_id: uuid.UUID) -> Profile | None:
         return self.profiles.get(user_id)
 
-    async def create_session(self, user_id: uuid.UUID, nonce: str, ttl_minutes: int) -> GameSession:
+    async def create_session(self, user_id: uuid.UUID | None, nonce: str, ttl_minutes: int) -> GameSession:
         now = datetime.now(timezone.utc)
         record = GameSession(
             id=uuid.uuid4(),
@@ -63,7 +63,7 @@ class InMemoryRepository:
         return True
 
     async def insert_score(
-        self, *, user_id: uuid.UUID, session_id: uuid.UUID, score: int, duration_ms: int, catches: int
+        self, *, user_id: uuid.UUID | None, session_id: uuid.UUID, score: int, duration_ms: int, catches: int
     ) -> int:
         self.scores.append(
             {
@@ -76,6 +76,23 @@ class InMemoryRepository:
         )
         return len(self.scores)
 
+    async def get_score_by_session(self, session_id: uuid.UUID) -> StoredScore | None:
+        for row in self.scores:
+            if row["session_id"] == session_id:
+                return StoredScore(user_id=row["user_id"], score=row["score"])
+        return None
+
+    async def is_top5(self, score: int) -> bool:
+        named = [s for s in self.scores if s["user_id"] is not None and s["score"] >= score]
+        return len(named) < 5
+
+    async def claim_score(self, session_id: uuid.UUID, user_id: uuid.UUID) -> bool:
+        for row in self.scores:
+            if row["session_id"] == session_id and row["user_id"] is None:
+                row["user_id"] = user_id
+                return True
+        return False
+
     async def best_score(self, user_id: uuid.UUID) -> int | None:
         values = [row["score"] for row in self.scores if row["user_id"] == user_id]
         return max(values) if values else None
@@ -83,6 +100,8 @@ class InMemoryRepository:
     async def leaderboard(self, user_id: uuid.UUID | None, limit: int = 5) -> list[LeaderboardEntry]:
         best: dict[uuid.UUID, int] = {}
         for row in self.scores:
+            if row["user_id"] is None:
+                continue
             best[row["user_id"]] = max(best.get(row["user_id"], 0), row["score"])
         ordered = sorted(best.items(), key=lambda item: (-item[1], str(item[0])))
         entries: list[LeaderboardEntry] = []

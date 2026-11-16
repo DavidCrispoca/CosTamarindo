@@ -11,11 +11,10 @@ using CosTamarindo.UI;
 namespace CosTamarindo.EditorTools
 {
     /// <summary>
-    /// Construye la escena de acceso (usuario + PIN).
+    /// Construye la escena de entrada.
     ///
-    /// Es una escena real y editable, igual que <c>Game</c>: el generador solo
-    /// sirve para rearmarla desde cero de forma reproducible. La lógica vive en
-    /// <see cref="LoginController"/> y <c>AuthStub</c>.
+    /// Flujo actual: se juega de forma anónima. Si el puntaje entra al top 5,
+    /// el nombre + PIN se reclaman al final de la partida (no aquí).
     /// </summary>
     public static class CosTamarindoLoginSceneBuilder
     {
@@ -53,72 +52,50 @@ namespace CosTamarindo.EditorTools
 
             var root = canvasGo.transform;
 
-            // ── Fondo ──
             var background = new GameObject("Background", typeof(RectTransform), typeof(Image));
             background.transform.SetParent(root, false);
             Stretch(background.GetComponent<RectTransform>());
             background.GetComponent<Image>().color = Sea;
 
-            // ── Tarjeta ──
             var card = new GameObject("Card", typeof(RectTransform), typeof(Image));
             card.transform.SetParent(root, false);
-
             var cardRt = card.GetComponent<RectTransform>();
             cardRt.anchorMin = new Vector2(0.5f, 0.5f);
             cardRt.anchorMax = new Vector2(0.5f, 0.5f);
             cardRt.pivot = new Vector2(0.5f, 0.5f);
-            cardRt.sizeDelta = new Vector2(820f, 760f);
+            cardRt.sizeDelta = new Vector2(820f, 560f);
             card.GetComponent<Image>().color = Sand;
 
             var cardContent = card.transform;
 
             var title = CreateText(cardContent, "Title", "CosTamarindo", 96f, TextAlignmentOptions.Center, displayFont);
-            title.rectTransform.anchoredPosition = new Vector2(0f, 268f);
+            title.rectTransform.anchoredPosition = new Vector2(0f, 170f);
             title.rectTransform.sizeDelta = new Vector2(700f, 110f);
 
             var subtitle = CreateText(cardContent, "Subtitle", "Entrá y ayudá a la Palenquera", 40f, TextAlignmentOptions.Center, bodyFont);
-            subtitle.rectTransform.anchoredPosition = new Vector2(0f, 196f);
+            subtitle.rectTransform.anchoredPosition = new Vector2(0f, 100f);
             subtitle.rectTransform.sizeDelta = new Vector2(700f, 50f);
 
-            // ── Usuario ──
-            var userLabel = CreateText(cardContent, "UserLabel", "Usuario", 34f, TextAlignmentOptions.Left, bodyFont);
-            userLabel.rectTransform.anchoredPosition = new Vector2(-210f, 120f);
-            userLabel.rectTransform.sizeDelta = new Vector2(360f, 44f);
-
-            var username = CreateInput(cardContent, "UsernameInput", "tu_usuario", 40f,
-                new Vector2(600f, 84f), new Vector2(0f, 62f), bodyFont);
-
-            // ── PIN ──
-            var pinLabel = CreateText(cardContent, "PinLabel", "PIN (4 dígitos)", 34f, TextAlignmentOptions.Left, bodyFont);
-            pinLabel.rectTransform.anchoredPosition = new Vector2(-210f, -10f);
-            pinLabel.rectTransform.sizeDelta = new Vector2(360f, 44f);
-
-            var pin = CreateInput(cardContent, "PinInput", "••••", 44f,
-                new Vector2(600f, 84f), new Vector2(0f, -68f), bodyFont);
-
-            // ── Estado ──
-            var status = CreateText(cardContent, "StatusText", "", 32f, TextAlignmentOptions.Center, bodyFont);
-            status.rectTransform.anchoredPosition = new Vector2(0f, -152f);
-            status.rectTransform.sizeDelta = new Vector2(700f, 72f);
+            var status = CreateText(cardContent, "StatusText",
+                "Jugás de forma anónima. Si entrás al top 5, vas a poder reclamar tu nombre.",
+                34f, TextAlignmentOptions.Center, bodyFont);
+            status.rectTransform.anchoredPosition = new Vector2(0f, 0f);
+            status.rectTransform.sizeDelta = new Vector2(700f, 120f);
             status.color = new Color(0.35f, 0.28f, 0.20f);
 
-            // ── Botón ──
-            var enter = CreateButton(cardContent, "EnterButton", "Entrar", 44f, new Vector2(420f, 96f), new Vector2(0f, -248f), displayFont);
+            var enter = CreateButton(cardContent, "EnterButton", "Jugar", 44f, new Vector2(420f, 96f), new Vector2(0f, -120f), displayFont);
 
-            // ── Nota de alcance ──
             var hint = CreateText(cardContent, "HintText",
-                "Modo desarrollo: la cuenta se crea en el primer acceso con ese usuario y PIN.",
+                "Sin registro previo: el nombre + PIN solo se piden para reclamar un puesto en el top 5.",
                 26f, TextAlignmentOptions.Center, bodyFont);
-            hint.rectTransform.anchoredPosition = new Vector2(0f, -336f);
-            hint.rectTransform.sizeDelta = new Vector2(700f, 60f);
+            hint.rectTransform.anchoredPosition = new Vector2(0f, -210f);
+            hint.rectTransform.sizeDelta = new Vector2(700f, 70f);
             hint.color = new Color(Ink.r, Ink.g, Ink.b, 0.65f);
 
-            // ── Controlador ──
             var controller = canvasGo.AddComponent<LoginController>();
-            SetObject(controller, "usernameInput", username);
-            SetObject(controller, "pinInput", pin);
             SetObject(controller, "statusText", status);
             SetObject(controller, "enterButton", enter);
+            // usernameInput/pinInput quedan sin asignar: el flujo ya no los usa.
             SetProperty(controller, "gameSceneName", "Game");
 
             EditorSceneManager.MarkSceneDirty(scene);
@@ -131,8 +108,6 @@ namespace CosTamarindo.EditorTools
             Debug.Log($"[CosTamarindo] Escena de acceso generada en {ScenePath}");
         }
 
-        // ── Construcción ─────────────────────────────────────────────────
-
         private static void BuildCamera()
         {
             var go = new GameObject("Main Camera") { tag = "MainCamera" };
@@ -144,56 +119,6 @@ namespace CosTamarindo.EditorTools
             cam.clearFlags = CameraClearFlags.SolidColor;
             cam.backgroundColor = Sea;
             go.AddComponent<AudioListener>();
-        }
-
-        /// <summary>
-        /// Campo de texto TMP con la estructura estándar: raíz con Image,
-        /// «Text Area» con RectMask2D, y dentro el texto editable y el placeholder.
-        /// Sin el viewport y el textComponent el campo no acepta entrada.
-        /// </summary>
-        private static TMP_InputField CreateInput(
-            Transform parent, string name, string placeholderText,
-            float fontSize, Vector2 size, Vector2 position, TMP_FontAsset font)
-        {
-            var go = new GameObject(name, typeof(RectTransform), typeof(Image));
-            go.transform.SetParent(parent, false);
-
-            var rt = go.GetComponent<RectTransform>();
-            rt.anchorMin = new Vector2(0.5f, 0.5f);
-            rt.anchorMax = new Vector2(0.5f, 0.5f);
-            rt.pivot = new Vector2(0.5f, 0.5f);
-            rt.sizeDelta = size;
-            rt.anchoredPosition = position;
-
-            var bg = go.GetComponent<Image>();
-            bg.color = new Color(1f, 0.98f, 0.92f);
-
-            var input = go.AddComponent<TMP_InputField>();
-            input.targetGraphic = bg;
-            input.lineType = TMP_InputField.LineType.SingleLine;
-
-            var area = new GameObject("Text Area", typeof(RectTransform), typeof(RectMask2D));
-            area.transform.SetParent(go.transform, false);
-
-            var areaRt = area.GetComponent<RectTransform>();
-            areaRt.anchorMin = Vector2.zero;
-            areaRt.anchorMax = Vector2.one;
-            areaRt.offsetMin = new Vector2(24f, 8f);
-            areaRt.offsetMax = new Vector2(-24f, -8f);
-
-            var text = CreateText(area.transform, "Text", "", fontSize, TextAlignmentOptions.Left, font);
-            text.color = Ink;
-            Stretch(text.rectTransform);
-
-            var placeholder = CreateText(area.transform, "Placeholder", placeholderText, fontSize, TextAlignmentOptions.Left, font);
-            placeholder.color = new Color(Ink.r, Ink.g, Ink.b, 0.40f);
-            Stretch(placeholder.rectTransform);
-
-            input.textViewport = areaRt;
-            input.textComponent = text;
-            input.placeholder = placeholder;
-
-            return input;
         }
 
         private static TextMeshProUGUI CreateText(
@@ -251,16 +176,12 @@ namespace CosTamarindo.EditorTools
             rt.offsetMax = Vector2.zero;
         }
 
-        // ── Utilidades ───────────────────────────────────────────────────
-
         private static void RegisterSceneInBuildSettings()
         {
             var scenes = new List<EditorBuildSettingsScene>(EditorBuildSettings.scenes);
             bool present = scenes.Exists(s => s.path == ScenePath);
             if (present) return;
 
-            // Se añade después de Game: el juego sigue arrancando directo en Game
-            // hasta que F4 haga obligatorio el acceso.
             int insertAt = scenes.FindIndex(s => s.path == ScenesFolder + "/Game.unity");
             scenes.Insert(insertAt >= 0 ? insertAt + 1 : 0, new EditorBuildSettingsScene(ScenePath, true));
             EditorBuildSettings.scenes = scenes.ToArray();

@@ -117,6 +117,19 @@ class AuthService:
         pair.refresh_token = tokens.refresh_token
         return pair
 
+    async def claim_identity(self, *, username: str, pin: str) -> Profile:
+        """Resuelve el nombre para el reclamo de puntaje.
+
+        Si el nombre es nuevo lo registra; si ya existe, verifica el PIN (con el
+        mismo bloqueo progresivo que el login). Devuelve el perfil resultante.
+        """
+        existing = await self._repo.get_profile_by_username(username)
+        if existing is None:
+            pair = await self.register(username=username, pin=pin)
+            return Profile(id=pair.user_id, username=pair.username)
+        await self.login(username=username, pin=pin)
+        return existing
+
     async def refresh(self, *, refresh_token: str) -> TokenPair:
         tokens = await self._provider.refresh(refresh_token)
         if tokens is None:

@@ -24,11 +24,17 @@ class Profile:
 @dataclass(frozen=True, slots=True)
 class GameSession:
     id: uuid.UUID
-    user_id: uuid.UUID
+    user_id: uuid.UUID | None
     nonce: str
     created_at: datetime
     expires_at: datetime
     used_at: datetime | None
+
+
+@dataclass(frozen=True, slots=True)
+class StoredScore:
+    user_id: uuid.UUID | None
+    score: int
 
 
 @dataclass(frozen=True, slots=True)
@@ -47,7 +53,7 @@ class Repository(Protocol):
     async def get_profile(self, user_id: uuid.UUID) -> Profile | None: ...
 
     async def create_session(
-        self, user_id: uuid.UUID, nonce: str, ttl_minutes: int
+        self, user_id: uuid.UUID | None, nonce: str, ttl_minutes: int
     ) -> GameSession: ...
     async def get_session(self, session_id: uuid.UUID) -> GameSession | None: ...
     async def consume_session(self, session_id: uuid.UUID) -> bool: ...
@@ -55,12 +61,15 @@ class Repository(Protocol):
     async def insert_score(
         self,
         *,
-        user_id: uuid.UUID,
+        user_id: uuid.UUID | None,
         session_id: uuid.UUID,
         score: int,
         duration_ms: int,
         catches: int,
     ) -> int: ...
+    async def get_score_by_session(self, session_id: uuid.UUID) -> StoredScore | None: ...
+    async def is_top5(self, score: int) -> bool: ...
+    async def claim_score(self, session_id: uuid.UUID, user_id: uuid.UUID) -> bool: ...
     async def best_score(self, user_id: uuid.UUID) -> int | None: ...
     async def leaderboard(self, user_id: uuid.UUID | None, limit: int = 5) -> list[LeaderboardEntry]: ...
 
@@ -115,7 +124,7 @@ class SqlRepository:
 
     # -- game_sessions ----------------------------------------------------
     async def create_session(
-        self, user_id: uuid.UUID, nonce: str, ttl_minutes: int
+        self, user_id: uuid.UUID | None, nonce: str, ttl_minutes: int
     ) -> GameSession:
         async with self._session_factory() as session, session.begin():
             row = (
@@ -125,7 +134,7 @@ class SqlRepository:
                         "values (:user_id, :nonce, now() + make_interval(mins => :ttl)) "
                         "returning id, user_id, nonce, created_at, expires_at, used_at"
                     ),
-                    {"user_id": str(user_id), "nonce": nonce, "ttl": ttl_minutes},
+                    {"user_id": str(user_id) if user_id else None, "nonce": nonce, "ttl": ttl_minutes},
                 )
             ).one()
         return GameSession(
@@ -179,7 +188,7 @@ class SqlRepository:
     async def insert_score(
         self,
         *,
-        user_id: uuid.UUID,
+        user_id: uuid.UUID | None,
         session_id: uuid.UUID,
         score: int,
         duration_ms: int,
@@ -194,7 +203,7 @@ class SqlRepository:
                         "returning id"
                     ),
                     {
-                        "user_id": str(user_id),
+                        "user_id": str(user_id) if user_id else None,
                         "session_id": str(session_id),
                         "score": score,
                         "duration_ms": duration_ms,
@@ -203,6 +212,45 @@ class SqlRepository:
                 )
             ).one()
         return int(row.id)
+
+    async def get_score_by_session(self, session_id: uuid.UUID) -> StoredScore | None:
+        async with self._session_factory() as session:
+            row = (
+                await session.execute(
+                    text("select user_id, score from public.scores where session_id = :sid"),
+                    {"sid": str(session_id)},
+                )
+            ).first()
+        return StoredScore(user_id=row.user_id, score=row.score) if row else None
+
+    async def is_top5(self, score: int) -> bool:
+        """True si `score` entraria en el top 5 de los puntajes ya reclamados.
+
+        Solo cuentan los puntajes con nombre (user_id not null): un puntaje
+        anonimo no ocupa una posicion del leaderboard hasta que se reclama.
+        """
+        async with self._session_factory() as session:
+            count = await session.scalar(
+                text("select count(*) from public.scores where user_id is not null and score >= :score"),
+                {"score": score},
+            )
+        return int(count) < 5
+
+    async def claim_score(self, session_id: uuid.UUID, user_id: uuid.UUID) -> bool:
+        """Asocia el puntaje de una sesion a un jugador, solo si sigue anonimo.
+
+        El `where user_id is null` es lo que evita que un puntaje ya reclamado
+        se reclame dos veces, incluso con peticiones simultaneas.
+        """
+        async with self._session_factory() as session, session.begin():
+            result = await session.execute(
+                text(
+                    "update public.scores set user_id = :uid "
+                    "where session_id = :sid and user_id is null returning id"
+                ),
+                {"uid": str(user_id), "sid": str(session_id)},
+            )
+            return result.first() is not None
 
     async def best_score(self, user_id: uuid.UUID) -> int | None:
         async with self._session_factory() as session:

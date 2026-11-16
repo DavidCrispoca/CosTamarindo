@@ -8,17 +8,17 @@ from typing import Literal
 from pydantic import BaseModel, Field
 
 USERNAME_PATTERN = r"^[A-Za-z0-9_]{3,16}$"
-PIN_PATTERN = r"^[0-9]{4}$"
+PIN_PATTERN = r"^[0-9]{4,6}$"
 
 
 class RegisterRequest(BaseModel):
     username: str = Field(min_length=3, max_length=16, pattern=USERNAME_PATTERN)
-    pin: str = Field(min_length=4, max_length=4, pattern=PIN_PATTERN)
+    pin: str = Field(min_length=4, max_length=6, pattern=PIN_PATTERN)
 
 
 class LoginRequest(BaseModel):
     username: str = Field(min_length=3, max_length=16, pattern=USERNAME_PATTERN)
-    pin: str = Field(min_length=4, max_length=4, pattern=PIN_PATTERN)
+    pin: str = Field(min_length=4, max_length=6, pattern=PIN_PATTERN)
 
 
 class RefreshRequest(BaseModel):
@@ -54,6 +54,20 @@ class ScoreRequest(BaseModel):
 class ScoreResponse(BaseModel):
     ok: bool = True
     score: int
+    best_score: int
+    rank_position: int | None = None
+    in_top5: bool = False
+
+
+class ClaimRequest(BaseModel):
+    session_id: uuid.UUID
+    username: str = Field(min_length=3, max_length=16, pattern=USERNAME_PATTERN)
+    pin: str = Field(min_length=4, max_length=6, pattern=PIN_PATTERN)
+
+
+class ClaimResponse(BaseModel):
+    ok: bool = True
+    username: str
     best_score: int
     rank_position: int | None = None
 

@@ -32,8 +32,9 @@ class Settings(BaseSettings):
     supabase_project_ref: str = ""
     supabase_publishable_key: str
     supabase_secret_key: str
+    # Pooler de sesion (5432): el indicado para un backend con pool de
+    # conexiones persistentes. Los scripts de backup (pg_dump) usan la misma URL.
     supabase_db_url: str
-    supabase_db_url_session: str = ""
 
     # Secretos propios
     backend_jwt_secret: str = Field(min_length=32)

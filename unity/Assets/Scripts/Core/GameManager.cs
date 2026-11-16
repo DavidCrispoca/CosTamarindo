@@ -27,6 +27,12 @@ namespace CosTamarindo.Core
         public float TimeLeft { get; private set; }
         public int BestScore => PlayerPrefs.GetInt(BestScoreKey, 0);
 
+        /// <summary>Tiempo jugado en la partida actual (ms), para el envío al backend.</summary>
+        public int ElapsedMs { get; private set; }
+
+        /// <summary>Total de ítems atrapados en la partida actual (incluye basura/peligros).</summary>
+        public int TotalCatches { get; private set; }
+
         /// <summary>Cuántas veces se atrapó cada ítem en la partida actual.</summary>
         public IReadOnlyDictionary<string, int> CaughtCounts => caughtCounts;
 
@@ -65,6 +71,7 @@ namespace CosTamarindo.Core
         {
             if (State != GameState.Playing) return;
 
+            ElapsedMs += Mathf.RoundToInt(Time.deltaTime * 1000f);
             TimeLeft = Mathf.Max(0f, TimeLeft - Time.deltaTime);
             TimeChanged?.Invoke(TimeLeft);
 
@@ -76,6 +83,8 @@ namespace CosTamarindo.Core
             Score = 0;
             Lives = startingLives;
             TimeLeft = matchDurationSeconds;
+            ElapsedMs = 0;
+            TotalCatches = 0;
             caughtCounts.Clear();
 
             ScoreChanged?.Invoke(Score);
@@ -111,6 +120,7 @@ namespace CosTamarindo.Core
             if (State != GameState.Playing || def == null) return;
 
             Score = Mathf.Max(0, Score + def.Points);
+            TotalCatches++;
             caughtCounts.TryGetValue(def.Id, out int count);
             caughtCounts[def.Id] = count + 1;
 
@@ -136,6 +146,11 @@ namespace CosTamarindo.Core
         public void EndMatch()
         {
             if (State == GameState.GameOver) return;
+
+            // Duración real acotada al tiempo de la partida (evita exceder límites).
+            int maxMs = Mathf.RoundToInt(matchDurationSeconds * 1000f);
+            if (ElapsedMs > maxMs) ElapsedMs = maxMs;
+            if (ElapsedMs < 0) ElapsedMs = 0;
 
             Time.timeScale = 1f;
             if (Score > BestScore) PlayerPrefs.SetInt(BestScoreKey, Score);

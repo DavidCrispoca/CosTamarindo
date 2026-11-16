@@ -38,13 +38,14 @@ namespace CosTamarindo.UI
             if (pinInput != null) pinInput.onSubmit.AddListener(_ => Submit());
             if (usernameInput != null) usernameInput.onSubmit.AddListener(_ => Submit());
 
-            SetStatus("Ingresá con tu usuario y un PIN de 4 dígitos.", InfoColor);
+            // Flujo actualizado: se juega de forma anónima. Si el puntaje entra al
+            // top 5, el nombre + PIN se piden al final para reclamarlo.
+            SetStatus("Jugás de forma anónima. Si entrás al top 5, vas a poder reclamar tu nombre.", InfoColor);
 
-            // El PIN se enmascara y no admite más de 4 caracteres.
             if (pinInput != null)
             {
                 pinInput.contentType = TMP_InputField.ContentType.Password;
-                pinInput.characterLimit = 4;
+                pinInput.characterLimit = 6;
                 pinInput.ForceLabelUpdate();
             }
 
@@ -58,74 +59,30 @@ namespace CosTamarindo.UI
         private void Update()
         {
             if (enterButton != null && !busy)
-                enterButton.interactable = !AuthStub.IsLocked;
-
-            // Cuenta regresiva visible mientras dura el bloqueo (A.8.5).
-            if (AuthStub.IsLocked && !busy)
-            {
-                SetStatus("Bloqueado. Reintentá en " + Mathf.CeilToInt(AuthStub.SecondsUntilUnlock) + " s.", ErrorColor);
-            }
+                enterButton.interactable = true;
         }
 
         public void Submit()
         {
             if (busy) return;
-
-            string user = usernameInput != null ? usernameInput.text : string.Empty;
-            string pin = pinInput != null ? pinInput.text : string.Empty;
-
-            StartCoroutine(SignInRoutine(user, pin));
+            StartCoroutine(GoToGame());
         }
 
-        private IEnumerator SignInRoutine(string user, string pin)
+        private IEnumerator GoToGame()
         {
             busy = true;
             if (enterButton != null) enterButton.interactable = false;
-            SetStatus("Conectando…", InfoColor);
+            SetStatus("Cargando partida…", InfoColor);
+            yield return null;
 
-            AuthResult result = default;
-            bool done = false;
-
-            yield return AuthStub.SignIn(user, pin, r =>
+            if (!string.IsNullOrEmpty(gameSceneName) && Application.CanStreamedLevelBeLoaded(gameSceneName))
+                SceneManager.LoadScene(gameSceneName, LoadSceneMode.Single);
+            else
             {
-                result = r;
-                done = true;
-            });
-
-            if (!done)
-            {
+                SetStatus("No se encontró la escena '" + gameSceneName + "' en Build Settings.", ErrorColor);
                 busy = false;
                 if (enterButton != null) enterButton.interactable = true;
-                yield break;
             }
-
-            if (result.Ok)
-            {
-                SetStatus(result.Message, OkColor);
-                yield return new WaitForSecondsRealtime(0.35f);
-
-                if (!string.IsNullOrEmpty(gameSceneName) && Application.CanStreamedLevelBeLoaded(gameSceneName))
-                    SceneManager.LoadScene(gameSceneName, LoadSceneMode.Single);
-                else
-                {
-                    SetStatus("No se encontró la escena '" + gameSceneName + "' en Build Settings.", ErrorColor);
-                    busy = false;
-                    if (enterButton != null) enterButton.interactable = true;
-                }
-
-                yield break;
-            }
-
-            SetStatus(result.Message, ErrorColor);
-
-            if (pinInput != null)
-            {
-                pinInput.text = string.Empty;
-                pinInput.ActivateInputField();
-            }
-
-            busy = false;
-            if (enterButton != null) enterButton.interactable = !AuthStub.IsLocked;
         }
 
         private void SetStatus(string message, Color color)

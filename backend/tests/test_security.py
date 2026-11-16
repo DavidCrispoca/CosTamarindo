@@ -86,11 +86,11 @@ def test_token_signed_with_other_secret_is_rejected():
         decode_access_token(secret=SECRET, token=token, expected_env="dev")
 
 
-@pytest.mark.parametrize("pin", ["0000", "1234", "4321", "9999", "2026"])
+@pytest.mark.parametrize("pin", ["0000", "1234", "4321", "9999", "2026", "000000", "123456", "11111", "654321"])
 def test_weak_pins_are_detected(pin: str):
     assert is_weak_pin(pin)
 
 
-@pytest.mark.parametrize("pin", ["4821", "9073", "1357", "2718"])
+@pytest.mark.parametrize("pin", ["4821", "9073", "1357", "2718", "482150", "907351"])
 def test_strong_pins_pass(pin: str):
     assert not is_weak_pin(pin)

@@ -1,8 +1,8 @@
 # API de CosTamarindo
 
 > **División:** Backend · **Nodo:** `Sg-Backend`
-> **Versión:** 1.0.0 · **Base:** `https://juego.local/api` (mismo origen que el juego)
-> **Estado:** implementada y verificada contra Supabase DEV el 2026-11-06.
+> **Versión:** 2.0.0 · **Base:** `https://juego.local/api` (mismo origen que el juego)
+> **Estado:** flujo anónimo + reclamo top-5 implementado (pendiente de desplegar/verificar contra Supabase DEV con migración `004_anonymous_claim.sql`).
 
 El cliente Unity **nunca** habla con Supabase. Habla solo con esta API, que es la
 única que conoce la clave secreta, la base y la IA.
@@ -14,10 +14,11 @@ El cliente Unity **nunca** habla con Supabase. Habla solo con esta API, que es l
 | Tema | Regla |
 | :--- | :--- |
 | Formato | JSON, `Content-Type: application/json`, UTF-8 |
-| Autenticación | `Authorization: Bearer <jwt>` emitido por el backend (HS256, TTL 30 min) |
+| Juego/puntaje | **Anónimo**: `/api/session/start` y `/api/score` no requieren token |
+| Autenticación (legado/admin) | `Authorization: Bearer <jwt>` emitido por el backend (HS256, TTL 30 min) para endpoints que lo requieran (p.ej. logout/refresh si se usan) |
 | Errores | `{"code": "<estable>", "message": "<corto>"}`; nunca detalles internos |
 | Identificador de petición | cabecera de respuesta `X-Request-ID` |
-| Rate limit | Nginx en `/api/` + bloqueo por usuario en login + guard en diálogo |
+| Rate limit | Nginx en `/api/` + bloqueo progresivo en login/claim + guard en diálogo |
 | Tamaño máximo de cuerpo | 8 kB (Nginx) |
 
 El JWT incluye `iss=costamarindo`, `aud=costamarindo-api`, `sub=<user_id>`,
@@ -26,74 +27,33 @@ El JWT incluye `iss=costamarindo`, `aud=costamarindo-api`, `sub=<user_id>`,
 
 ---
 
-## 2. Autenticación
+## 2. Identidad y reclamo (top 5)
 
-### 2.1 `POST /api/auth/register`
+No hay pantalla de login antes de jugar. El juego es **anónimo**. Solo si el puntaje
+entra al **top 5 global** de puntajes reclamados, el cliente ofrece reclamarlo con
+un **nombre público + PIN**:
 
-Crea la identidad en Supabase Auth y el perfil. La primera vez no hay login previo.
+- **Nombre** (`^[A-Za-z0-9_]{3,16}$`, sin distinguir mayúsculas): público, único
+  globalmente y visible para todos. No existen dos nombres iguales.
+- **PIN** (`^[0-9]{4,6}$`): privado. Protege el nombre: volver a usar ese nombre
+  (para reclamar otro puntaje) exige el mismo PIN. Se rechazan PIN predecibles
+  (repetidos, secuenciales, comunes).
+- Si el nombre es nuevo se crea con ese PIN; si ya existe, el PIN se verifica con
+  bloqueo progresivo (5 fallos consecutivos → 60 s, `Retry-After`). El contador vive
+  en `public.login_attempts`.
 
-```json
-{ "username": "ana", "pin": "4821" }
-```
-
-| Código | Cuándo |
-| :--- | :--- |
-| `201` | Registrado; devuelve `TokenPair` |
-| `409` | `username_taken` |
-| `422` | `invalid_request` (formato) o `weak_pin` (PIN predecible) |
-
-Reglas: usuario `^[A-Za-z0-9_]{3,16}$` único sin distinguir mayúsculas; PIN de 4
-dígitos, no secuencial ni repetido; se rechazan los PIN más usados.
-
-### 2.2 `POST /api/auth/login`
-
-```json
-{ "username": "ana", "pin": "4821" }
-```
-
-| Código | Cuándo |
-| :--- | :--- |
-| `200` | `TokenPair` |
-| `401` | `invalid_credentials` |
-| `423` | `account_locked`, con `Retry-After` en segundos |
-
-Cinco fallos consecutivos bloquean la cuenta 60 s. El contador vive en
-`public.login_attempts`, no en el cliente, y un login correcto lo reinicia.
-
-### 2.3 `POST /api/auth/refresh`
-
-```json
-{ "refresh_token": "<token de GoTrue>" }
-```
-
-Devuelve un `TokenPair` nuevo. El refresh de GoTrue rota en cada uso; reutilizar uno
-viejo falla con `401 invalid_token`.
-
-### 2.4 `POST /api/auth/logout`
-
-Requiere `Bearer`. Responde `204`. El cliente descarta el token; la sesión caduca por
-TTL.
-
-### 2.5 `TokenPair`
-
-```json
-{
-  "access_token": "…",
-  "refresh_token": "…",
-  "token_type": "bearer",
-  "expires_in": 1800,
-  "user_id": "uuid",
-  "username": "ana"
-}
-```
+> Los endpoints `/api/auth/register`, `/api/auth/login`, `/api/auth/refresh` y
+> `/api/auth/logout` siguen disponibles internamente/compatibilidad, pero el flujo de
+> juego no los requiere: la identidad se resuelve en `/api/claim`. Reglas de formato:
+> usuario `^[A-Za-z0-9_]{3,16}$`; PIN 4–6 dígitos, no predecible.
 
 ---
 
-## 3. Partida y puntaje
+## 3. Partida, puntaje y reclamo
 
 ### 3.1 `POST /api/session/start`
 
-Requiere `Bearer`.
+**Sin autenticación.** Crea una sesión anónima.
 
 ```json
 {
@@ -101,7 +61,7 @@ Requiere `Bearer`.
   "nonce": "…",
   "session_key": "hex de 64 caracteres",
   "expires_in": 900,
-  "best_score": 180
+  "best_score": 0
 }
 ```
 
@@ -110,7 +70,7 @@ de `(session_id, nonce)`. El cliente la mantiene solo en memoria durante la part
 
 ### 3.2 `POST /api/score`
 
-Requiere `Bearer`.
+**Sin autenticación.** El puntaje se guarda de forma anónima (sin nombre).
 
 ```json
 {
@@ -129,11 +89,11 @@ Cadena canónica, exactamente:
 session_id|score|duration_ms|catches|nonce
 ```
 
-`signature = hex(HMAC-SHA256(session_key, cadena))`.
+`signature = hex(HMAC-SHA256(bytes.fromhex(session_key), cadena))`.
 
 | `code` | Significado |
 | :--- | :--- |
-| `bad_session` | No existe o es de otro jugador |
+| `bad_session` | Sesión inexistente |
 | `session_used` | Ya se envió un puntaje con esa sesión (incluye replay) |
 | `session_expired` | Pasaron los 15 min de TTL |
 | `bad_nonce` | El nonce no coincide con el de la sesión |
@@ -146,18 +106,51 @@ Se aplican además los `check` de la tabla.
 Respuesta aceptada:
 
 ```json
-{ "ok": true, "score": 180, "best_score": 180, "rank_position": 1 }
+{ "ok": true, "score": 180, "best_score": 0, "rank_position": null, "in_top5": true }
 ```
 
-### 3.3 `GET /api/leaderboard?limit=5`
+`in_top5` indica si el puntaje entra en el top 5 global de puntajes **reclamados** en
+ese momento. Si es `true`, el cliente debe ofrecer la pantalla de nombre+PIN y llamar
+a `/api/claim`; si es `false`, no se muestra login/claim y el puntaje no queda
+asociado a ningún nombre.
 
-Sin token devuelve el top; con token agrega la fila propia marcada.
+### 3.3 `POST /api/claim`
+
+Reclama el puntaje anónimo de una sesión con nombre + PIN. Solo procede si el puntaje
+sigue en el top 5 y la sesión no fue reclamada.
+
+```json
+{ "session_id": "uuid", "username": "ana", "pin": "482150" }
+```
+
+`pin` admite 4 a 6 dígitos. Si el nombre es nuevo se crea; si ya existe se verifica
+el PIN (mismo bloqueo progresivo que el login: `401 invalid_credentials`,
+`423 account_locked` con `Retry-After`).
+
+| `code` | Significado |
+| :--- | :--- |
+| `not_top5` | El puntaje ya no está en el top 5 (el ranking cambió) |
+| `bad_session` | Sesión/puntaje inexistente o ya reclamado |
+| `invalid_credentials` | PIN incorrecto para un nombre existente |
+| `account_locked` | Nombre bloqueado temporalmente por intentos fallidos |
+| `weak_pin` | PIN predecible (nombre nuevo) |
+| `username_taken` | Conflicto de nombre (caso de carrera) |
+
+Respuesta:
+
+```json
+{ "ok": true, "username": "ana", "best_score": 180, "rank_position": 1 }
+```
+
+### 3.4 `GET /api/leaderboard?limit=5`
+
+Público. Devuelve el top de puntajes **reclamados** (con nombre). No hay token de
+jugador en el flujo anónimo, por lo que `is_me` será `false`.
 
 ```json
 {
   "entries": [
-    { "rank_position": 1, "username": "beto", "best_score": 300, "is_me": false },
-    { "rank_position": 6, "username": "dani", "best_score": 60, "is_me": true }
+    { "rank_position": 1, "username": "beto", "best_score": 300, "is_me": false }
   ]
 }
 ```
@@ -206,12 +199,13 @@ cualquier monitor lo traten como caída real.
 
 | HTTP | `code` | Notas |
 | :--- | :--- | :--- |
-| 400 | `bad_session`, `session_used`, `session_expired`, `bad_nonce`, `bad_signature`, `implausible_score` | Solo en `/api/score` |
-| 401 | `invalid_token`, `invalid_credentials` | |
+| 400 | `bad_session`, `session_used`, `session_expired`, `bad_nonce`, `bad_signature`, `implausible_score` | `/api/score` |
+| 400 | `not_top5`, `bad_session` | `/api/claim` (puntaje fuera del top 5 o ya reclamado) |
+| 401 | `invalid_token`, `invalid_credentials` | `invalid_credentials` también en `/api/claim` para nombre existente |
 | 403 | — | No se usa: no hay roles de cliente |
-| 409 | `username_taken` | |
-| 422 | `invalid_request`, `weak_pin` | |
-| 423 | `account_locked` | `Retry-After` |
+| 409 | `username_taken` | Registro/conflicto de nombre |
+| 422 | `invalid_request`, `weak_pin` | Formato o PIN predecible |
+| 423 | `account_locked` | `Retry-After` (login/claim) |
 | 429 | `rate_limited` | `Retry-After` |
 | 502 | `upstream_error` | Supabase Auth no disponible |
 | 503 | `database_unavailable` | Pooler/base no disponible |
@@ -225,8 +219,8 @@ Se emiten como JSON a stdout:
 
 `app_start`, `db_ready`, `db_warmup_retry`, `db_warmup_failed`, `register_ok`,
 `register_rejected`, `register_failed`, `login_ok`, `login_fail`, `login_blocked`,
-`token_refresh`, `logout`, `session_start`, `score_accepted`, `score_rejected`,
-`dialog_blocked`, `health_degraded`, `database_error`, `unhandled_error`.
+`token_refresh`, `logout`, `session_start`, `score_accepted`, `score_claimed`,
+`score_rejected`, `dialog_blocked`, `health_degraded`, `database_error`, `unhandled_error`.
 
 Campos: `ts`, `level`, `event`, `request_id`, `user_id`, y el detalle del evento. La IP
-se registra enmascarada (último octeto a cero).
+se registra enmascarada (último octeto a cero). `score_accepted` incluye `in_top5`.
