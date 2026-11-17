@@ -29,6 +29,9 @@ namespace CosTamarindo.UI
     {
         private const string DialogUrl = "https://juego.local/api/dialog";
 
+        private static string GetDialogUrl() =>
+            Application.platform == RuntimePlatform.WebGLPlayer ? "/api/dialog" : DialogUrl;
+
         [Header("Ritmo")]
         [SerializeField] private float commentChance = 0.35f;
         [SerializeField] private float cooldownSeconds = 9f;
@@ -70,27 +73,13 @@ namespace CosTamarindo.UI
         private float nextAllowedAt;
         private bool requestInFlight;
 
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
-        private static void RegisterSceneHook()
-        {
-            SceneManager.sceneLoaded -= OnSceneLoaded;
-            SceneManager.sceneLoaded += OnSceneLoaded;
-        }
-
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
-        private static void Bootstrap()
-        {
-            if (SceneManager.GetActiveScene().name != "Game") return;
-            if (FindFirstObjectByType<NpcDialogueController>() != null) return;
-
-            var go = new GameObject("NpcDialogue");
-            go.AddComponent<NpcDialogueController>();
-        }
-
-        private static void OnSceneLoaded(Scene scene, LoadSceneMode mode)
-        {
-            if (scene.name == "Game") Bootstrap();
-        }
+        // Auto-bootstrap desactivado temporalmente: en WebGL producía un crash de stack
+        // al cargar. El diálogo NPC se puede reactivar cuando se estabilice la escena.
+        // [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        // private static void RegisterSceneHook() { ... }
+        // [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+        // private static void Bootstrap() { ... }
+        // private static void OnSceneLoaded(Scene scene, LoadSceneMode mode) { ... }
 
         private void Awake()
         {
@@ -281,22 +270,20 @@ namespace CosTamarindo.UI
             if (requestInFlight) yield break;
 
             string fallback = LocalLine(context, item);
-            if (!AuthStub.IsBackendToken)
-            {
-                ShowLine(fallback);
-                yield break;
-            }
 
             requestInFlight = true;
             string json = BuildPayload(text, context, item, kind);
-            var request = new UnityWebRequest(DialogUrl, UnityWebRequest.kHttpVerbPOST)
+            var request = new UnityWebRequest(GetDialogUrl(), UnityWebRequest.kHttpVerbPOST)
             {
                 uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(json)),
                 downloadHandler = new DownloadHandlerBuffer(),
                 timeout = Mathf.Max(1, Mathf.RoundToInt(requestTimeoutSeconds))
             };
             request.SetRequestHeader("Content-Type", "application/json");
-            request.SetRequestHeader("Authorization", "Bearer " + AuthStub.SessionToken);
+            if (AuthStub.IsBackendToken)
+            {
+                request.SetRequestHeader("Authorization", "Bearer " + AuthStub.SessionToken);
+            }
 
             yield return request.SendWebRequest();
 

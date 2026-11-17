@@ -50,7 +50,14 @@ namespace CosTamarindo.Net
             }
             Instance = this;
             DontDestroyOnLoad(gameObject);
-            baseUrl = (baseUrl ?? string.Empty).TrimEnd('/');
+            if (Application.platform == RuntimePlatform.WebGLPlayer)
+            {
+                baseUrl = "/api";
+            }
+            else
+            {
+                baseUrl = (baseUrl ?? string.Empty).TrimEnd('/');
+            }
         }
 
         public IEnumerator StartSession(Action<ApiResult<SessionStartResponse>> onDone)

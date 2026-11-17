@@ -42,6 +42,7 @@ namespace CosTamarindo.EditorTools
             var player = BuildPlayer();
             BuildSpawner(player);
             BuildInterface(manager, player);
+            BuildNpcDialogue();
 
             EditorSceneManager.MarkSceneDirty(scene);
             EditorSceneManager.SaveScene(scene, ScenePath);
@@ -150,6 +151,12 @@ namespace CosTamarindo.EditorTools
 
             SetObject(spawner, "player", player);
             SetObjectArray(spawner, "itemSprites", LoadItemSprites());
+        }
+
+        private static void BuildNpcDialogue()
+        {
+            var go = new GameObject("NpcDialogue");
+            go.AddComponent<NpcDialogueController>();
         }
 
         // ── Interfaz ─────────────────────────────────────────────────────
