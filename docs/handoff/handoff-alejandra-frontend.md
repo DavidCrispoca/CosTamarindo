@@ -1,5 +1,9 @@
 # Handoff — Alejandra (Frontend/Unity) · integrar el NPC y publicar el build WebGL
 
+> **Actualizado 2026-11-23:** `main` ya incluye el NPC y el panel de reclamo en `Game.unity`.
+> El flujo vigente es anónimo y `POST /api/dialog` acepta token **opcional**; el NPC funciona sin
+> JWT. Este documento sirve como contexto histórico de integración.
+>
 > **Para el agente de Alejandra.** Contexto operativo para integrar F7 en la rama de Frontend.
 > No borrar arte ni tocar escenas/prefabs sin necesidad: el bocadillo se construye en runtime.
 >

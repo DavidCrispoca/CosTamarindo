@@ -3,6 +3,10 @@
 > **Fecha:** 2026-11-13 · **Nodo:** `Sg-AI` · **Modelo:** `qwen2.5:3b`
 > **Estado:** F7 cerrada en simulación local/WebGL. La validación con el backend real de
 > Supabase sigue pendiente de las claves y de la reconstrucción de la imagen.
+> **Actualización 2026-11-23:** `main` ya incluye el flujo anónimo + `/api/claim` y la suite del
+> backend tiene **64 tests**; esta carpeta conserva la evidencia histórica de la simulación. Para
+> los datos y accesos que faltan, ver
+> [`docs/handoff/solicitud-datos-santiago.md`](../../docs/handoff/solicitud-datos-santiago.md).
 
 ---
 

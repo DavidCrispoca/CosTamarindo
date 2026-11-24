@@ -1,7 +1,7 @@
 # Handoff · CosTamarindo 2D
 
 > **Para quién:** las personas que toman Frontend, Security e IA.
-> **Estado del proyecto:** 2026-11-13.
+> **Estado del proyecto:** 2026-11-23 (merge de `main` en `85a5205`).
 > **Fuente de verdad del avance:** [`../../Plan.md`](../../Plan.md).
 > **Contratos de la API:** [`../api.md`](../api.md).
 
@@ -13,7 +13,8 @@ división por división. No reemplaza a `Plan.md`: lo hace accionable.
 | [`frontend.md`](frontend.md) | integrar Unity con la API, reparar el arte y cerrar `FE-01`…`FE-14` |
 | [`security.md`](security.md) | atacar y evidenciar los 10 controles (`SEC-01`…`SEC-14`) |
 | [`ia.md`](ia.md) | conectar Ollama al NPC sin romper el puntaje (`IA-01`…`IA-07`) |
-| [`handoff-santiago-backend.md`](handoff-santiago-backend.md) | cargar Supabase/JWT, reconstruir el backend y validar `/api/dialog` real |
+| [`solicitud-datos-santiago.md`](solicitud-datos-santiago.md) | **pedir a Santiago** claves, migraciones, evidencias y datos/accesos del nodo Frontend |
+| [`handoff-santiago-backend.md`](handoff-santiago-backend.md) | contexto histórico de F7/backend; el contrato vigente es anónimo + claim |
 | [`handoff-alejandra-frontend.md`](handoff-alejandra-frontend.md) | integrar el NPC, regenerar WebGL y validar el bocadillo en su rama |
 | [`evidencias/_plantilla/README.md`](../../evidencias/_plantilla/README.md) | formato obligatorio de una carpeta de evidencia |
 
@@ -23,11 +24,11 @@ división por división. No reemplaza a `Plan.md`: lo hace accionable.
 
 | División | Nodo | Estado | Qué falta |
 | :--- | :--- | :--- | :--- |
-| **Frontend** | `Sg-Frontend` | 🟡 Nginx/TLS healthy; build WebGL generado; arte/UI pendientes | integrar NPC, arte, UI y clientes de red |
-| **Backend** | `Sg-Backend` | 🚧 imagen construida y 53 tests; no arranca sin claves | cargar Supabase/JWT y validar arranque |
-| **DB** | `Sg-DB` | ✅ esquema, RLS, leaderboard, backup probado | proyecto PROD al desplegar |
+| **Frontend** | `Sg-Frontend` | 🟡 Nginx/TLS healthy; build de `main` generado; arte versionado; falta publicarlo en el nodo de Santiago | publicar y validar NPC + panel de reclamo |
+| **Backend** | `Sg-Backend` | 🚧 API y **64/64 tests**; imagen `main-test` construida; `latest` pendiente | cargar Supabase/JWT, migrar `004` y validar arranque |
+| **DB** | `Sg-DB` | 🟡 esquema 001–003 y backup probados; `004_anonymous_claim.sql` pendiente en DEV | aplicar `004` y validar claim/RLS |
 | **Security** | `Sg-Security` | 🟡 A.8.25 completo; A.8.15/A.8.20/A.8.24 parciales; SoA de 93 | cerrar ataques y controles restantes |
-| **IA** | `Sg-AI` | ✅ Ollama healthy, `qwen2.5:3b`, prompt, endpoint y bocadillo probado en WebGL | validar con backend real/Supabase |
+| **IA** | `Sg-AI` | ✅ Ollama healthy, `qwen2.5:3b`, endpoint y pensamiento probados; simulación E2E con Ollama real | validar con backend real/Supabase |
 
 ---
 
@@ -76,7 +77,7 @@ de Supabase/JWT; sin eso quedan detenidos o no arrancan. El build WebGL ya está
 ### 2.3 Verificación rápida de que todo está sano
 
 ```powershell
-backend\.venv\Scripts\python.exe -m pytest backend        # 53 passed
+backend\.venv\Scripts\python.exe -m pytest backend        # 64 passed
 backend\.venv\Scripts\python.exe backend\scripts\check_db.py
 $env:CT_E2E_BASE = "https://juego.local"
 backend\.venv\Scripts\python.exe backend\scripts\e2e_check.py
@@ -148,7 +149,7 @@ fuentes), el proyecto Unity (`unity/` sin `Library/`).
 **No entra:** `.env`, `infra/tls/`, `infra/backups/`, `builds/`, `.venv/`, `__pycache__/`,
 `node_modules/`, `unity/Library/`, `Proceso.md` (bitácora interna).
 
-Un clon limpio + `.env` + `pip install -r requirements-dev.txt` alcanza para correr las 53
+Un clon limpio + `.env` + `pip install -r requirements-dev.txt` alcanza para correr las 64
 pruebas. Si alguna prueba falla en un clon nuevo, es un archivo que falta: avisar antes de
 improvisar.
 

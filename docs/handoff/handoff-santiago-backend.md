@@ -1,5 +1,11 @@
 # Handoff — Santiago (Backend/Supabase) · cierre real de F7
 
+> **Actualizado 2026-11-23:** este documento es **contexto histórico**. `main` ya integró el
+> flujo anónimo de sesión/puntaje, `/api/claim` y la migración `004_anonymous_claim.sql`; los
+> tests vigentes son **64**, no 53, y `/api/dialog` ya no exige JWT. Para pedir las claves,
+> migraciones, evidencias y accesos del nodo Frontend, usar
+> [`solicitud-datos-santiago.md`](solicitud-datos-santiago.md).
+>
 > **Para el agente de Santiago.** Contexto operativo, no una orden de cambios destructivos. Si
 > hay que borrar datos, rotar claves o recrear volúmenes, pedir confirmación primero.
 >

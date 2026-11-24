@@ -74,12 +74,12 @@ terminado. Nada se da por hecho porque «funciona en el editor»: se verifica en
 | Arte de personaje y fondo | Palenquera y `bg_playa.png` importados y en la escena | `unity/Assets/Art/Characters/`, `.../Backgrounds/` |
 | Arte de ítems | ⚠️ **Regresión real**: los 4 sprites originales se borraron y la escena quedó con 4 referencias rotas. Hay 60 PNG nuevos sin cablear | ver §3.2 |
 | UI de Figma | 0 componentes exportados; `unity/Assets/Art/UI/` está **vacío** | — |
-| Build WebGL | ✅ `builds/webgl` generado (16,2 MB) y servido en `https://juego.local/` con CSP regenerada | `builds/` (no versionado) |
+| Build WebGL | ✅ build de `main` generado localmente (17,7 MB) y servido en `https://juego.local/`; falta publicarlo en el nodo Frontend de Santiago | `builds/` (no versionado) |
 | Nginx / Sg-Frontend | Operativo: 443 (8081 solo con override de dev), TLS local con mkcert, CSP por hash, HSTS, proxy `/api/` | `infra/nginx/`, [`docs/fases/F3.md`](docs/fases/F3.md) |
 | Docker | Compose de 5 nodos declarado y validado. `sg-frontend`, `sg-wazuh-agent` y `sg-ai` arriba; `sg-backend` no arranca sin claves | `infra/docker-compose.yml`, [`evidencias/F6/`](evidencias/F6/README.md) |
 | Modelo de IA | ✅ `qwen2.5:3b` descargado (1,9 GB); `Sg-AI` healthy, sin puerto publicado; NPC probado en WebGL | [`evidencias/F7/`](evidencias/F7/README.md) |
-| Backend | 🚧 API completa en `backend/` y 53/53 tests; imagen construida, pero no arranca sin las claves de Supabase/JWT en `.env` | [`evidencias/F5/`](evidencias/F5/README.md) |
-| Base de datos | ✅ Supabase DEV con esquema versionado, RLS cerrado, leaderboard y backup/restauración probados | [`evidencias/F4/`](evidencias/F4/README.md) |
+| Backend | 🚧 API completa en `backend/` y 64/64 tests; imagen `main-test` construida, pero `latest` sigue pendiente y no arranca sin las claves de Supabase/JWT en `.env` | [`evidencias/F5/`](evidencias/F5/README.md) |
+| Base de datos | 🟡 Supabase DEV con esquema 001–003, RLS y backup probados; falta aplicar y validar `004_anonymous_claim.sql` | [`evidencias/F4/`](evidencias/F4/README.md) |
 | Logs / SIEM | 🟡 Wazuh 4.14 en VM, agente **002**, reglas `100200–100250`, logs Nginx reales y `100250`; FIM guarda estado sin alerta por archivo; `backend.log` pendiente | `infra/wazuh/`, `infra/docker-compose.yml` |
 | Gitleaks (A.8.25) | ✅ Implementado, hook instalado y probado | [`evidencias/A.8.25/`](evidencias/A.8.25/README.md) |
 | Otros 9 controles ISO | 🟡 A.8.15/A.8.20/A.8.24 parciales; 6 sin implementar ni evidenciar | [`evidencias/`](evidencias/) |
@@ -143,7 +143,7 @@ de negocio. El cliente **nunca es fuente de verdad** (A.8.9): solo presenta.
 | Ítems con arte | ⛔ referencias rotas (§3.2.1) |
 | Componentes de UI de Figma | ⛔ 0/~30 |
 | Tokens (17 colores, 5 estilos) | ⛔ hardcodeados en el `SceneBuilder` |
-| Build WebGL | ✅ generado (16,2 MB) y servido; el arte sigue pendiente de FE-01/FE-02 |
+| Build WebGL | ✅ build de `main` generado (17,7 MB) y servido; arte versionado; falta publicarlo en el nodo de Santiago |
 | Nginx + TLS + CSP | ✅ operativo |
 | Leaderboard y envío de puntaje | ⛔ no existen en el cliente |
 | Bocadillo del NPC | ✅ Pensamiento en runtime anclado al sprite, build WebGL y captura |
@@ -195,9 +195,9 @@ contratos en [`docs/api.md`](docs/api.md).
 
 ### 5.2 Backlog
 
-**Estado 2026-11-13:** cerradas `BE-01`…`BE-05` y `BE-07`…`BE-11`. `BE-06` ya llama a Ollama
-con prompt versionado, timeout y fallback; los 53 tests del backend pasan. El arranque real del
-contenedor sigue bloqueado por las claves de Supabase/JWT.
+**Estado 2026-11-23:** cerradas `BE-01`…`BE-05` y `BE-07`…`BE-11`. `BE-06` ya llama a Ollama
+con prompt versionado, timeout y fallback; los 64 tests del backend pasan. El arranque real del
+contenedor sigue bloqueado por las claves de Supabase/JWT y la migración `004_anonymous_claim.sql`.
 
 | ID | Tarea | Depende de | DoD |
 | :--- | :--- | :--- | :--- |
@@ -358,9 +358,10 @@ El modelo se descarga por procedimiento explícito, no en caliente.
 > **Ejecución por fases:** [`docs/fases/F7-ia.md`](docs/fases/F7-ia.md) define las seis fases
 > (F7.0–F7.5), sus puertas y la evidencia esperada.
 >
-> **Cierre 2026-11-13:** `IA-01` medido; `IA-02`–`IA-05` implementados; `IA-06` con 53 tests y
-> smoke test real; `IA-07` cubierto por test de no escritura y por la simulación WebGL. El
-> bocadillo ya tiene captura; falta el arranque del backend con claves reales y Supabase.
+> **Cierre 2026-11-13 / actualización 2026-11-23:** `IA-01` medido; `IA-02`–`IA-05`
+> implementados; `IA-06` con 64 tests y simulación E2E con Ollama real; `IA-07` cubierto por test
+> de no escritura y por la simulación WebGL. El bocadillo ya tiene captura; falta el arranque del
+> backend con claves reales, Supabase y el nodo Frontend de Santiago.
 
 ### 8.3 Criterio de terminado de la división
 

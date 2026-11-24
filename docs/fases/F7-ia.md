@@ -3,6 +3,10 @@
 > **División:** IA · **Nodo:** `Sg-AI`
 > **Estado:** ✅ F7.0–F7.5 cerradas en simulación local/WebGL; falta la validación con el
 > backend real de Supabase.
+> **Actualizado 2026-11-23:** `main` ya incluye el flujo anónimo + `/api/claim`; el backend tiene
+> **64 tests** y `/api/dialog` acepta token opcional. La evidencia `01`–`12` es de la simulación
+> anterior; la validación real sigue pendiente. Datos que faltan:
+> [`../handoff/solicitud-datos-santiago.md`](../handoff/solicitud-datos-santiago.md).
 > **Depende de:** [F6](F6.md) (compose), F5 (backend), F4 (auth)
 > **Handoff:** [`../handoff/ia.md`](../handoff/ia.md)
 > **Backlog:** [`Plan.md` §8](../../Plan.md) (`IA-01`–`IA-07`)
@@ -31,7 +35,7 @@ Dejar el NPC de la Palenquera funcionando de punta a punta:
 | Prompt del NPC | ✅ `backend/app/ai/prompts.py` |
 | Cliente Ollama en backend | ✅ `backend/app/providers/ollama.py` |
 | Bocadillo en Unity | ✅ `NpcDialogueController` (runtime UI), build WebGL y captura real |
-| Pruebas del diálogo | ✅ `backend/tests/test_dialog.py`; 53 tests en verde |
+| Pruebas del diálogo | ✅ `backend/tests/test_dialog.py`; suite completa con 64 tests en verde |
 | Evidencia F7 | ✅ `evidencias/F7/01`–`12` y `README.md` |
 
 **Estado 2026-11-13.** `Sg-AI` está operativo y el endpoint genera texto real. La prueba de
@@ -157,13 +161,13 @@ sigue respondiendo sin error 500. ✅
 **Objetivo:** llevar la IA al juego (`IA-07` + integración de Frontend).
 
 - ✅ `context`, `item` y `kind` opcionales en `DialogRequest`, documentados en `docs/api.md` §4.
-- ✅ `AuthStub` intenta `/api/auth/login` y `/api/auth/register`, guarda el JWT solo en memoria y
-  cae al modo local si el backend no está desplegado.
+- ✅ `AuthStub` intenta `/api/auth/login` y `/api/auth/register`, pero el flujo de juego ya no
+  exige login; `/api/dialog` acepta token opcional y el NPC funciona en partidas anónimas.
 - ✅ `unity/Assets/Scripts/UI/NpcDialogueController.cs` crea el pensamiento en runtime y se
   engancha a `GameManager.ItemCaught` y `MatchEnded`.
 - ✅ Envía `context` `captura`, `peligro` o `game_over`, más `item` y `kind`.
 - ✅ Comenta de vez en cuando (35 % de probabilidad, 9 s de enfriamiento), muestra la respuesta
-  durante 5,5 s y usa frases locales si no hay JWT o la red falla.
+  durante 5,5 s y usa frases locales si el backend o la red fallan.
 - ✅ No llama a `session` ni a `score`; el puntaje no se toca.
 - ✅ El cuadro se dibuja como pensamiento anclado al `SpriteRenderer` del jugador: encima de
   la cabeza, con tres puntos, siguiendo el movimiento y sin tapar al personaje.
@@ -194,7 +198,8 @@ partida, sin bloquear el gameplay.
   - contexto inválido y falta de texto/ítem;
   - prueba de que el diálogo no escribe en `game_sessions` ni en `scores`;
   - cliente Ollama con `httpx.MockTransport`.
-- ✅ Suite completa: **53 tests** en verde (`evidencias/F7/04-tests.txt`).
+- ✅ Suite completa: **64 tests** en verde (`backend/tests/`); `04-tests.txt` conserva la
+  corrida histórica de 53 tests de la simulación anterior.
 - ✅ Smoke test real con `qwen2.5:3b` (`evidencias/F7/02`, `03` y `10`).
 - ✅ Fallback real con `sg-ai` detenido: 797/758/757 ms (`evidencias/F7/05-fallback.txt`).
 - ✅ Captura visual del bocadillo en WebGL (`07` y `08` para el contenido real; `11` y `12`
