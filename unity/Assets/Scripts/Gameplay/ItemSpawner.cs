@@ -58,6 +58,14 @@ namespace CosTamarindo.Gameplay
                     if (s != null) spritesById[s.name] = s;
             }
 
+            // Diagnóstico temprano: un Id sin sprite cae a relleno procedural.
+            // Se avisa una sola vez para no inundar la consola del build.
+            foreach (var def in ItemCatalog.All)
+            {
+                if (!spritesById.ContainsKey(def.Id))
+                    Debug.LogWarning($"[ItemSpawner] sin sprite para '{def.Id}': se usará relleno procedural.");
+            }
+
             if (itemsRoot == null)
             {
                 var root = new GameObject("Items");

@@ -22,11 +22,11 @@ namespace CosTamarindo.Gameplay
             switch (kind)
             {
                 case ItemKind.Danger:
-                    return danger != null ? danger : (danger = Circle(new Color(0.88f, 0.32f, 0.32f)));
+                    return danger != null ? danger : (danger = Circle(Theme.Error));
                 case ItemKind.Trash:
-                    return trash != null ? trash : (trash = Circle(new Color(0.45f, 0.45f, 0.45f)));
+                    return trash != null ? trash : (trash = Circle(Theme.InkSoft));
                 default:
-                    return good != null ? good : (good = Circle(new Color(0.98f, 0.78f, 0.28f)));
+                    return good != null ? good : (good = Circle(Theme.Gold));
             }
         }
 
@@ -51,7 +51,7 @@ namespace CosTamarindo.Gameplay
                     float dy = (y + 0.5f - center.y) / (height * 0.5f);
                     float d = Mathf.Sqrt(dx * dx + dy * dy);
                     float alpha = Mathf.Pow(Mathf.Clamp01(1f - d), 1.8f) * 0.45f;
-                    pixels[y * width + x] = new Color(0.16f, 0.08f, 0.04f, alpha);
+                    pixels[y * width + x] = Theme.WithAlpha(Theme.WoodDark, alpha);
                 }
             }
 

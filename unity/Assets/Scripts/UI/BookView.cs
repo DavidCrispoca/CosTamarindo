@@ -31,9 +31,9 @@ namespace CosTamarindo.UI
         [SerializeField] private Vector2 cellSize = new Vector2(190f, 190f);
         [SerializeField] private float spacing = 22f;
 
-        private static readonly Color PanelColor = new Color(0.96f, 0.87f, 0.71f, 0.98f);
-        private static readonly Color CardColor = new Color(0.90f, 0.79f, 0.60f);
-        private static readonly Color InkColor = new Color(0.24f, 0.16f, 0.10f);
+        private static Color PanelColor => Theme.WithAlpha(Theme.Sand, 0.98f);
+        private static Color CardColor => Theme.SandDark;
+        private static Color InkColor => Theme.Ink;
 
         private GameObject panel;
         private RectTransform gridRoot;
@@ -98,7 +98,7 @@ namespace CosTamarindo.UI
             panelRt.offsetMax = Vector2.zero;
 
             var dim = panel.GetComponent<Image>();
-            dim.color = new Color(0f, 0f, 0f, 0.60f);
+            dim.color = Theme.Scrim;
             dim.raycastTarget = true;
 
             // ── Tarjeta central ──
@@ -216,7 +216,7 @@ namespace CosTamarindo.UI
         {
             var cell = new GameObject("Cell_" + def.Id, typeof(RectTransform), typeof(Image));
             var bg = cell.GetComponent<Image>();
-            bg.color = isUnlocked ? CardColor : new Color(0.80f, 0.73f, 0.62f);
+            bg.color = isUnlocked ? CardColor : Theme.WithAlpha(Theme.SandDark, 0.72f);
 
             // ── Retrato ──
             var portrait = new GameObject("Portrait", typeof(RectTransform), typeof(Image));
@@ -238,7 +238,7 @@ namespace CosTamarindo.UI
                 image.sprite = sprite;
 
                 // Bloqueado: silueta oscura del propio sprite, no un cuadro gris.
-                image.color = isUnlocked ? Color.white : new Color(0.20f, 0.15f, 0.10f, 0.55f);
+                image.color = isUnlocked ? Theme.White : Theme.WithAlpha(Theme.Ink, 0.55f);
             }
             else
             {
@@ -248,11 +248,11 @@ namespace CosTamarindo.UI
                 if (fallback != null)
                 {
                     image.sprite = fallback;
-                    image.color = isUnlocked ? Color.white : new Color(0.20f, 0.15f, 0.10f, 0.55f);
+                    image.color = isUnlocked ? Theme.White : Theme.WithAlpha(Theme.Ink, 0.55f);
                 }
                 else
                 {
-                    image.color = isUnlocked ? CardColor : new Color(0.45f, 0.38f, 0.30f, 0.8f);
+                    image.color = isUnlocked ? Theme.White : Theme.WithAlpha(Theme.WoodDark, 0.80f);
                 }
             }
 
@@ -261,7 +261,7 @@ namespace CosTamarindo.UI
             var nameText = CreateText(
                 cell.transform, "Name", label, 26f,
                 isUnlocked ? bodyFont : displayFont,
-                isUnlocked ? InkColor : new Color(0.48f, 0.40f, 0.32f));
+                isUnlocked ? InkColor : Theme.InkSoft);
 
             var nameRt = nameText.rectTransform;
             nameRt.anchorMin = new Vector2(0.5f, 0f);
@@ -273,7 +273,7 @@ namespace CosTamarindo.UI
 
             if (isUnlocked && def.Kind == ItemKind.Danger)
             {
-                var danger = CreateText(cell.transform, "Danger", "\u26A0", 26f, displayFont, new Color(0.75f, 0.20f, 0.20f));
+                var danger = CreateText(cell.transform, "Danger", "\u26A0", 26f, displayFont, Theme.Error);
                 var dangerRt = danger.rectTransform;
                 dangerRt.anchorMin = new Vector2(1f, 1f);
                 dangerRt.anchorMax = new Vector2(1f, 1f);
@@ -318,12 +318,12 @@ namespace CosTamarindo.UI
             rt.sizeDelta = size;
 
             var image = go.GetComponent<Image>();
-            image.color = new Color(0.45f, 0.29f, 0.18f);
+            image.color = Theme.Wood;
 
             var button = go.GetComponent<Button>();
             button.targetGraphic = image;
 
-            var text = CreateText(go.transform, "Label", label, fontSize, font, new Color(0.96f, 0.87f, 0.71f));
+            var text = CreateText(go.transform, "Label", label, fontSize, font, Theme.Sand);
             var textRt = text.rectTransform;
             textRt.anchorMin = Vector2.zero;
             textRt.anchorMax = Vector2.one;

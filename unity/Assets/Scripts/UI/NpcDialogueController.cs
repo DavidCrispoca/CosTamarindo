@@ -53,7 +53,7 @@ namespace CosTamarindo.UI
             };
 
         private const float BubbleWidth = 780f;
-        private const float BubbleHeight = 190f;
+        private const float BubbleHeight = 232f;
         private const float HeadGap = 78f;
         private const float EdgeMargin = 28f;
 
@@ -65,7 +65,12 @@ namespace CosTamarindo.UI
         private RectTransform gameOverPanel;
         private readonly List<Image> thoughtDots = new List<Image>();
         private TMP_Text bodyText;
+        private TMP_Text historyText;
         private Coroutine hideRoutine;
+        private Coroutine typingRoutine;
+        private string lastLine;
+        private readonly Queue<string> history = new Queue<string>(HistorySize);
+        private const int HistorySize = 2;
         private GameManager gameManager;
         private PlayerController player;
         private SpriteRenderer playerSprite;
@@ -272,6 +277,7 @@ namespace CosTamarindo.UI
             string fallback = LocalLine(context, item);
 
             requestInFlight = true;
+            BeginTyping();
             string json = BuildPayload(text, context, item, kind);
             var request = new UnityWebRequest(GetDialogUrl(), UnityWebRequest.kHttpVerbPOST)
             {
@@ -304,6 +310,7 @@ namespace CosTamarindo.UI
 
             request.Dispose();
             requestInFlight = false;
+            StopTyping();
             ShowLine(string.IsNullOrEmpty(reply) ? fallback : reply);
         }
 
@@ -352,10 +359,78 @@ namespace CosTamarindo.UI
         {
             if (bodyText == null || bubbleGroup == null || string.IsNullOrEmpty(line)) return;
 
+            // FE-09: historial corto. La línea anterior queda visible, atenuada,
+            // debajo de la nueva, para que el comentario no aparezca de la nada.
+            if (!string.IsNullOrEmpty(lastLine) && lastLine != line)
+            {
+                history.Enqueue(lastLine);
+                while (history.Count > HistorySize) history.Dequeue();
+            }
+            lastLine = line;
+            RefreshHistory();
+
             bodyText.text = line;
 
             if (hideRoutine != null) StopCoroutine(hideRoutine);
             hideRoutine = StartCoroutine(ShowRoutine());
+        }
+
+        private void RefreshHistory()
+        {
+            if (historyText == null) return;
+            historyText.text = string.Join("\n", history);
+        }
+
+        /// <summary>Indicador de "escribiendo…" mientras la IA responde.</summary>
+        private void BeginTyping()
+        {
+            if (typingRoutine != null) StopCoroutine(typingRoutine);
+            if (hideRoutine != null)
+            {
+                StopCoroutine(hideRoutine);
+                hideRoutine = null;
+            }
+            typingRoutine = StartCoroutine(TypingRoutine());
+        }
+
+        private void StopTyping()
+        {
+            if (typingRoutine == null) return;
+            StopCoroutine(typingRoutine);
+            typingRoutine = null;
+        }
+
+        private IEnumerator TypingRoutine()
+        {
+            // Un backend local responde en milisegundos; esperar evita un
+            // parpadeo de "escribiendo…" en cada captura.
+            yield return new WaitForSecondsRealtime(0.35f);
+
+            if (bodyText == null || bubbleGroup == null)
+            {
+                typingRoutine = null;
+                yield break;
+            }
+
+            const string label = "escribiendo";
+            int dots = 0;
+            float elapsed = 0f;
+            const float fadeIn = 0.18f;
+
+            while (true)
+            {
+                bodyText.text = label + new string('.', dots);
+                dots = (dots + 1) % 4;
+
+                if (bubbleGroup.alpha < 1f)
+                {
+                    elapsed += 0.35f;
+                    bubbleGroup.alpha = Mathf.Clamp01(elapsed / fadeIn);
+                    if (thoughtGroup != null) thoughtGroup.alpha = bubbleGroup.alpha;
+                }
+
+                yield return new WaitForSecondsRealtime(0.35f);
+            }
         }
 
         private IEnumerator ShowRoutine()
@@ -438,7 +513,7 @@ namespace CosTamarindo.UI
             bubbleGo.transform.SetParent(canvasGo.transform, false);
 
             var background = bubbleGo.GetComponent<Image>();
-            background.color = new Color(0.07f, 0.12f, 0.16f, 0.94f);
+            background.color = Theme.WithAlpha(Theme.Ink, 0.94f);
             background.raycastTarget = false;
 
             bubbleRect = bubbleGo.GetComponent<RectTransform>();
@@ -449,7 +524,7 @@ namespace CosTamarindo.UI
             bubbleRect.sizeDelta = new Vector2(BubbleWidth, BubbleHeight);
 
             var bubbleOutline = bubbleGo.AddComponent<Outline>();
-            bubbleOutline.effectColor = new Color(1f, 0.9f, 0.7f, 0.32f);
+            bubbleOutline.effectColor = Theme.WithAlpha(Theme.Gold, 0.32f);
             bubbleOutline.effectDistance = new Vector2(1.5f, -1.5f);
 
             bubbleGroup = bubbleGo.GetComponent<CanvasGroup>();
@@ -463,7 +538,7 @@ namespace CosTamarindo.UI
             nameText.text = "La Palenquera";
             nameText.fontSize = 28f;
             nameText.fontStyle = FontStyles.Bold;
-            nameText.color = new Color(1f, 0.78f, 0.25f);
+            nameText.color = Theme.Gold;
             nameText.alignment = TextAlignmentOptions.Left;
             nameText.raycastTarget = false;
             if (TMP_Settings.defaultFontAsset != null) nameText.font = TMP_Settings.defaultFontAsset;
@@ -479,9 +554,9 @@ namespace CosTamarindo.UI
             bodyGo.transform.SetParent(bubbleGo.transform, false);
             bodyText = bodyGo.GetComponent<TextMeshProUGUI>();
             bodyText.fontSize = 34f;
-            bodyText.color = Color.white;
+            bodyText.color = Theme.White;
             bodyText.alignment = TextAlignmentOptions.TopLeft;
-            bodyText.enableWordWrapping = true;
+            bodyText.textWrappingMode = TextWrappingModes.Normal;
             bodyText.overflowMode = TextOverflowModes.Truncate;
             bodyText.raycastTarget = false;
             if (TMP_Settings.defaultFontAsset != null) bodyText.font = TMP_Settings.defaultFontAsset;
@@ -489,12 +564,31 @@ namespace CosTamarindo.UI
             var bodyRect = bodyText.rectTransform;
             bodyRect.anchorMin = Vector2.zero;
             bodyRect.anchorMax = Vector2.one;
-            bodyRect.offsetMin = new Vector2(28f, 18f);
+            bodyRect.offsetMin = new Vector2(28f, 62f);
             bodyRect.offsetMax = new Vector2(-28f, -50f);
 
             var shadow = bodyGo.AddComponent<Shadow>();
-            shadow.effectColor = new Color(0f, 0f, 0f, 0.65f);
+            shadow.effectColor = Theme.WithAlpha(Theme.Ink, 0.65f);
             shadow.effectDistance = new Vector2(2f, -2f);
+
+            // FE-09: dos líneas previas, pequeñas y atenuadas, al pie del bocadillo.
+            var historyGo = new GameObject("History", typeof(RectTransform), typeof(TextMeshProUGUI));
+            historyGo.transform.SetParent(bubbleGo.transform, false);
+            historyText = historyGo.GetComponent<TextMeshProUGUI>();
+            historyText.fontSize = 21f;
+            historyText.color = Theme.WithAlpha(Theme.Sand, 0.62f);
+            historyText.alignment = TextAlignmentOptions.TopLeft;
+            historyText.textWrappingMode = TextWrappingModes.Normal;
+            historyText.overflowMode = TextOverflowModes.Ellipsis;
+            historyText.raycastTarget = false;
+            if (TMP_Settings.defaultFontAsset != null) historyText.font = TMP_Settings.defaultFontAsset;
+
+            var historyRect = historyText.rectTransform;
+            historyRect.anchorMin = Vector2.zero;
+            historyRect.anchorMax = new Vector2(1f, 0f);
+            historyRect.pivot = new Vector2(0.5f, 0f);
+            historyRect.offsetMin = new Vector2(28f, 14f);
+            historyRect.offsetMax = new Vector2(-28f, 58f);
         }
 
         private void CreateThoughtDots()
@@ -514,11 +608,11 @@ namespace CosTamarindo.UI
 
                 var dot = dotGo.GetComponent<Image>();
                 dot.sprite = circle;
-                dot.color = new Color(0.07f, 0.12f, 0.16f, 0.96f);
+                dot.color = Theme.WithAlpha(Theme.Ink, 0.96f);
                 dot.raycastTarget = false;
 
                 var outline = dotGo.AddComponent<Outline>();
-                outline.effectColor = new Color(1f, 0.9f, 0.7f, 0.45f);
+                outline.effectColor = Theme.WithAlpha(Theme.Gold, 0.45f);
                 outline.effectDistance = new Vector2(1.1f, -1.1f);
 
                 thoughtDots.Add(dot);
@@ -546,7 +640,7 @@ namespace CosTamarindo.UI
                     float dy = y - center;
                     float distance = Mathf.Sqrt(dx * dx + dy * dy);
                     float alpha = Mathf.Clamp01(radius - distance + 0.5f);
-                    pixels[y * size + x] = new Color(1f, 1f, 1f, alpha);
+                    pixels[y * size + x] = new Color(Theme.White.r, Theme.White.g, Theme.White.b, alpha);
                 }
             }
 

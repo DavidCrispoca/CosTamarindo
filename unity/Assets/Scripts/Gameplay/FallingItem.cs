@@ -42,8 +42,8 @@ namespace CosTamarindo.Gameplay
 
         private static Color TintFor(ItemKind kind) => kind switch
         {
-            ItemKind.Danger => new Color(1f, 0.80f, 0.80f),
-            ItemKind.Trash => new Color(0.82f, 0.82f, 0.82f),
+            ItemKind.Danger => Theme.WithAlpha(Theme.Error, 0.75f),
+            ItemKind.Trash => Theme.WithAlpha(Theme.InkSoft, 0.85f),
             _ => Color.white
         };
     }

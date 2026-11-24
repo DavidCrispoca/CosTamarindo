@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem.UI;
 using UnityEngine.UI;
+using CosTamarindo.Core;
 using CosTamarindo.UI;
 
 namespace CosTamarindo.EditorTools
@@ -21,10 +22,11 @@ namespace CosTamarindo.EditorTools
         private const string ScenesFolder = "Assets/Scenes";
         private const string ScenePath = ScenesFolder + "/Login.unity";
 
-        private static readonly Color Sand = new Color(0.96f, 0.87f, 0.71f);
-        private static readonly Color Wood = new Color(0.45f, 0.29f, 0.18f);
-        private static readonly Color Ink = new Color(0.24f, 0.16f, 0.10f);
-        private static readonly Color Sea = new Color(0.42f, 0.78f, 0.90f);
+        // Paleta centralizada en Theme (FE-04).
+        private static Color Sand => Theme.Sand;
+        private static Color Wood => Theme.Wood;
+        private static Color Ink => Theme.Ink;
+        private static Color Sea => Theme.Sea;
 
         [MenuItem("CosTamarindo/Construir escena de inicio de sesión", priority = 2)]
         public static void BuildLoginScene()
@@ -81,7 +83,7 @@ namespace CosTamarindo.EditorTools
                 34f, TextAlignmentOptions.Center, bodyFont);
             status.rectTransform.anchoredPosition = new Vector2(0f, 0f);
             status.rectTransform.sizeDelta = new Vector2(700f, 120f);
-            status.color = new Color(0.35f, 0.28f, 0.20f);
+            status.color = Theme.InkSoft;
 
             var enter = CreateButton(cardContent, "EnterButton", "Jugar", 44f, new Vector2(420f, 96f), new Vector2(0f, -120f), displayFont);
 
@@ -90,7 +92,7 @@ namespace CosTamarindo.EditorTools
                 26f, TextAlignmentOptions.Center, bodyFont);
             hint.rectTransform.anchoredPosition = new Vector2(0f, -210f);
             hint.rectTransform.sizeDelta = new Vector2(700f, 70f);
-            hint.color = new Color(Ink.r, Ink.g, Ink.b, 0.65f);
+            hint.color = Theme.WithAlpha(Theme.Ink, 0.65f);
 
             var controller = canvasGo.AddComponent<LoginController>();
             SetObject(controller, "statusText", status);
@@ -178,12 +180,10 @@ namespace CosTamarindo.EditorTools
 
         private static void RegisterSceneInBuildSettings()
         {
+            // FE-10: el login es la primera escena del build. Sin sesión no se juega.
             var scenes = new List<EditorBuildSettingsScene>(EditorBuildSettings.scenes);
-            bool present = scenes.Exists(s => s.path == ScenePath);
-            if (present) return;
-
-            int insertAt = scenes.FindIndex(s => s.path == ScenesFolder + "/Game.unity");
-            scenes.Insert(insertAt >= 0 ? insertAt + 1 : 0, new EditorBuildSettingsScene(ScenePath, true));
+            scenes.RemoveAll(s => s.path == ScenePath);
+            scenes.Insert(0, new EditorBuildSettingsScene(ScenePath, true));
             EditorBuildSettings.scenes = scenes.ToArray();
         }
 

@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using CosTamarindo.Auth;
+using CosTamarindo.Core;
 
 namespace CosTamarindo.UI
 {
@@ -28,9 +29,9 @@ namespace CosTamarindo.UI
 
         private bool busy;
 
-        private static readonly Color ErrorColor = new Color(0.72f, 0.16f, 0.18f);
-        private static readonly Color InfoColor = new Color(0.35f, 0.28f, 0.20f);
-        private static readonly Color OkColor = new Color(0.16f, 0.55f, 0.26f);
+        private static Color ErrorColor => Theme.Error;
+        private static Color InfoColor => Theme.InkSoft;
+        private static Color OkColor => Theme.Palm;
 
         private void Awake()
         {

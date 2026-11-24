@@ -29,9 +29,9 @@ namespace CosTamarindo.UI
         [SerializeField] private float lifetime = 0.9f;
         [SerializeField] private float fontSize = 54f;
 
-        private static readonly Color GoodColor = new Color(0.18f, 0.62f, 0.28f);
-        private static readonly Color BadColor = new Color(0.82f, 0.22f, 0.24f);
-        private static readonly Color NewColor = new Color(0.95f, 0.62f, 0.12f);
+        private static Color GoodColor => Theme.Palm;
+        private static Color BadColor => Theme.Error;
+        private static Color NewColor => Theme.Gold;
 
         private bool subscribed;
 

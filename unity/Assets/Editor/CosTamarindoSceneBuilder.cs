@@ -22,12 +22,13 @@ namespace CosTamarindo.EditorTools
     {
         private const string ScenesFolder = "Assets/Scenes";
         private const string ScenePath = ScenesFolder + "/Game.unity";
+        private const string CuratedItemsFolder = "Assets/Art/Items/curated";
 
-        // Paleta provisional tomada del diseño (se reemplaza por los tokens de Figma en F1).
-        private static readonly Color Sand = new Color(0.96f, 0.87f, 0.71f);
-        private static readonly Color Wood = new Color(0.45f, 0.29f, 0.18f);
-        private static readonly Color Ink = new Color(0.24f, 0.16f, 0.10f);
-        private static readonly Color Sea = new Color(0.42f, 0.78f, 0.90f);
+        // Paleta y estilos centralizados en Theme (FE-04). No hay colores sueltos.
+        private static Color Sand => Theme.Sand;
+        private static Color Wood => Theme.Wood;
+        private static Color Ink => Theme.Ink;
+        private static Color Sea => Theme.Sea;
 
         [MenuItem("CosTamarindo/Construir escena de juego", priority = 1)]
         public static void BuildGameScene()
@@ -130,7 +131,7 @@ namespace CosTamarindo.EditorTools
             }
             else
             {
-                renderer.color = new Color(0.99f, 0.62f, 0.36f);
+                renderer.color = Theme.Coral;
                 Debug.LogWarning($"[CosTamarindo] falta el personaje en {FigmaArtImporter.CharacterPath}");
             }
 
@@ -196,7 +197,7 @@ namespace CosTamarindo.EditorTools
             var livesText = CreateText(root, "LivesText", "\u2665\u2665\u2665", 64f, TextAlignmentOptions.TopRight);
             Anchor(livesText.rectTransform, new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(1f, 1f),
                    new Vector2(-150f, -40f), new Vector2(320f, 88f));
-            livesText.color = new Color(0.85f, 0.25f, 0.30f);
+            livesText.color = Theme.Error;
 
             var pauseButton = CreateButton(root, "PauseButton", "II", 46f, new Vector2(96f, 88f));
             Anchor(pauseButton.GetComponent<RectTransform>(), new Vector2(1f, 1f), new Vector2(1f, 1f),
@@ -312,7 +313,7 @@ namespace CosTamarindo.EditorTools
             rt.offsetMax = Vector2.zero;
 
             var image = go.GetComponent<Image>();
-            image.color = new Color(0f, 0f, 0f, 0.55f);
+            image.color = Theme.Scrim;
             image.raycastTarget = true;
 
             var card = new GameObject("Card", typeof(RectTransform), typeof(Image));
@@ -395,7 +396,7 @@ namespace CosTamarindo.EditorTools
             rt.anchoredPosition = position;
 
             var bg = go.GetComponent<Image>();
-            bg.color = new Color(1f, 1f, 1f, 0.92f);
+            bg.color = Theme.Field;
 
             var viewport = new GameObject("Text Area", typeof(RectTransform), typeof(RectMask2D));
             viewport.transform.SetParent(go.transform, false);
@@ -406,7 +407,7 @@ namespace CosTamarindo.EditorTools
             vprt.offsetMax = new Vector2(-12f, -8f);
 
             var placeholderText = CreateText(viewport.transform, "Placeholder", placeholder, fontSize, TextAlignmentOptions.Left, font);
-            placeholderText.color = new Color(Ink.r, Ink.g, Ink.b, 0.45f);
+            placeholderText.color = Theme.Placeholder;
             Stretch(placeholderText.rectTransform);
 
             var inputText = CreateText(viewport.transform, "Text", "", fontSize, TextAlignmentOptions.Left, font);
@@ -450,17 +451,24 @@ namespace CosTamarindo.EditorTools
 
         private static Sprite[] LoadItemSprites()
         {
-            var guids = AssetDatabase.FindAssets("t:Sprite", new[] { "Assets/Art/Items" });
+            // FE-02/FE-03: solo se cargan los 12 sprites curados, en el orden del
+            // catálogo. Un PNG sin definición (o una definición sin PNG) se avisa
+            // aquí y no llega al build como referencia huérfana.
             var list = new List<Sprite>();
 
-            foreach (var guid in guids)
+            foreach (var def in ItemCatalog.All)
             {
-                var path = AssetDatabase.GUIDToAssetPath(guid);
+                string path = $"{CuratedItemsFolder}/{def.Id}.png";
                 var sprite = AssetDatabase.LoadAssetAtPath<Sprite>(path);
-                if (sprite != null) list.Add(sprite);
+                if (sprite == null)
+                {
+                    Debug.LogError($"[CosTamarindo] falta el sprite curado {path}");
+                    continue;
+                }
+                list.Add(sprite);
             }
 
-            Debug.Log($"[CosTamarindo] {list.Count} sprites de ítems cargados.");
+            Debug.Log($"[CosTamarindo] {list.Count}/{ItemCatalog.All.Count} sprites de ítems curados cargados.");
             return list.ToArray();
         }
 
