@@ -378,7 +378,16 @@ namespace CosTamarindo.UI
         private void RefreshHistory()
         {
             if (historyText == null) return;
-            historyText.text = string.Join("\n", history);
+
+            // Una línea por entrada: si una frase larga se envolviera, el
+            // historial se comería la frase principal del bocadillo.
+            var lines = new List<string>(history.Count);
+            foreach (string line in history)
+            {
+                const int maxChars = 52;
+                lines.Add(line.Length > maxChars ? line.Substring(0, maxChars - 1) + "…" : line);
+            }
+            historyText.text = string.Join("\n", lines);
         }
 
         /// <summary>Indicador de "escribiendo…" mientras la IA responde.</summary>
@@ -513,7 +522,8 @@ namespace CosTamarindo.UI
             bubbleGo.transform.SetParent(canvasGo.transform, false);
 
             var background = bubbleGo.GetComponent<Image>();
-            background.color = Theme.WithAlpha(Theme.Ink, 0.94f);
+            // El bocadillo deja ver el fondo: los ítems que caen no quedan tapados.
+            background.color = Theme.DialogueBubble;
             background.raycastTarget = false;
 
             bubbleRect = bubbleGo.GetComponent<RectTransform>();
@@ -524,7 +534,7 @@ namespace CosTamarindo.UI
             bubbleRect.sizeDelta = new Vector2(BubbleWidth, BubbleHeight);
 
             var bubbleOutline = bubbleGo.AddComponent<Outline>();
-            bubbleOutline.effectColor = Theme.WithAlpha(Theme.Gold, 0.32f);
+            bubbleOutline.effectColor = Theme.WithAlpha(Theme.Gold, 0.24f);
             bubbleOutline.effectDistance = new Vector2(1.5f, -1.5f);
 
             bubbleGroup = bubbleGo.GetComponent<CanvasGroup>();
@@ -553,7 +563,7 @@ namespace CosTamarindo.UI
             var bodyGo = new GameObject("Body", typeof(RectTransform), typeof(TextMeshProUGUI));
             bodyGo.transform.SetParent(bubbleGo.transform, false);
             bodyText = bodyGo.GetComponent<TextMeshProUGUI>();
-            bodyText.fontSize = 34f;
+            bodyText.fontSize = 32f;
             bodyText.color = Theme.White;
             bodyText.alignment = TextAlignmentOptions.TopLeft;
             bodyText.textWrappingMode = TextWrappingModes.Normal;
@@ -564,8 +574,10 @@ namespace CosTamarindo.UI
             var bodyRect = bodyText.rectTransform;
             bodyRect.anchorMin = Vector2.zero;
             bodyRect.anchorMax = Vector2.one;
-            bodyRect.offsetMin = new Vector2(28f, 62f);
-            bodyRect.offsetMax = new Vector2(-28f, -50f);
+            // Franjas separadas: nombre (arriba), frase (centro) e historial (abajo).
+            // Ninguna se traslapa aunque la frase ocupe tres líneas.
+            bodyRect.offsetMin = new Vector2(28f, 74f);
+            bodyRect.offsetMax = new Vector2(-28f, -48f);
 
             var shadow = bodyGo.AddComponent<Shadow>();
             shadow.effectColor = Theme.WithAlpha(Theme.Ink, 0.65f);
@@ -575,8 +587,8 @@ namespace CosTamarindo.UI
             var historyGo = new GameObject("History", typeof(RectTransform), typeof(TextMeshProUGUI));
             historyGo.transform.SetParent(bubbleGo.transform, false);
             historyText = historyGo.GetComponent<TextMeshProUGUI>();
-            historyText.fontSize = 21f;
-            historyText.color = Theme.WithAlpha(Theme.Sand, 0.62f);
+            historyText.fontSize = 20f;
+            historyText.color = Theme.DialogueHistory;
             historyText.alignment = TextAlignmentOptions.TopLeft;
             historyText.textWrappingMode = TextWrappingModes.Normal;
             historyText.overflowMode = TextOverflowModes.Ellipsis;
@@ -587,8 +599,8 @@ namespace CosTamarindo.UI
             historyRect.anchorMin = Vector2.zero;
             historyRect.anchorMax = new Vector2(1f, 0f);
             historyRect.pivot = new Vector2(0.5f, 0f);
-            historyRect.offsetMin = new Vector2(28f, 14f);
-            historyRect.offsetMax = new Vector2(-28f, 58f);
+            historyRect.offsetMin = new Vector2(28f, 16f);
+            historyRect.offsetMax = new Vector2(-28f, 68f);
         }
 
         private void CreateThoughtDots()
@@ -608,11 +620,11 @@ namespace CosTamarindo.UI
 
                 var dot = dotGo.GetComponent<Image>();
                 dot.sprite = circle;
-                dot.color = Theme.WithAlpha(Theme.Ink, 0.96f);
+                dot.color = Theme.DialogueDot;
                 dot.raycastTarget = false;
 
                 var outline = dotGo.AddComponent<Outline>();
-                outline.effectColor = Theme.WithAlpha(Theme.Gold, 0.45f);
+                outline.effectColor = Theme.WithAlpha(Theme.Gold, 0.32f);
                 outline.effectDistance = new Vector2(1.1f, -1.1f);
 
                 thoughtDots.Add(dot);

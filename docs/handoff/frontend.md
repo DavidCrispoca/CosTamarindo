@@ -19,7 +19,8 @@
 | Tipografías SDF | ✅ | `Assets/Art/Fonts/` |
 | Escena de login `/ Jugar` → `Game` | ✅ anónima; el PIN se pide solo al reclamar | `Assets/Scenes/Login.unity`, `UI/LoginController.cs` |
 | Build + Nginx + TLS | ✅ build Release 2026-11-24 (16,5 MB) verificado con `check.mjs`; regenerar si cambia Unity | `builds/webgl`, `infra/nginx/` |
-| Pensamiento del NPC | ✅ runtime anclado al sprite, “escribiendo…”, historial corto | `Assets/Scripts/UI/NpcDialogueController.cs` |
+| Pensamiento del NPC | ✅ runtime anclado al sprite, “escribiendo…”, historial de una línea por entrada, fondo translúcido | `Assets/Scripts/UI/NpcDialogueController.cs`, `Core/Theme.cs` |
+| Fin de partida | ✅ textos en franjas separadas; sin backend muestra “Sin conexión…” en tono neutro, no un error rojo | `Assets/Scripts/UI/OverlayController.cs`, `Assets/Editor/CosTamarindoSceneBuilder.cs` |
 | 15 pruebas PlayMode | ✅ 15/15 (2026-11-24) | `Assets/Tests/PlayMode/` |
 
 ---
@@ -41,7 +42,19 @@ Cómo quedó cerrado (`FE-01`…`FE-03`, detalle en [`../fases/F1.md`](../fases/
 
 Los otros 48 PNG siguen en `recolectables/` y `daninos/` como fuente, fuera del build.
 
-### 2.2 Integración con la API (`FE-07`) — ya desbloqueada
+### 2.2 Legibilidad del bocadillo y del fin de partida (2026-11-24)
+
+| Ajuste | Antes | Ahora |
+| :--- | :--- | :--- |
+| Fondo del bocadillo | `Ink` con alpha 0,94 (casi opaco, tapaba los ítems) | `Theme.DialogueBubble` = alpha **0,55**; contorno y puntos también más ligeros |
+| Frase e historial | 34/21 px con franjas que podían tocarse | 32/20 px, franjas separadas y una línea por entrada (máx. 52 caracteres) |
+| Panel de fin de partida | Título, score, récord, desglose, estado y botón con posiciones que se traslapaban | Seis franjas verticales con hueco dentro de la tarjeta de 760×700; desglose limitado a 3 líneas + “… y N tipos más” |
+| Sin conexión al terminar | “No se pudo conectar con el servidor.” en rojo | “Sin conexión: puntaje guardado en este dispositivo.” en tono neutro; sí se sigue mostrando un error si el servidor responde 4xx/5xx |
+
+Los textos se regeneran con `CosTamarindo.EditorTools.BuildScript.RebuildScenes`; no hace falta
+editar `Game.unity` a mano. El puntaje sigue guardándose en `PlayerPrefs` (`GameManager`).
+
+### 2.3 Integración con la API (`FE-07`) — ya desbloqueada
 
 El backend está en producción local. Contrato completo en [`../api.md`](../api.md). Flujo:
 
@@ -115,9 +128,9 @@ para “cuadrar”**: si un playtest real los supera, se ajusta el servidor con 
 | `Assets/Scripts/Core/GameManager.cs` | al terminar la partida, exponer `score`, `durationMs`, `catches` |
 | nuevo `Assets/Scripts/Net/ApiClient.cs` | cliente HTTP con token en memoria |
 | nuevo `Assets/Scripts/Net/ScoreSigner.cs` | firma HMAC (arriba) |
-| `OverlayController` | botón “Enviar puntaje” y estado de error |
+| `OverlayController` | ✅ envío automático al terminar, estado de error y modo offline neutral |
 
-### 2.3 Resto del backlog
+### 2.4 Resto del backlog
 
 | Tarea | Qué falta |
 | :--- | :--- |

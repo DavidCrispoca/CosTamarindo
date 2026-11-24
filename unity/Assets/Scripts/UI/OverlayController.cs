@@ -129,13 +129,18 @@ namespace CosTamarindo.UI
             var api = EnsureApiClient();
             if (api == null)
             {
-                SetSubmitStatus("No hay conexión configurada.", ErrorColor);
+                SetOfflineScoreStatus();
                 yield break;
             }
 
             ApiResult<SessionStartResponse> sessionRes = null;
             yield return api.StartSession(r => sessionRes = r);
-            if (sessionRes == null || !sessionRes.Ok || sessionRes.Data == null)
+            if (IsOffline(sessionRes))
+            {
+                SetOfflineScoreStatus();
+                yield break;
+            }
+            if (!sessionRes.Ok || sessionRes.Data == null)
             {
                 SetSubmitStatus(MessageForError(sessionRes, "No se pudo iniciar la sesión."), ErrorColor);
                 yield break;
@@ -162,7 +167,12 @@ namespace CosTamarindo.UI
 
             ApiResult<ScoreResponse> scoreRes = null;
             yield return api.SubmitScore(req, r => scoreRes = r);
-            if (scoreRes == null || !scoreRes.Ok || scoreRes.Data == null)
+            if (IsOffline(scoreRes))
+            {
+                SetOfflineScoreStatus();
+                yield break;
+            }
+            if (!scoreRes.Ok || scoreRes.Data == null)
             {
                 SetSubmitStatus(MessageForError(scoreRes, "No se pudo enviar el puntaje."), ErrorColor);
                 yield break;
@@ -205,7 +215,7 @@ namespace CosTamarindo.UI
             var api = EnsureApiClient();
             if (api == null)
             {
-                SetClaimStatus("No hay conexión configurada.", ErrorColor);
+                SetClaimStatus("Sin conexión: intentá reclamar más tarde.", InfoColor);
                 claimBusy = false;
                 if (claimButton != null) claimButton.interactable = true;
                 yield break;
@@ -221,7 +231,12 @@ namespace CosTamarindo.UI
             ApiResult<ClaimResponse> res = null;
             yield return api.Claim(req, r => res = r);
 
-            if (res != null && res.Ok && res.Data != null)
+            if (IsOffline(res))
+            {
+                SetClaimStatus("Sin conexión: intentá reclamar más tarde.", InfoColor);
+                SetSubmitStatus("Sin conexión: el nombre no se pudo registrar.", InfoColor);
+            }
+            else if (res != null && res.Ok && res.Data != null)
             {
                 claimed = true;
                 string rank = res.Data.rank_position > 0 ? (" · Puesto #" + res.Data.rank_position) : string.Empty;
@@ -248,14 +263,25 @@ namespace CosTamarindo.UI
 
         private static string BuildBreakdown(IReadOnlyDictionary<string, int> counts)
         {
-            var sb = new StringBuilder(256);
+            var captured = new List<KeyValuePair<ItemDef, int>>();
             foreach (var def in ItemCatalog.All)
             {
                 counts.TryGetValue(def.Id, out int n);
-                if (n == 0) continue;
-                sb.Append(def.DisplayName).Append("  x").Append(n).Append('\n');
+                if (n > 0) captured.Add(new KeyValuePair<ItemDef, int>(def, n));
             }
-            return sb.Length == 0 ? "Sin capturas" : sb.ToString().TrimEnd();
+            if (captured.Count == 0) return "Sin capturas";
+
+            // Como máximo tres líneas: el desglose vive en una franja de 120 px
+            // y no debe invadir el estado de envío ni el botón de reintentar.
+            captured.Sort((a, b) => b.Value.CompareTo(a.Value));
+            var sb = new StringBuilder(160);
+            const int maxLines = 3;
+            int shown = Math.Min(maxLines, captured.Count);
+            for (int i = 0; i < shown; i++)
+                sb.Append(captured[i].Key.DisplayName).Append("  x").Append(captured[i].Value).Append('\n');
+            if (captured.Count > shown)
+                sb.Append("… y ").Append(captured.Count - shown).Append(" tipos más");
+            return sb.ToString().TrimEnd();
         }
 
         private void WireButton(string objectName, UnityEngine.Events.UnityAction action)
@@ -307,6 +333,19 @@ namespace CosTamarindo.UI
             if (claimStatusText == null) return;
             claimStatusText.text = msg ?? string.Empty;
             claimStatusText.color = color;
+        }
+
+        /// <summary>
+        /// Sin backend no hay nada que reclamar: es un estado normal del juego
+        /// offline, no un error. El récord ya quedó en PlayerPrefs (GameManager).
+        /// </summary>
+        private static bool IsOffline<T>(ApiResult<T> res) where T : class =>
+            res == null || res.ErrorCode == "network_error" || res.HttpStatus <= 0;
+
+        private void SetOfflineScoreStatus()
+        {
+            SetSubmitStatus("Sin conexión: puntaje guardado en este dispositivo.", InfoColor);
+            ShowClaimUI(false);
         }
 
         private static string MessageForError<T>(ApiResult<T> res, string fallback) where T : class

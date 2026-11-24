@@ -151,8 +151,13 @@ de negocio. El cliente **nunca es fuente de verdad** (A.8.9): solo presenta.
 | Tokens (17 colores, 5 estilos) | ✅ `Theme.cs`, sin colores de paleta sueltos |
 | Build WebGL | ✅ rebuild Release del 2026-11-24 con el arte curado: 16,5 MB y 0 errores de consola |
 | Nginx + TLS + CSP | ✅ operativo |
-| Leaderboard y envío de puntaje | ✅ cliente `ApiClient` + panel top-5/claim; validación real pendiente de claves |
-| Bocadillo del NPC | ✅ pensamiento anclado, “escribiendo…”, historial corto y fallback |
+| Leaderboard y envío de puntaje | ✅ cliente `ApiClient` + panel top-5/claim; sin backend muestra estado offline neutral, no un error rojo; validación real pendiente de claves |
+| Bocadillo del NPC | ✅ fondo translúcido (alpha 0,55) que deja ver los ítems, “escribiendo…”, historial de una línea por entrada y fallback |
+
+> **Ajuste de legibilidad (2026-11-24, segunda pasada).** El panel de fin de partida usa
+> franjas verticales separadas (título, score, récord, desglose de ≤ 3 líneas, estado de red,
+> reclamo y botón) para que ningún texto se monte sobre otro; el bocadillo baja su alpha de
+> 0,94 a 0,55 y separa nombre, frase e historial. `Theme` concentra los tres tokens nuevos.
 
 ### 4.2 Backlog
 

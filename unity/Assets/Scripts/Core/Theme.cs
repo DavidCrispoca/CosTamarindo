@@ -69,6 +69,18 @@ namespace CosTamarindo.Core
         /// <summary>Placeholder de un campo de texto.</summary>
         public static Color Placeholder => WithAlpha(Ink, 0.45f);
 
+        /// <summary>
+        /// Fondo del bocadillo de la Palenquera: translúcido a propósito para que
+        /// se vean los ítems que caen detrás mientras lee el comentario.
+        /// </summary>
+        public static Color DialogueBubble => WithAlpha(Ink, 0.55f);
+
+        /// <summary>Historial del bocadillo, reforzado sobre el fondo translúcido.</summary>
+        public static Color DialogueHistory => WithAlpha(Cream, 0.82f);
+
+        /// <summary>Puntos de pensamiento, más ligeros que el bocadillo.</summary>
+        public static Color DialogueDot => WithAlpha(Ink, 0.72f);
+
         /// <summary>Devuelve el mismo color con otra transparencia.</summary>
         public static Color WithAlpha(Color color, float alpha)
         {

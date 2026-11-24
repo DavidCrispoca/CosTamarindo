@@ -210,18 +210,25 @@ namespace CosTamarindo.EditorTools
             CreateButton(pauseContent, "RestartButton", "Reiniciar", 46f, new Vector2(420f, 96f), new Vector2(0f, -100f), bodyFont);
 
             // ── Fin de partida ──
+            // La tarjeta mide 760×700 (-350..350). Cada elemento ocupa su propia
+            // franja vertical con hueco, para que ningún texto se monte sobre otro
+            // cuando el desglose o el estado de la red cambian de longitud.
             var gameOverPanel = CreateOverlayPanel(root, "GameOverPanel", out var overContent);
-            CreateText(overContent, "Title", "¡Se acabó la pesca!", 76f, TextAlignmentOptions.Center, displayFont);
-            var finalScore = CreateText(overContent, "FinalScore", "0", 120f, TextAlignmentOptions.Center, displayFont);
-            finalScore.rectTransform.anchoredPosition = new Vector2(0f, 70f);
-            var finalBest = CreateText(overContent, "FinalBest", "Récord 0", 40f, TextAlignmentOptions.Center, bodyFont);
-            finalBest.rectTransform.anchoredPosition = new Vector2(0f, -10f);
-            var breakdown = CreateText(overContent, "Breakdown", "", 30f, TextAlignmentOptions.Center, bodyFont);
-            breakdown.rectTransform.anchoredPosition = new Vector2(0f, -80f);
 
-            var submitStatus = CreateText(overContent, "SubmitStatus", "", 32f, TextAlignmentOptions.Center, bodyFont);
-            submitStatus.rectTransform.anchoredPosition = new Vector2(0f, -150f);
-            submitStatus.rectTransform.sizeDelta = new Vector2(680f, 70f);
+            var overTitle = CreateText(overContent, "Title", "¡Se acabó la pesca!", 68f, TextAlignmentOptions.Center, displayFont);
+            PlaceText(overTitle, new Vector2(0f, 292f), new Vector2(640f, 72f));
+
+            var finalScore = CreateText(overContent, "FinalScore", "0", 104f, TextAlignmentOptions.Center, displayFont);
+            PlaceText(finalScore, new Vector2(0f, 198f), new Vector2(640f, 104f));
+
+            var finalBest = CreateText(overContent, "FinalBest", "Récord 0", 36f, TextAlignmentOptions.Center, bodyFont);
+            PlaceText(finalBest, new Vector2(0f, 118f), new Vector2(640f, 52f));
+
+            var breakdown = CreateText(overContent, "Breakdown", "", 24f, TextAlignmentOptions.Center, bodyFont);
+            PlaceText(breakdown, new Vector2(0f, 30f), new Vector2(640f, 120f));
+
+            var submitStatus = CreateText(overContent, "SubmitStatus", "", 26f, TextAlignmentOptions.Center, bodyFont);
+            PlaceText(submitStatus, new Vector2(0f, -70f), new Vector2(640f, 64f));
 
             // Reclamo top 5 (se activa en runtime si in_top5)
             var claimPanel = new GameObject("ClaimPanel", typeof(RectTransform));
@@ -230,20 +237,19 @@ namespace CosTamarindo.EditorTools
             claimRt.anchorMin = new Vector2(0.5f, 0.5f);
             claimRt.anchorMax = new Vector2(0.5f, 0.5f);
             claimRt.pivot = new Vector2(0.5f, 0.5f);
-            claimRt.anchoredPosition = new Vector2(0f, -230f);
-            claimRt.sizeDelta = new Vector2(680f, 220f);
+            claimRt.anchoredPosition = new Vector2(0f, -190f);
+            claimRt.sizeDelta = new Vector2(680f, 170f);
 
-            var claimUser = CreateInputField(claimPanel.transform, "ClaimUsernameInput", "Nombre público (3-16)", 30f,
-                new Vector2(320f, 64f), new Vector2(-170f, 40f), bodyFont, false, 16);
-            var claimPin = CreateInputField(claimPanel.transform, "ClaimPinInput", "PIN (4-6 dígitos)", 30f,
-                new Vector2(320f, 64f), new Vector2(170f, 40f), bodyFont, true, 6);
-            var claimBtn = CreateButton(claimPanel.transform, "ClaimButton", "Reclamar", 40f, new Vector2(320f, 72f), new Vector2(0f, -30f), bodyFont);
-            var claimStatus = CreateText(claimPanel.transform, "ClaimStatus", "", 28f, TextAlignmentOptions.Center, bodyFont);
-            claimStatus.rectTransform.anchoredPosition = new Vector2(0f, -88f);
-            claimStatus.rectTransform.sizeDelta = new Vector2(680f, 60f);
+            var claimUser = CreateInputField(claimPanel.transform, "ClaimUsernameInput", "Nombre público (3-16)", 26f,
+                new Vector2(300f, 56f), new Vector2(-160f, 44f), bodyFont, false, 16);
+            var claimPin = CreateInputField(claimPanel.transform, "ClaimPinInput", "PIN (4-6 dígitos)", 26f,
+                new Vector2(300f, 56f), new Vector2(160f, 44f), bodyFont, true, 6);
+            var claimBtn = CreateButton(claimPanel.transform, "ClaimButton", "Reclamar", 34f, new Vector2(280f, 52f), new Vector2(0f, -12f), bodyFont);
+            var claimStatus = CreateText(claimPanel.transform, "ClaimStatus", "", 22f, TextAlignmentOptions.Center, bodyFont);
+            PlaceText(claimStatus, new Vector2(0f, -62f), new Vector2(640f, 36f));
             claimPanel.SetActive(false);
 
-            CreateButton(overContent, "RetryButton", "Reintentar", 46f, new Vector2(420f, 96f), new Vector2(0f, -340f), bodyFont);
+            CreateButton(overContent, "RetryButton", "Reintentar", 42f, new Vector2(360f, 60f), new Vector2(0f, -315f), bodyFont);
 
             // ── Controladores de UI ──
             var hud = canvasGo.AddComponent<HudController>();
@@ -351,6 +357,16 @@ namespace CosTamarindo.EditorTools
             rt.pivot = new Vector2(0.5f, 0.5f);
             rt.sizeDelta = new Vector2(640f, 90f);
             return text;
+        }
+
+        /// <summary>Ubica un texto y evita que se desborde de su franja.</summary>
+        private static void PlaceText(TMP_Text text, Vector2 position, Vector2 size)
+        {
+            var rt = text.rectTransform;
+            rt.anchoredPosition = position;
+            rt.sizeDelta = size;
+            text.textWrappingMode = TextWrappingModes.Normal;
+            text.overflowMode = TextOverflowModes.Ellipsis;
         }
 
         private static Button CreateButton(Transform parent, string name, string label, float fontSize, Vector2 size, Vector2 position = default, TMP_FontAsset font = null)
