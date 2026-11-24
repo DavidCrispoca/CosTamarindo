@@ -1,15 +1,17 @@
 # Handoff — Alejandra (Frontend/Unity) · integrar el NPC y publicar el build WebGL
 
-> **Actualizado 2026-11-23:** `main` ya incluye el NPC y el panel de reclamo en `Game.unity`.
-> El flujo vigente es anónimo y `POST /api/dialog` acepta token **opcional**; el NPC funciona sin
-> JWT. Este documento sirve como contexto histórico de integración.
+> **Actualizado 2026-11-24:** este documento es **contexto histórico**. `main` ya incluye el NPC,
+> el panel de reclamo, `FE-10` (`Login → Game`) y el flujo anónimo; `POST /api/dialog` acepta token
+> **opcional**. El estado vigente está en [`frontend.md`](frontend.md) y las capturas actuales en
+> [`../../evidencias/F7/`](../../evidencias/F7/README.md).
 >
 > **Para el agente de Alejandra.** Contexto operativo para integrar F7 en la rama de Frontend.
 > No borrar arte ni tocar escenas/prefabs sin necesidad: el bocadillo se construye en runtime.
 >
-> **Rama de referencia:** `Yoann` (último commit; incluye los fixes de simulación).
+> **Rama de referencia:** `main` (`efe5d0a`); `Yoann` ya quedó integrada.
 > **Nodo IA:** `sg-ai` healthy con `qwen2.5:3b`; el backend real depende de Santiago.
-> **Estado F7:** cerrado en simulación WebGL; falta integrar/validar en la rama de Frontend.
+> **Estado F7:** cerrado en simulación WebGL y verificado en el build del 2026-11-24; falta
+> validar contra el backend real/Supabase.
 
 ---
 
@@ -131,16 +133,14 @@ volumen. Si el juego queda cargando, revisar que la CSP se haya regenerado y Ngi
 
 ### Build oficial actual
 
-El build oficial arranca en `Game` (FE-10 pendiente), así que **no pasa por Login**. Sin JWT
-real, el NPC usa el fallback local; sirve para validar la UI, no la IA real.
+**Histórico:** el build antiguo arrancaba en `Game` (FE-10 pendiente), por lo que no pasaba por
+`Login`. Ya no es así: `FE-10` está cerrado y `Login` es la escena 0. Sin backend real, el NPC usa
+el fallback local; sirve para validar la UI, no la IA real.
 
 ### Prueba con JWT real
 
-Para validar Ollama desde Unity hay dos opciones:
-
-1. Generar un build temporal con `Login` como escena inicial, iniciar sesión y luego restaurar el
-   build oficial.
-2. Implementar FE-10 (`Login` obligatorio → `Game`) en la rama de Frontend y probar allí.
+`FE-10` ya permitía probar `Login → Game` sin builds temporales. El flujo del jugador es anónimo:
+el token para `/api/dialog` es opcional y se obtiene del backend real cuando está desplegado.
 
 Pasos:
 
@@ -163,10 +163,10 @@ Si no hay JWT real, no habrá request a `/api/dialog`: eso es correcto, se usa e
 Para distinguir la IA real del fallback, revisar el log `dialog_ok` del backend con `latency_ms`
 y el `context`/`item` de la llamada.
 
-**Nota de la simulación:** en el build temporal con `Login` primero apareció un
-`ArgumentOutOfRangeException` en la consola durante la transición. No se reprodujo en el build
-oficial que arranca en `Game`. Revisarlo si FE-10 se implementa; puede ser un problema previo de
-la transición de escena, no del NPC.
+**Nota histórica de la simulación:** en el build temporal con `Login` primero apareció un
+`ArgumentOutOfRangeException` en la consola durante la transición. `FE-10` ya está implementado y
+el flujo `Login → Game` se verificó en WebGL sin ese error; si reaparece, es un problema de la
+transición de escena, no del NPC.
 
 ---
 
@@ -222,7 +222,7 @@ No commitear `builds/` (está ignorado) ni los `.meta` de arte si no son parte d
 | `dialog` 401 | token ausente/expirado | volver a login; no reutilizar tokens viejos |
 | `dialog` 422 en `game_over` | cliente viejo con `text` vacío | integrar el fix de `NpcDialogueController` |
 | `dialog` 429 | rate limit 10/min | esperar o usar otro usuario |
-| `ArgumentOutOfRangeException` al pasar de Login a Game | posible bug previo de la transición | revisar si FE-10 lo reproduce; no es del NPC |
+| `ArgumentOutOfRangeException` al pasar de Login a Game | bug histórico de la transición | `FE-10` verificado en WebGL; si reaparece, no es del NPC |
 
 Si el build se hace desde una copia temporal, recordar que el artefacto final debe corresponder
 a la rama de Frontend integrada, no a una copia con cambios locales.

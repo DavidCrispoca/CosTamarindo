@@ -2,7 +2,7 @@
 
 > **Para:** Santiago y su agente.
 > **Fecha:** 2026-11-23 · **Actualizado:** 2026-11-24 (respuesta local en §7).
-> **Rama verificada:** `Yoann` ya está integrada en `main`; último commit local `a376e07`
+> **Rama verificada:** `Yoann` ya está integrada en `main`; último commit local `efe5d0a`
 > (fast-forward previo `85a5205`; 64 tests de backend, 15/15 tests PlayMode).
 > **Objetivo:** desbloquear la validación real de F7/Supabase y usar el nodo Frontend para publicar
 > y probar el build de `main`.
@@ -247,7 +247,7 @@ y nada de eso se pegó en el repositorio.
 
 | Sección solicitada | Estado | Detalle / evidencia |
 | :--- | :--- | :--- |
-| §0 Contexto | ✅ actualizado | `Yoann` integrada en `main` (`a376e07`); 64/64 tests de backend y 15/15 PlayMode |
+| §0 Contexto | ✅ actualizado | `Yoann` integrada en `main` (`efe5d0a`); 64/64 tests de backend y 15/15 PlayMode |
 | §1 Datos de Supabase/JWT | ⛔ pendiente de Santiago | No hay claves ni proyecto confirmado; no se generaron valores falsos |
 | §1.2 Migraciones y `004` | ⛔ pendiente de Santiago | Sin acceso a Supabase; el repositorio solo contiene los `.sql` |
 | §1.3 Imagen y despliegue | ⛔ pendiente de Santiago | `costamarindo-backend:latest` sigue pendiente; Docker estaba apagado |
@@ -269,3 +269,15 @@ Las casillas sin marcar de §1–§4 siguen vigentes, en especial: proyecto **DE
 con `check_db.py` en verde, responsable de `costamarindo-backend:latest`, ruta/comando de
 publicación del build y la URL real del juego. Con eso se puede repetir la medición con
 Nginx/TLS y generar las evidencias F7 contra el backend real.
+
+### 7.3 Publicación web e ISO/IEC 27001:2022
+
+- **Web:** el build WebGL se compila y mide en local, pero **no hay URL pública**. Para compartir
+  rápido alcanza una demo estática (por ejemplo itch.io, sin ranking online); para la versión
+  completa hace falta el VPS con Docker + Nginx + HTTPS descrito en §2. El navegador debe hablar
+  siempre a `/api/` del mismo origen; los secretos quedan solo en el backend.
+- **ISO:** la SoA (93 controles) y A.8.25 están cerrados; A.8.15, A.8.20 y A.8.24 son parciales y
+  faltan seis controles (A.8.5, A.8.9, A.8.12, A.8.19, A.8.28, A.8.31) con sus evidencias de
+  ataque. Parte de ese cierre depende de lo que se pide aquí: sin backend no se pueden atacar
+  A.8.5/A.8.24/A.8.28, sin publicación ni hashes no se pueden cerrar A.8.12 y A.8.19, y A.8.31
+  necesita un proyecto PROD. Detalle en [`security.md`](security.md) §5 y `Plan.md` §7.

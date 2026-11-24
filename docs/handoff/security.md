@@ -3,9 +3,10 @@
 > **División:** Security · **Nodo:** `Sg-Security`
 > **Backlog:** `Plan.md` §7 (`SEC-01`…`SEC-14`)
 > **Evidencia existente:** [`../../evidencias/`](../../evidencias/)
-> **Estado:** A.8.25 completo; A.8.15, A.8.20 y A.8.24 con evidencia parcial. La API tiene
-> código y tests, pero el backend no arranca hasta cargar las claves de Supabase/JWT; el
-> build WebGL no está presente en este clon.
+> **Estado 2026-11-24:** A.8.25 y SoA (93 controles) completos; A.8.15, A.8.20 y A.8.24 con
+> evidencia parcial; seis controles siguen abiertos. La API tiene 64/64 tests, pero el backend no
+> arranca hasta cargar las claves de Supabase/JWT. El build WebGL sí se regeneró y se midió en
+> local (`builds/`, no versionado ni publicado aún). Ver `Plan.md` §7 para el estado de verdad.
 
 ---
 
@@ -20,15 +21,15 @@ Todo lo que sigue funciona **ahora**, con el entorno levantado:
 | Puntaje | `/api/session/start` + `/api/score` | 🚧 HMAC, nonce, TTL y tests; falta ataque real |
 | Diálogo | `/api/dialog` | ✅ saneo, rate limit, Ollama y fallback; inyección bloqueada |
 | Base | PostgREST (`/rest/v1/`) | ✅ cerrado: `anon` recibe 401 |
-| Frontend | build WebGL | ✅ Nginx y TLS operativos; build generado y sirviendo en `https://juego.local/` |
+| Frontend | build WebGL | ✅ Nginx y TLS operativos; build Release del 2026-11-24 verificado en local y sirviendo en `https://juego.local/`; sin URL pública |
 
 Lo que **todavía no** se puede atacar y por qué:
 
 | Control | Bloqueo |
 | :--- | :--- |
-| A.8.9 (editar IndexedDB) | depende de `FE-07`: hoy el cliente no envía puntajes |
-| A.8.12 (consola y `strings`) | depende del build final (`FE-12`) |
-| A.8.19 (reemplazar `.wasm`) | depende de `FE-12` y de `SHA256SUMS` |
+| A.8.9 (editar `PlayerPrefs`/IndexedDB) | `FE-07` ya envía puntajes, pero el backend real no está desplegado: hoy solo se puede atacar el récord local |
+| A.8.12 (consola y `strings`) | `FE-12` ya está cerrado; falta ejecutar el ataque sobre el build publicado |
+| A.8.19 (reemplazar `.wasm`) | `FE-12` ya está cerrado; falta `SHA256SUMS` firmado y verificación en despliegue |
 | A.8.15 (Wazuh) | Wazuh está activo y `100250` dispara; falta `backend.log` y la alerta FIM por archivo |
 
 ---
@@ -37,16 +38,16 @@ Lo que **todavía no** se puede atacar y por qué:
 
 | # | Control | Implementación | Evidencia | Falta |
 | :--- | :--- | :--- | :--- | :--- |
-| 1 | **A.8.24** Criptografía | HMAC-SHA256 + nonce + TTL + TLS local mkcert | 🚧 | ataque con Burp y captura de `bad_signature`; cifrado en reposo |
-| 2 | **A.8.5** Autenticación | Supabase Auth + bloqueo 5/60 s + PIN débil rechazado | ⬜ | fuerza bruta, JWT manipulado, captura del 423 |
-| 3 | **A.8.9** Configuración | servidor autoritativo; cliente no escribe | ⬜ | edición de IndexedDB (tras `FE-07`) |
-| 4 | **A.8.20** Redes | 5 redes Docker, un solo puerto público | 🚧 | `nmap` host+VM hecho; falta contenedor |
-| 5 | **A.8.12** DLP | sin secretos en cliente; IP enmascarada en logs | ⬜ | consola + `strings` del build |
-| 6 | **A.8.15** Logging | JSON a stdout con `request_id` | 🚧 | Wazuh activo, `100250` (36); falta `backend.log` y alerta FIM |
-| 7 | **A.8.28** Codificación segura | Pydantic, SQL parametrizado, saneo, RLS | ⬜ | SQLi, XSS/rich text, prompt injection |
+| 1 | **A.8.24** Criptografía | HMAC-SHA256 + nonce + TTL + TLS local mkcert, HSTS y CSP | 🟡 | ataque con Burp y captura de `bad_signature`; cifrado en reposo y gestión de claves |
+| 2 | **A.8.5** Autenticación | Supabase Auth + bloqueo 5/60 s + PIN débil rechazado (flujo anónimo + claim) | ⬜ | fuerza bruta, JWT manipulado, captura del 423; backend sin claves |
+| 3 | **A.8.9** Configuración | servidor autoritativo; el cliente solo presenta | ⬜ | editar `PlayerPrefs` contra backend real (sin desplegar) |
+| 4 | **A.8.20** Redes | 5 redes Docker, un solo puerto público | 🟡 | `nmap` host+VM hecho; falta prueba desde otro contenedor |
+| 5 | **A.8.12** DLP | sin secretos en cliente; IP enmascarada en logs | ⬜ | consola + `strings` del build ya generado |
+| 6 | **A.8.15** Logging | JSON a stdout con `request_id` | 🟡 | Wazuh activo, `100250` (36); falta `backend.log` y alerta FIM por archivo |
+| 7 | **A.8.28** Codificación segura | Pydantic, SQL parametrizado, saneo, RLS | ⬜ | SQLi, XSS/rich text, prompt injection contra backend real |
 | 8 | **A.8.31** Separación | guard `assert_environment` + claim `env` | ⬜ | token DEV contra PROD (necesita PROD) |
-| 9 | **A.8.25** SDLC | Gitleaks + hook + historial | ✅ | CI en `.github/workflows/security.yml` |
-| 10 | **A.8.19** Instalación | — | ⬜ | `SHA256SUMS` + GPG + FIM |
+| 9 | **A.8.25** SDLC | Gitleaks + hook + historial (84 commits, 0 hallazgos) | ✅ | CI creada en `.github/workflows/security.yml`; falta ejecución remota |
+| 10 | **A.8.19** Instalación | build WebGL generado y medido | ⬜ | `SHA256SUMS` + GPG y verificación en despliegue |
 
 **Nivel 2 ya cubierto sin querer:** A.8.13 (copia de seguridad) tiene evidencia real en
 [`../../evidencias/F4/`](../../evidencias/F4/README.md) §5: `pg_dump`, hash y restauración
@@ -240,22 +241,25 @@ el hook parecía funcionar y dejaba pasar los commits por un problema de `PATH`.
 
 ## 5. Pendientes concretos
 
-| ID | Tarea | Depende de |
+| ID | Tarea | Estado / dependencia |
 | :--- | :--- | :--- |
-| `SEC-01` | Plantilla de evidencia y scripts en `evidencias/ataques/` | — |
-| `SEC-02` | `docs/soa.md` + matriz de riesgos (93 controles) | — |
-| `SEC-03` | A.8.24: Burp + replay + TLS | API ✅ |
-| `SEC-04` | A.8.5: fuerza bruta + JWT | API ✅ |
-| `SEC-05` | A.8.9: IndexedDB | `FE-07` |
-| `SEC-06` | A.8.20: `nmap` host y contenedor | `nmap` instalado |
-| `SEC-07` | A.8.12: consola + `strings` | `FE-12` |
-| `SEC-08` | A.8.15: Wazuh + reglas + FIM | perfil `security` |
-| `SEC-09` | A.8.28: SQLi, XSS, prompt injection | API ✅ |
-| `SEC-10` | A.8.31: DEV contra PROD | proyecto PROD |
-| `SEC-11` | A.8.19: `SHA256SUMS` + GPG + FIM | `FE-12` |
-| `SEC-12` | SonarQube + `pip-audit`/`npm audit` | instalar Sonar |
-| `SEC-13` | CI en GitHub Actions (Gitleaks + tests) | — |
-| `SEC-14` | Quitar `com.coplaydev.unity-mcp` del `manifest.json` | coordinar con Frontend |
+| `SEC-01` | Plantilla de evidencia y scripts en `evidencias/ataques/` | ✅ cerrado |
+| `SEC-02` | `docs/soa.md` + matriz de riesgos (93 controles) | ✅ cerrado |
+| `SEC-03` | A.8.24: Burp + replay + TLS | ⬜ TLS verificado; falta ataque real y cifrado en reposo |
+| `SEC-04` | A.8.5: fuerza bruta + JWT | ⬜ backend con claves de Supabase/JWT |
+| `SEC-05` | A.8.9: `PlayerPrefs`/IndexedDB | ⬜ `FE-07` listo; falta backend desplegado |
+| `SEC-06` | A.8.20: `nmap` host y contenedor | 🟡 host+VM hechos; falta prueba desde otro contenedor |
+| `SEC-07` | A.8.12: consola + `strings` | ⬜ `FE-12` listo; falta ejecutar sobre build publicado |
+| `SEC-08` | A.8.15: Wazuh + reglas + FIM | 🟡 Wazuh y reglas activos; falta `backend.log` y alerta FIM |
+| `SEC-09` | A.8.28: SQLi, XSS, prompt injection | ⬜ backend real (diálogo ya validado en simulación) |
+| `SEC-10` | A.8.31: DEV contra PROD | ⬜ proyecto PROD |
+| `SEC-11` | A.8.19: `SHA256SUMS` + GPG + FIM | ⬜ `FE-12` listo; faltan hash firmado y verificación en despliegue |
+| `SEC-12` | `pip-audit`/`npm audit` | ✅ cerrado (`npm audit` y SonarQube diferidos) |
+| `SEC-13` | CI en GitHub Actions (Gitleaks + tests) | ✅ creada; falta primera ejecución remota |
+| `SEC-14` | Quitar `com.coplaydev.unity-mcp` del `manifest.json` | ✅ cerrado con `FE-14` |
+
+`FE-12`, `FE-13` y `FE-14` ya están cerrados, así que los ataques de `SEC-07` y `SEC-11`
+ya no esperan al build: esperan a que se publique y a que exista una cadena de hashes.
 
 ---
 
@@ -266,11 +270,11 @@ el hook parecía funcionar y dejaba pasar los commits por un problema de `PATH`.
 | El PIN de 4 dígitos es de baja entropía | Media | mitigado con bloqueo 5/60 s, rechazo de PIN débiles y derivación con `PIN_PEPPER`; `password_hibp_enabled` está **desactivado a propósito** (HIBP rechazaría PINs comunes y el control real es el bloqueo) |
 | El HMAC no impide trampas de un cliente comprometido (H1) | Alta | asumido y compensado con plausibilidad, TTL, nonce y un envío por sesión |
 | Rate limit del diálogo en memoria | Baja | suficiente con una instancia; si se escala, mover a base/Redis |
-| `com.coplaydev.unity-mcp` en `Packages/manifest.json` | Media | dependencia Git de agente dentro del proyecto; `SEC-14` |
-| `preloadedAssets` vaciado en `ProjectSettings.asset` | Baja | sin verificar; `FE-13` |
-| Wazuh apagado y sin reglas | Media | `SEC-08` |
-| Sin CI | Media | `SEC-13` |
-| Sin `SHA256SUMS` | Alta | `SEC-11` |
+| `com.coplaydev.unity-mcp` en `Packages/manifest.json` | Media | ✅ resuelto el 2026-11-24 con `FE-14`/`SEC-14` |
+| `preloadedAssets` vaciado en `ProjectSettings.asset` | Baja | ✅ verificado en WebGL con `FE-13` |
+| Wazuh apagado y sin reglas | Media | 🟡 Wazuh y reglas activos; falta `backend.log` y alerta FIM (`SEC-08`) |
+| Sin CI | Media | ✅ CI creada (`SEC-13`); falta ejecución remota |
+| Sin `SHA256SUMS` | Alta | ⬜ pendiente (`SEC-11`); ya hay build sobre el que generarlo |
 
 ---
 

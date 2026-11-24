@@ -1,15 +1,15 @@
 # Handoff — Santiago (Backend/Supabase) · cierre real de F7
 
-> **Actualizado 2026-11-23:** este documento es **contexto histórico**. `main` ya integró el
-> flujo anónimo de sesión/puntaje, `/api/claim` y la migración `004_anonymous_claim.sql`; los
-> tests vigentes son **64**, no 53, y `/api/dialog` ya no exige JWT. Para pedir las claves,
-> migraciones, evidencias y accesos del nodo Frontend, usar
-> [`solicitud-datos-santiago.md`](solicitud-datos-santiago.md).
+> **Actualizado 2026-11-24:** este documento es **contexto histórico**. `main` (`efe5d0a`) ya
+> integró el flujo anónimo de sesión/puntaje, `/api/claim` y la migración
+> `004_anonymous_claim.sql`; los tests vigentes son **64/64**, no 53, y `/api/dialog` ya no exige
+> JWT. `FE-10` (`Login → Game`) también está cerrado. Para pedir claves, migraciones y accesos,
+> usar [`solicitud-datos-santiago.md`](solicitud-datos-santiago.md) (§7 registra lo entregado en local).
 >
 > **Para el agente de Santiago.** Contexto operativo, no una orden de cambios destructivos. Si
 > hay que borrar datos, rotar claves o recrear volúmenes, pedir confirmación primero.
 >
-> **Rama de referencia:** `Yoann` (último commit de la rama; incluye los fixes de simulación).
+> **Rama de referencia:** `main`; `Yoann` ya quedó integrada.
 > **Nodo IA:** `sg-ai` healthy, `qwen2.5:3b`, red `costamarindo-ai` interna, sin puerto publicado.
 > **Objetivo:** que el backend real arranque con Supabase, emita JWT reales y que
 > `POST /api/dialog` funcione desde el juego sin el backend temporal.
@@ -24,7 +24,7 @@
 | `POST /api/dialog` | ✅ contrato, guardrails, rate limit, fallback |
 | Cliente Ollama | ✅ `backend/app/providers/ollama.py` |
 | Prompt de la Palenquera | ✅ `backend/app/ai/prompts.py` |
-| Tests del diálogo | ✅ 53 tests en verde |
+| Tests del diálogo | ✅ 64/64 tests en verde (53 en la medición histórica) |
 | Fallback con Ollama apagado | ✅ 797/758/757 ms |
 | Unity/NPC | ✅ compila, build WebGL y captura con Ollama real en simulación |
 | Simulación E2E | ✅ `sg-backend-sim` (código real + memoria) y `evidencias/F7/10-webgl-simulacion.txt` |
@@ -184,13 +184,10 @@ confirmación contra la base real.
 
 ## 5. E2E con Unity/WebGL
 
-El build oficial ya está generado y servido en `https://juego.local/`. Ojo: por ahora el build
-arranca en `Game` (FE-10 pendiente), así que **no fuerza login**. Para probar el JWT real desde
-Unity hay dos opciones:
-
-1. Generar un build temporal con `Login` como escena inicial (solo para la prueba) y luego
-   restaurar el build oficial.
-2. Esperar a que Alejandra implemente FE-10 (`Login` obligatorio → `Game`).
+El build Release del 2026-11-24 está generado y servido en `https://juego.local/`. **Histórico:**
+el build antiguo arrancaba en `Game` (FE-10 pendiente) y no forzaba login. Ya no es así: `FE-10`
+está cerrado, `Login` es la escena 0 y encadena con `Game`. El flujo es anónimo y el token para
+`/api/dialog` es opcional; para probar la IA real hace falta que el backend esté desplegado.
 
 Pasos:
 

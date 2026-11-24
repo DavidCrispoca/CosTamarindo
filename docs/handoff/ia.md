@@ -4,8 +4,9 @@
 > **Backlog:** `Plan.md` §8 (`IA-01`…`IA-07`)
 > **Fases:** [`../fases/F7-ia.md`](../fases/F7-ia.md) (F7.0–F7.5)
 > **Contrato:** [`../api.md`](../api.md) §4 · **Código:** `backend/app/ai/`, `backend/app/providers/ollama.py`
-> **Estado:** ✅ nodo operativo, bocadillo de Unity probado en WebGL con Ollama real y fallback.
-> El backend completo sigue bloqueado por las claves de Supabase/JWT.
+> **Estado 2026-11-24:** ✅ nodo operativo, bocadillo de Unity probado en WebGL con Ollama real y
+> fallback; UI actualizada (globo translúcido y textos sin solape, `F7/14` y `F7/15`). El backend
+> completo sigue bloqueado por las claves de Supabase/JWT.
 
 ---
 
@@ -27,7 +28,7 @@
 | Logs | ✅ `dialog_blocked`, `dialog_fallback`, `dialog_ok` | mismo módulo |
 | UI Unity | ✅ `NpcDialogueController` crea el pensamiento anclado al sprite en runtime y se engancha a `sceneLoaded` | `unity/Assets/Scripts/UI/` |
 | Auth Unity | ✅ intenta backend y cae a local si no está desplegado | `unity/Assets/Scripts/Auth/AuthStub.cs` |
-| Evidencia | ✅ `evidencias/F7/01`–`12` y `README.md` | `evidencias/F7/` |
+| Evidencia | ✅ `evidencias/F7/01`–`15` y `README.md`; §13 responde a Santiago | `evidencias/F7/` |
 
 > **Readiness 2026-11-13.** Para volver a levantar el nodo:
 >
@@ -69,9 +70,9 @@ para no depender de Supabase. Ver `evidencias/F7/03-endpoint-real.txt`.
 `Login` (hook en `SceneManager.sceneLoaded`). Los scripts compilaron en batchmode con Unity
 6000.3.27f1 (exit 0, sin `error CS`; ver `evidencias/F7/06-unity-compile.txt`). Para verlo:
 
-1. El build WebGL está generado en `builds/webgl` y servido por Nginx.
-2. El build oficial arranca en `Game`; para probar login real hay que usar un build temporal con
-   `Login` primero o implementar FE-10.
+1. El build WebGL Release está generado en `builds/webgl` (no versionado) y servido por Nginx.
+2. `FE-10` ya está cerrado: `Login` es la escena 0 y encadena con `Game`; el jugador entra de forma
+   anónima y el token para `/api/dialog` es opcional.
 3. Jugar y esperar una captura; el comentario aparece con 35 % de probabilidad y 9 s de
    enfriamiento. El `game_over` siempre dispara el pensamiento final.
 
@@ -175,8 +176,11 @@ con Ollama apagado el juego responde en **< 1 s** sin dejar de ser jugable.
 | `IA-03` | ✅ guardrails y delimitadores | `backend/tests/test_dialog.py` |
 | `IA-04` | ✅ timeout, semáforo y rate limit | `backend/app/providers/ollama.py` |
 | `IA-05` | ✅ fallback por contexto/ítem | `dialog_service.py` |
-| `IA-06` | ✅ 53 tests + smoke real | `evidencias/F7/04-tests.txt` |
+| `IA-06` | ✅ 64/64 tests + smoke real | `evidencias/F7/04-tests.txt` (archivo histórico: 53 tests) y `Plan.md` §3 |
 | `IA-07` | ✅ test de no escritura + captura visual con Ollama real | `test_dialog.py`, `evidencias/F7/07` y `08` |
 
-`FE-09` (bocadillo en Unity) está implementado y probado en WebGL. Quedan para Frontend el
-estado “escribiendo…”, el historial corto y la integración en su rama.
+`FE-09` está implementado y probado en WebGL: “escribiendo…”, historial de una línea por entrada,
+fallback visible y fondo translúcido (alpha 0,55). Las capturas del estado actual son
+`evidencias/F7/11-webgl-pensamiento.png`, `12-webgl-pensamiento-game-over.png`,
+`14-webgl-bocadillo-translucido.png` y `15-webgl-game-over-legible.png`. Lo único que queda es la
+validación contra el backend real/Supabase.

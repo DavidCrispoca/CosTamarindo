@@ -56,26 +56,32 @@ editar `Game.unity` a mano. El puntaje sigue guardándose en `PlayerPrefs` (`Gam
 
 ### 2.3 Integración con la API (`FE-07`) — ya desbloqueada
 
-El backend está en producción local. Contrato completo en [`../api.md`](../api.md). Flujo:
+El contrato vigente es **anónimo**: se juega sin login y solo se pide nombre + PIN si el
+puntaje entra al top 5. Detalle completo en [`../api.md`](../api.md) §2–§3. Flujo:
 
 ```
-POST /api/auth/register  o  /api/auth/login     -> JWT + refresh
-POST /api/session/start                          -> session_id, nonce, session_key
+POST /api/session/start          -> session_id, nonce, session_key, best_score  (sin token)
    (jugar)
-POST /api/score                                  -> firma HMAC del resultado
-GET  /api/leaderboard                            -> top 5 + mi posición
+POST /api/score                  -> firma HMAC del resultado; responde in_top5  (sin token)
+GET  /api/leaderboard            -> top 5
+POST /api/claim                  -> nombre + PIN                                 (si in_top5)
+POST /api/dialog                 -> texto de la Palenquera                       (token opcional)
 ```
+
+`/api/auth/register`, `/login`, `/refresh` y `/logout` siguen disponibles por compatibilidad,
+pero **no** están en el camino del jugador.
 
 #### Reglas de integración
 
 | Regla | Detalle |
 | :--- | :--- |
-| Base URL | `https://juego.local/api` (mismo origen: no hay CORS en el juego) |
-| Token | **solo en memoria**. Nunca `PlayerPrefs` ni IndexedDB (A.8.9) |
-| `session_key` | solo en memoria durante la partida; no se persiste |
+| Base URL | `https://juego.local/api` en local (mismo origen: no hay CORS); en producción, la URL pública con `/api/` proxificado por Nginx |
+| Token | si se usa, **solo en memoria**. Nunca `PlayerPrefs` ni IndexedDB (A.8.9) |
+| `session_key` | solo en memoria durante la partida; no se persiste ni se envía al servidor |
 | Contenido | `Content-Type: application/json`, `UnityWebRequest` |
 | Errores | leer `code` del cuerpo; no mostrar detalles internos al jugador |
-| Timeout | 10 s para auth, 10 s para score, 25 s para diálogo |
+| Timeout | 10 s para sesión/score, 10 s para claim, 25 s para diálogo |
+| Sin backend | no es un error de juego: el récord se guarda en `PlayerPrefs` y se muestra «Sin conexión: puntaje guardado en este dispositivo.» |
 
 #### Firma del puntaje
 
@@ -111,24 +117,24 @@ para “cuadrar”**: si un playtest real los supera, se ajusta el servidor con 
 
 | `code` | Qué mostrar |
 | :--- | :--- |
-| `invalid_credentials` | “Usuario o PIN incorrectos” |
-| `account_locked` | “Cuenta bloqueada”, cuenta atrás con `Retry-After` |
-| `weak_pin` | “Elegí otro PIN” |
-| `username_taken` | “Ese usuario ya existe” |
-| `invalid_token` | volver a login |
+| `bad_session` / `bad_nonce` / `bad_signature` | no reenviar; registrar en consola |
 | `session_used` / `session_expired` | no reenviar; mostrar el resultado local |
 | `implausible_score` | registrar en consola y no reintentar |
+| `bad_session` / `not_top5` en `/api/claim` | no se puede reclamar ese puntaje; cerrar el panel |
+| `invalid_credentials` / `account_locked` | en `/api/claim`: PIN incorrecto o cuenta bloqueada; respetar `Retry-After` |
+| `weak_pin` / `username_taken` | “Elegí otro PIN” / “Ese usuario ya existe” |
 | `database_unavailable` / `upstream_error` | “Servicio no disponible, intentá de nuevo” |
+| red caída / HTTP 404 en local | estado offline neutral; el puntaje ya quedó en el dispositivo |
 
 #### Dónde engancharlo
 
 | Archivo | Cambio |
 | :--- | :--- |
-| `Assets/Scripts/Auth/AuthStub.cs` | ✅ ya llama a `/api/auth/login` y `/api/auth/register`; cae a local si el backend no está desplegado. **La UI no se toca** |
-| `Assets/Scripts/Core/GameManager.cs` | al terminar la partida, exponer `score`, `durationMs`, `catches` |
-| nuevo `Assets/Scripts/Net/ApiClient.cs` | cliente HTTP con token en memoria |
-| nuevo `Assets/Scripts/Net/ScoreSigner.cs` | firma HMAC (arriba) |
-| `OverlayController` | ✅ envío automático al terminar, estado de error y modo offline neutral |
+| `Assets/Scripts/Auth/AuthStub.cs` | endpoints de login/registro solo por compatibilidad; el flujo del jugador ya no los usa |
+| `Assets/Scripts/Core/GameManager.cs` | ✅ expone `score`, `durationMs` y `catches` al terminar la partida |
+| `Assets/Scripts/Net/ApiClient.cs` | ✅ cliente HTTP de session/score/claim/leaderboard/dialog; token opcional en memoria |
+| `Assets/Scripts/Net/ScoreSigner.cs` | ✅ firma HMAC (arriba) |
+| `OverlayController` | ✅ envío automático al terminar, panel top-5/claim, estado de error y modo offline neutral |
 
 ### 2.4 Resto del backlog
 
