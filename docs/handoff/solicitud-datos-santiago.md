@@ -167,7 +167,7 @@ Ahora que Santiago tiene el nodo Frontend, necesitamos saber cómo publicar y va
 
 ## 3. Decisiones de contrato que deben confirmarse
 
-`main` cambió el contrato respeto al handoff anterior. Necesitamos que Santiago confirme:
+`main` cambió el contrato respecto al handoff anterior. Necesitamos que Santiago confirme:
 
 - [ ] El flujo **anónimo** es el oficial: se juega sin login y solo se pide nombre + PIN si el
       puntaje entra al top-5.
