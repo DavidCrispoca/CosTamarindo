@@ -2,7 +2,7 @@
 
 > **Documento vivo y fuente de verdad del avance.** Todo lo que diga este archivo manda
 > sobre `Proceso.md` (bitácora interna, no versionada) y sobre cualquier nota de fase.
-> **Última verificación contra el repositorio:** 2026-11-06.
+> **Última verificación contra el repositorio:** 2026-11-24.
 > **Especificación de origen:** [`docs/CosTamarindo.md`](docs/CosTamarindo.md) (ISO/IEC 27001:2022).
 >
 > **Cómo se usa este documento.** El proyecto está partido en **cinco divisiones** que
@@ -59,7 +59,7 @@ terminado. Nada se da por hecho porque «funciona en el editor»: se verifica en
 
 ---
 
-## 3. Estado real verificado (2026-11-06)
+## 3. Estado real verificado (2026-11-24)
 
 ### 3.1 Estado por elemento
 
@@ -67,14 +67,14 @@ terminado. Nada se da por hecho porque «funciona en el editor»: se verifica en
 | :--- | :--- | :--- |
 | Unity Hub / Editor | `6000.3.27f1` (Unity 6.3 LTS), módulo WebGL | `unity/ProjectSettings/ProjectVersion.txt` |
 | Proyecto Unity | URP 2D 17.3.0, Input System 1.20.1, TMP, asmdefs separados | `unity/Packages/manifest.json` |
-| Escenas | `Game.unity` (índice 0), `Login.unity` (índice 1), `SampleScene` (índice 2, sobra) | `unity/ProjectSettings/EditorBuildSettings.asset` |
+| Escenas | `Login.unity` (índice 0), `Game.unity` (índice 1); `SampleScene` deshabilitada | `unity/ProjectSettings/EditorBuildSettings.asset` |
 | Gameplay offline | Completo: 3 vidas, 120 s, curva de dificultad, pausa, game over, Libro, feedback de captura, SFX sintetizado | `unity/Assets/Scripts/`, [`evidencias/F2/`](evidencias/F2/README.md) |
-| Tests PlayMode | **15/15** verdes (última corrida 2026-11-03; no re-ejecutados el 2026-11-06) | `unity/Assets/Tests/PlayMode/` |
+| Tests PlayMode | **15/15** verdes (re-ejecutados el 2026-11-24 tras integrar el arte curado y `Theme.cs`) | `unity/Assets/Tests/PlayMode/` |
 | Autenticación | ✅ real en el backend: usuario + PIN contra Supabase Auth, bloqueo 5 fallos → 60 s persistido, JWT propio de 30 min. `AuthStub` ya intenta el backend y cae a local solo si no está desplegado | `backend/app/services/auth_service.py`, `unity/Assets/Scripts/Auth/AuthStub.cs` |
 | Arte de personaje y fondo | Palenquera y `bg_playa.png` importados y en la escena | `unity/Assets/Art/Characters/`, `.../Backgrounds/` |
-| Arte de ítems | ⚠️ **Regresión real**: los 4 sprites originales se borraron y la escena quedó con 4 referencias rotas. Hay 60 PNG nuevos sin cablear | ver §3.2 |
-| UI de Figma | 0 componentes exportados; `unity/Assets/Art/UI/` está **vacío** | — |
-| Build WebGL | ✅ build de `main` generado localmente (17,7 MB) y servido en `https://juego.local/`; falta publicarlo en el nodo Frontend de Santiago | `builds/` (no versionado) |
+| Arte de ítems | ✅ 12 tipos curados con PNG real en `Assets/Art/Items/curated/` (Single, PPU 100, máx. 512); el `Id` coincide con el nombre del sprite | `unity/Assets/Art/Items/curated/`, `ItemCatalog.cs` |
+| UI de Figma | 🟡 Tokens centralizados en `Theme.cs` (17 colores, 5 estilos); 0/~30 componentes exportados; `Assets/Art/UI/` vacío | `unity/Assets/Scripts/Core/Theme.cs` |
+| Build WebGL | ✅ rebuild Release del 2026-11-24 con el arte curado: 17 archivos, 16,5 MB, `unityReady: true`, 1,2 s de carga y 0 errores de consola con `tools/dev-server/check.mjs`; falta publicarlo en el nodo de Santiago | `builds/` (no versionado) |
 | Nginx / Sg-Frontend | Operativo: 443 (8081 solo con override de dev), TLS local con mkcert, CSP por hash, HSTS, proxy `/api/` | `infra/nginx/`, [`docs/fases/F3.md`](docs/fases/F3.md) |
 | Docker | Compose de 5 nodos declarado y validado. `sg-frontend`, `sg-wazuh-agent` y `sg-ai` arriba; `sg-backend` no arranca sin claves | `infra/docker-compose.yml`, [`evidencias/F6/`](evidencias/F6/README.md) |
 | Modelo de IA | ✅ `qwen2.5:3b` descargado (1,9 GB); `Sg-AI` healthy, sin puerto publicado; NPC probado en WebGL | [`evidencias/F7/`](evidencias/F7/README.md) |
@@ -85,12 +85,18 @@ terminado. Nada se da por hecho porque «funciona en el editor»: se verifica en
 | Otros 9 controles ISO | 🟡 A.8.15/A.8.20/A.8.24 parciales; 6 sin implementar ni evidenciar | [`evidencias/`](evidencias/) |
 | CI | ✅ Gitleaks + tests + `pip-audit` + Compose; falta primera ejecución remota | [`.github/workflows/security.yml`](.github/workflows/security.yml) |
 | SoA / informe / `docs/api.md` | SoA ✅ (93 controles); `docs/api.md` ✅; informe final ⬜ | [`docs/soa.md`](docs/soa.md), [`docs/api.md`](docs/api.md) |
-| Remoto Git | `main` publicada; árbol de trabajo **sucio** (§3.2) | `git status` |
+| Remoto Git | `main` publicada; árbol de trabajo limpio tras el cierre del 2026-11-24 | `git status` |
 
 ### 3.2 Hallazgos que corrigen la documentación anterior
 
 Estos puntos estaban mal documentados o directamente no estaban documentados. Quedan aquí
 porque afectan a la planificación:
+
+> **Cierre 2026-11-24.** Los hallazgos **1–5 y 7 están resueltos**: se curaron 12 ítems en
+> `Assets/Art/Items/curated/` con nombres iguales al `Id`, se regeneró la escena, se centralizó
+> la paleta en `Theme.cs`, se quitó `com.coplaydev.unity-mcp` del manifest y se deshabilitó
+> `SampleScene`. El build final se rehizo ese mismo día (`FE-12`): 16,5 MB y medición limpia
+> con `tools/dev-server/check.mjs`.
 
 1. **Los 4 sprites de ítems con arte real ya no existen.** El commit `ee62e8c`
    (*feat(assets): agregar items recolectables y dañinos*) **borró**
@@ -140,32 +146,32 @@ de negocio. El cliente **nunca es fuente de verdad** (A.8.9): solo presenta.
 | Libro de colección, feedback de captura, SFX | ✅ |
 | Escena `Login` con PIN y bloqueo progresivo | ✅ (contra stub local) |
 | Personaje y fondo de Figma | ✅ en escena |
-| Ítems con arte | ⛔ referencias rotas (§3.2.1) |
-| Componentes de UI de Figma | ⛔ 0/~30 |
-| Tokens (17 colores, 5 estilos) | ⛔ hardcodeados en el `SceneBuilder` |
-| Build WebGL | ✅ build de `main` generado (17,7 MB) y servido; arte versionado; falta publicarlo en el nodo de Santiago |
+| Ítems con arte | ✅ 12 tipos curados y cableados por nombre |
+| Componentes de UI de Figma | ⛔ 0/~30 (bloqueado por `FIGMA_TOKEN`) |
+| Tokens (17 colores, 5 estilos) | ✅ `Theme.cs`, sin colores de paleta sueltos |
+| Build WebGL | ✅ rebuild Release del 2026-11-24 con el arte curado: 16,5 MB y 0 errores de consola |
 | Nginx + TLS + CSP | ✅ operativo |
-| Leaderboard y envío de puntaje | ⛔ no existen en el cliente |
-| Bocadillo del NPC | ✅ Pensamiento en runtime anclado al sprite, build WebGL y captura |
+| Leaderboard y envío de puntaje | ✅ cliente `ApiClient` + panel top-5/claim; validación real pendiente de claves |
+| Bocadillo del NPC | ✅ pensamiento anclado, “escribiendo…”, historial corto y fallback |
 
 ### 4.2 Backlog
 
 | ID | Tarea | Depende de | DoD |
 | :--- | :--- | :--- | :--- |
-| **FE-01** | Reparar las 4 referencias rotas de `Game.unity`: regenerar la escena con el arte ya normalizado | FE-02 | Play en editor sin `Missing (Sprite)` y sin warnings de referencia |
-| **FE-02** | Normalizar importación de los PNG elegidos (`Single`, PPU 100, máx. 512, alfa), renombrarlos a los Id del catálogo y **versionar los `.meta`** | FE-03 | `ItemSpawner` resuelve cada sprite por nombre; sin referencias huérfanas |
-| **FE-03** | Curar el catálogo: decidir cuántos tipos de ítem existen (recomendado: 10–12, no 60) y qué sprite representa cada uno | — | Tabla de mapeo tipo → sprite → puntos/peso, aprobada y reflejada en `ItemCatalog` |
-| **FE-04** | `Theme.cs` o ScriptableObject con los 17 colores y 5 estilos; quitar colores hardcodeados del `SceneBuilder` | — | Ningún `new Color(...)` de paleta suelto en UI |
+| **FE-01** | ✅ Reparar las 4 referencias rotas de `Game.unity`: escena regenerada con el arte ya normalizado | FE-02 | Play en editor sin `Missing (Sprite)` y sin warnings de referencia |
+| **FE-02** | ✅ Normalizar importación de los PNG elegidos y renombrarlos a los Id del catálogo | FE-03 | `ItemSpawner` resuelve cada sprite por nombre; sin referencias huérfanas |
+| **FE-03** | ✅ Curar el catálogo: 12 tipos (8 buenos, 3 peligrosos, 1 basura) | — | Tabla de mapeo tipo → sprite → puntos/peso reflejada en `ItemCatalog` |
+| **FE-04** | ✅ `Theme.cs` con 17 colores y 5 estilos; fuera los colores hardcodeados | — | Ningún `new Color(...)` de paleta suelto en UI |
 | **FE-05** | Kit de UI: `WoodButton`, `IconButton`, `HandInput`, `PinSlot`, `WoodPanel`, `Heart`, `Counter`, `DialogBubble`, `LeaderRow`, `CollectibleCard` | FE-04 | 10 prefabs reutilizables usados por las escenas |
 | **FE-06** | Aplicar el kit a HUD, pausa, game over, Libro y Login; reemplazar corazones de LiberationSans por el sprite | FE-05 | HUD sin placeholders tipográficos; consola limpia |
-| **FE-07** | Cliente de red: `ApiClient`, `SessionClient`, `ScoreSigner`, `LeaderboardClient`, `DialogueClient` (`UnityWebRequest`, token en memoria) | BE-02…BE-05 | Flujo real contra `https://juego.local/api/` sin secretos en el cliente |
-| **FE-08** | Pantalla de leaderboard (top 5 + posición propia) y estados vacío/error/timeout | FE-07 | Se ve el top 5 tras enviar un puntaje |
-| **FE-09** | Bocadillo del NPC: “escribiendo…”, historial corto, sin bloquear gameplay, fallback visible | FE-07, IA-03 | 🟡 Pensamiento runtime anclado al sprite, build y captura F7; faltan “escribiendo…” e historial |
-| **FE-10** | Hacer `Login` obligatorio (build index 0) y encadenar `Login → Game` | FE-07 | Sin sesión no se juega; logout limpia memoria |
+| **FE-07** | ✅ Cliente de red (`ApiClient`): session, score, claim, leaderboard y diálogo; token en memoria | BE-02…BE-05 | Flujo real contra `https://juego.local/api/` sin secretos en el cliente |
+| **FE-08** | ✅ Pantalla de leaderboard (top 5 + reclamo con nombre y PIN) y estados vacío/error/timeout | FE-07 | Se ve el top 5 tras enviar un puntaje |
+| **FE-09** | ✅ Bocadillo del NPC: “escribiendo…”, historial corto, sin bloquear gameplay, fallback visible | FE-07, IA-03 | Pensamiento runtime anclado al sprite; indicador e historial implementados |
+| **FE-10** | ✅ `Login` obligatorio (build index 0) y encadenado `Login → Game` | FE-07 | Sin sesión no se juega; logout limpia memoria |
 | **FE-11** | Playtest de 10–15 min y ajuste de `spawnInterval` / `fallSpeed` | FE-01 | Curva de dificultad validada por una persona real |
-| **FE-12** | Rebuild Release + medición (tamaño, tiempo de carga, errores de consola) | FE-01, FE-07…FE-10 | ≤ 30 MB, < 10 s, 0 errores, 0 warnings |
-| **FE-13** | Desactivar `SampleScene` del build y limpiar `preloadedAssets` (decidir si se conserva `InputSystem_Actions`) | — | Build Settings con solo las escenas necesarias; input verificado en WebGL |
-| **FE-14** | Quitar `com.coplaydev.unity-mcp` del `manifest.json` versionado | — | El proyecto compila en una máquina sin MCP instalado |
+| **FE-12** | ✅ Rebuild Release + medición: 16,5 MB, 1,2 s, 0 errores y 0 avisos de la app (`check.mjs`; solo quedan 4 mensajes de rendimiento del driver GL de SwiftShader en headless) | FE-01, FE-07…FE-10 | ≤ 30 MB, < 10 s, 0 errores, 0 warnings |
+| **FE-13** | ✅ Desactivar `SampleScene` del build y limpiar `preloadedAssets` | — | Build Settings con solo las escenas necesarias; input verificado en WebGL |
+| **FE-14** | ✅ Quitar `com.coplaydev.unity-mcp` del `manifest.json` versionado y del lock | — | El proyecto compila en una máquina sin MCP instalado |
 
 ### 4.3 Criterio de terminado de la división
 

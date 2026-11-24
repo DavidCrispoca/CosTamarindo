@@ -3,7 +3,7 @@
 > **División:** Frontend · **Nodo:** `Sg-Frontend`
 > **Backlog:** `Plan.md` §4 (`FE-01`…`FE-14`)
 > **Contratos:** [`../api.md`](../api.md)
-> **Estado:** juego jugable offline; API online lista y sin consumir.
+> **Estado:** juego jugable offline verificado en WebGL; API online lista y sin consumir.
 
 ---
 
@@ -14,32 +14,32 @@
 | Bucle jugable completo | ✅ | `unity/Assets/Scripts/` |
 | Libro, feedback de captura, SFX | ✅ | `BookView.cs`, `CaptureFeedback.cs`, `ProceduralSfx.cs` |
 | Personaje y fondo de Figma | ✅ en escena | `Assets/Art/Characters/`, `.../Backgrounds/` |
+| 12 ítems con arte curado | ✅ PNG + `.meta` versionados | `Assets/Art/Items/curated/`, `ItemCatalog.cs` |
+| Tokens visuales (17 colores, 5 estilos) | ✅ | `Assets/Scripts/Core/Theme.cs` |
 | Tipografías SDF | ✅ | `Assets/Art/Fonts/` |
-| Escena de login con bloqueo | ✅ intenta backend y cae a local | `Assets/Scenes/Login.unity`, `Auth/AuthStub.cs` |
-| Build + Nginx + TLS | ✅ build generado y servido; regenerar si cambia Unity | `builds/webgl`, `infra/nginx/` |
-| Pensamiento del NPC | ✅ runtime anclado al sprite, probado en WebGL | `Assets/Scripts/UI/NpcDialogueController.cs` |
-| 15 pruebas PlayMode | ✅ | `Assets/Tests/PlayMode/` |
+| Escena de login `/ Jugar` → `Game` | ✅ anónima; el PIN se pide solo al reclamar | `Assets/Scenes/Login.unity`, `UI/LoginController.cs` |
+| Build + Nginx + TLS | ✅ build Release 2026-11-24 (16,5 MB) verificado con `check.mjs`; regenerar si cambia Unity | `builds/webgl`, `infra/nginx/` |
+| Pensamiento del NPC | ✅ runtime anclado al sprite, “escribiendo…”, historial corto | `Assets/Scripts/UI/NpcDialogueController.cs` |
+| 15 pruebas PlayMode | ✅ 15/15 (2026-11-24) | `Assets/Tests/PlayMode/` |
 
 ---
 
 ## 2. Lo que falta, en orden
 
-### 2.1 El arte de ítems está roto (lo primero)
+### 2.1 El arte de ítems — ✅ resuelto el 2026-11-24
 
-El commit `ee62e8c` borró `item_cocada.png`, `item_tamarindo.png`, `item_pescado.png` y
-`item_frutas.png`. `Game.unity` conserva **cuatro GUID que ya no existen**, así que todos los
-ítems se dibujan con relleno procedural. Además hay 60 PNG nuevos sin integrar.
+El commit `ee62e8c` había borrado `item_cocada.png`, `item_tamarindo.png`, `item_pescado.png` y
+`item_frutas.png`, dejando cuatro GUID muertos en `Game.unity` y 60 PNG nuevos sin integrar.
 
-| Paso | Tarea | Qué hacer |
-| :--- | :--- | :--- |
-| 1 | `FE-03` | Decidir el catálogo final. **Recomendado: 10–12 tipos**, no 60: el spawner no gana nada con 60 y el Libro es una grilla 4×2. Aprobar una tabla tipo → sprite → puntos → peso |
-| 2 | `FE-02` | Renombrar los PNG elegidos a los `Id` del catálogo (`item_cocada.png`, `item_erizo.png`…) y **versionar los `.meta`**. Extender `Assets/Editor/FigmaArtImporter.cs` para recorrer `Assets/Art/Items`: `Single`, PPU 100, máx. 512, alfa |
-| 3 | `FE-01` | Regenerar la escena con **CosTamarindo → Construir escena de juego** y comprobar que no quede `Missing (Sprite)` |
+Cómo quedó cerrado (`FE-01`…`FE-03`, detalle en [`../fases/F1.md`](../fases/F1.md) §5.2):
 
-Detalle completo en [`../fases/F1.md`](../fases/F1.md) §5.
+1. **Catálogo de 12 tipos** (8 buenos, 3 peligrosos, 1 basura) en `ItemCatalog.cs`.
+2. Los 12 PNG elegidos viven en `Assets/Art/Items/curated/` con el nombre exacto del `Id`
+   (`git mv`, conservando el `.meta`), normalizados a `spriteMode: 1`, PPU 100, máx. 512.
+3. `CosTamarindoSceneBuilder.LoadItemSprites` carga **solo** esos 12 y avisa si falta alguno;
+   la escena se regeneró y `Game.unity` quedó sin referencias huérfanas.
 
-> **Por qué este orden:** no se puede renombrar ni regenerar sin haber decidido qué ítems
-> existen. El catálogo manda.
+Los otros 48 PNG siguen en `recolectables/` y `daninos/` como fuente, fuera del build.
 
 ### 2.2 Integración con la API (`FE-07`) — ya desbloqueada
 
@@ -121,16 +121,16 @@ para “cuadrar”**: si un playtest real los supera, se ajusta el servidor con 
 
 | Tarea | Qué falta |
 | :--- | :--- |
-| `FE-04` | `Theme.cs`/ScriptableObject con los 17 colores y 5 estilos; hoy están hardcodeados en `CosTamarindoSceneBuilder` |
-| `FE-05` | 10 prefabs de UI (`WoodButton`, `HandInput`, `PinSlot`, `Heart`, `DialogBubble`, `LeaderRow`…) |
-| `FE-06` | aplicar el kit a HUD, pausa, game over, Libro y Login; corazones con sprite |
-| `FE-08` | pantalla de leaderboard con estados vacío/error/timeout |
-| `FE-09` | 🟡 pensamiento runtime anclado al sprite, build y captura F7; faltan “escribiendo…” e historial |
-| `FE-10` | `Login` a build index 0 y encadenado `Login → Game` |
-| `FE-11` | playtest de 10–15 min y ajuste de `spawnInterval` / `fallSpeed` |
-| `FE-12` | rebuild Release + medición (≤ 30 MB, < 10 s, 0 errores) |
-| `FE-13` | sacar `SampleScene` del build y decidir el `preloadedAssets` vaciado |
-| `FE-14` | quitar `com.coplaydev.unity-mcp` del `Packages/manifest.json` versionado |
+| `FE-04` | ✅ `Theme.cs` con los 17 colores y 5 estilos; los constructores y controladores ya no escriben colores de paleta |
+| `FE-05` | 10 prefabs de UI (`WoodButton`, `HandInput`, `PinSlot`, `Heart`, `DialogBubble`, `LeaderRow`…) — ⛔ bloqueado por `FIGMA_TOKEN` |
+| `FE-06` | aplicar el kit a HUD, pausa, game over, Libro y Login; corazones con sprite — ⛔ depende de `FE-05` |
+| `FE-08` | ✅ pantalla de leaderboard (top 5 + reclamo con nombre y PIN) y estados vacío/error/timeout |
+| `FE-09` | ✅ “escribiendo…”, historial corto de 2 líneas y fallback visible, sin bloquear gameplay |
+| `FE-10` | ✅ `Login` en build index 0 y encadenado `Login → Game` |
+| `FE-11` | ⬜ playtest de 10–15 min y ajuste de `spawnInterval` / `fallSpeed` (necesita una persona) |
+| `FE-12` | ✅ rebuild Release 2026-11-24: 16,5 MB, 1,2 s, 0 errores de consola |
+| `FE-13` | ✅ `SampleScene` deshabilitada y `preloadedAssets` vacío verificado en WebGL |
+| `FE-14` | ✅ `com.coplaydev.unity-mcp` fuera de `manifest.json` y del lock |
 
 ---
 
@@ -142,11 +142,23 @@ para “cuadrar”**: si un playtest real los supera, se ajusta el servidor con 
   -batchmode -projectPath unity -runTests -testPlatform PlayMode `
   -testResults "$env:TEMP\playtests.xml" -logFile "$env:TEMP\playtests.log"
 
-# build + CSP
-powershell -File infra/scripts/build_webgl.ps1
-docker exec sg-frontend nginx -s reload
+# regenerar Login/Game con los constructores (batch)
+& "C:\Program Files\Unity\Hub\Editor\6000.3.27f1\Editor\Unity.exe" `
+  -batchmode -quit -projectPath unity `
+  -executeMethod CosTamarindo.EditorTools.BuildScript.RebuildScenes `
+  -logFile "$env:TEMP\rebuild-scenes.log"
 
-# medición real
+# build Release + CSP
+& "C:\Program Files\Unity\Hub\Editor\6000.3.27f1\Editor\Unity.exe" `
+  -batchmode -quit -projectPath unity `
+  -executeMethod CosTamarindo.EditorTools.BuildScript.BuildWebGL `
+  -logFile "$env:TEMP\webgl-build.log"
+
+# sin Docker: servidor local que respeta Content-Encoding y CSP
+node tools/dev-server/server.mjs 8080
+
+# medición en navegador real (Edge + playwright-core, headless)
+node tools/dev-server/check.mjs http://localhost:8080/
 node tools/dev-server/check.mjs https://juego.local/
 ```
 
@@ -157,18 +169,20 @@ node tools/dev-server/check.mjs https://juego.local/
 
 ## 4. Trampas que ya costaron tiempo
 
-1. **El 8080 del host es de Unity MCP.** El HTTP plano del contenedor se publica en 8081.
-2. **La CSP se lee al arrancar.** Si se regenera `csp.conf`, hay que recargar Nginx o el
-   juego se queda cargando.
+1. **El 8080 del host es de Unity MCP** si lo tenés corriendo (el proyecto ya no lo trae como
+   dependencia). `tools/dev-server/server.mjs` acepta otro puerto: `node … 8090`.
+2. **La CSP se lee al arrancar.** Si se regenera `csp.conf` (o `index.html` cambia), hay que
+   recargar Nginx o el juego se queda cargando.
 3. **Unity pide los `.gz` directamente.** No sirve `gzip_static`: hace falta
    `Content-Encoding: gzip` **y** el MIME original (`application/wasm`).
 4. **`ItemSpawner` empareja por `sprite.name == ItemDef.Id`.** Un sprite con otro nombre no
    se usa, aunque esté importado.
-5. **`spriteMode: 2` es Multiple**, no Single. Los 60 PNG nuevos quedaron así: no se cargan
-   como `Sprite` con `LoadAssetAtPath<Sprite>`.
-6. **`SampleScene` sigue en Build Settings** (índice 2). No molesta, pero sobra.
-7. **El árbol tiene cambios sin commitear** de arte (`*.meta`) y `ProjectSettings.asset`.
-   Coordinar antes de tocar, para no pisarse.
+5. **`spriteMode: 2` es Multiple**, no Single. Los 12 PNG curados ya están en Single; los 48
+   restantes siguen en Multiple y por eso no se cargan como `Sprite` (no están en el build).
+6. **`SampleScene` ya está deshabilitada** (build index 0 `Login`, 1 `Game`). Si alguien
+   regenera las escenas, los constructores vuelven a fijar ese orden.
+7. **El build no está versionado.** `builds/` está en `.gitignore`: cada quien lo regenera con
+   `BuildScript.BuildWebGL` y lo mide con `check.mjs` antes de publicarlo.
 
 ---
 

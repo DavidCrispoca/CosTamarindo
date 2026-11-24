@@ -9,6 +9,8 @@ infraestructura de 5 nodos con **Docker** y diálogos de NPC generados por **Oll
 - Especificación ISO 27001: [`docs/CosTamarindo.md`](docs/CosTamarindo.md)
 - Arquitectura de los 5 nodos Docker: [`docs/arquitectura.md`](docs/arquitectura.md)
 - Operación de infraestructura: [`infra/README.md`](infra/README.md)
+- Seguridad y política de secretos: [`SECURITY.md`](SECURITY.md) ·
+  [`docs/seguridad/politica-secretos.md`](docs/seguridad/politica-secretos.md)
 - Bitácora por fase: [`docs/fases/`](docs/fases/)
 
 ---
@@ -18,9 +20,9 @@ infraestructura de 5 nodos con **Docker** y diálogos de NPC generados por **Oll
 El proyecto está partido en **cinco divisiones**, una por nodo. Cada una tiene su propio
 backlog y criterio de terminado en [`Plan.md`](Plan.md) §4–§8.
 
-| División | Nodo | Estado real (2026-11-23) | Documento |
+| División | Nodo | Estado real (2026-11-24) | Documento |
 | :--- | :--- | :--- | :--- |
-| **Frontend** | `Sg-Frontend` | 🟡 Nginx/TLS *healthy*; build de `main` generado; arte versionado; falta publicarlo en el nodo de Santiago | [`Plan.md` §4](Plan.md) |
+| **Frontend** | `Sg-Frontend` | 🟡 Build Release del 2026-11-24 (16,5 MB, 0 errores) verificado en navegador; falta publicarlo en el nodo de Santiago y la UI de Figma | [`Plan.md` §4](Plan.md) |
 | **Backend** | `Sg-Backend` | 🚧 API y 64/64 tests; imagen `main-test` construida; `latest` pendiente; no arranca sin claves | [`Plan.md` §5](Plan.md) |
 | **DB** | `Sg-DB` | 🟡 Supabase DEV con RLS y backup; falta aplicar `004_anonymous_claim.sql` | [`Plan.md` §6](Plan.md) |
 | **Security** | `Sg-Security` | 🟡 A.8.25 completo; A.8.15/A.8.20/A.8.24 parciales; SoA de 93 controles | [`evidencias/`](evidencias/) |
@@ -29,10 +31,11 @@ backlog y criterio de terminado en [`Plan.md`](Plan.md) §4–§8.
 ### Qué funciona hoy
 
 - **Nginx / `Sg-Frontend`** sirve en <https://juego.local> con TLS de mkcert, CSP por hash
-  y HSTS; el build WebGL ya está generado y la raíz responde `200`.
+  y HSTS. El build WebGL Release se regeneró el 2026-11-24 con el arte curado (16,5 MB) y se
+  verificó en un navegador real: `unityReady: true`, 0 errores de consola.
 - **Bucle jugable offline** implementado: menú → partida → 3 vidas → game over → reintento,
   con Libro de colección, feedback de captura y SFX sintetizado. **15/15** tests PlayMode
-  verdes (última corrida 2026-11-03).
+  verdes (corrida del 2026-11-24).
 - **API y tests**: 64/64 tests del backend; la imagen `main-test` se construyó desde `main`, pero
   `costamarindo-backend:latest` sigue pendiente y el contenedor no arranca hasta cargar las claves
   de Supabase/JWT y aplicar `004_anonymous_claim.sql`.
@@ -48,8 +51,8 @@ backlog y criterio de terminado en [`Plan.md`](Plan.md) §4–§8.
 
 ### Qué falta para cumplir el objetivo
 
-1. **Frontend**: publicar el build de `main` en el nodo de Santiago y validar NPC + panel de
-   reclamo; completar UI de Figma y clientes de red.
+1. **Frontend**: publicar el build de `main` en el nodo de Santiago, completar la UI de Figma
+   (`FE-05`/`FE-06`, bloqueada por `FIGMA_TOKEN`) y hacer el playtest de 10–15 min (`FE-11`).
 2. **Backend/DB**: cargar las claves de Supabase/JWT, aplicar `004_anonymous_claim.sql` y validar
    el arranque completo, el claim y RLS.
 3. **IA**: validar con el backend real; el nodo, el prompt, el build WebGL, la captura del
@@ -123,6 +126,7 @@ archivo `hosts`). El HTTP plano escucha en **8081** porque el 8080 del host lo o
 - **Commits:** [Conventional Commits](https://www.conventionalcommits.org/) — `tipo(alcance): descripción`.
 - **Ramas:** `feat/`, `fix/`, `sec/`, `docs/`; `main` solo por pull request.
 - **Secretos:** solo en `.env` local; el repositorio guarda únicamente `.env.example`.
+  **Prohibido subir claves o datos sensibles** (ver [`SECURITY.md`](SECURITY.md)).
 - **Escenas Unity:** serialización en texto forzada; trabajo por prefabs para evitar conflictos.
 
 ---
