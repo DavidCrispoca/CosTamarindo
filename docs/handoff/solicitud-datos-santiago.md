@@ -1,8 +1,9 @@
 # Solicitud de datos y accesos — Santiago (Backend/Supabase + Frontend)
 
 > **Para:** Santiago y su agente.
-> **Fecha:** 2026-11-23.
-> **Rama verificada:** `Yoann` ya está en `85a5205` (fast-forward de `origin/main`; 64 tests).
+> **Fecha:** 2026-11-23 · **Actualizado:** 2026-11-24 (respuesta local en §7).
+> **Rama verificada:** `Yoann` ya está integrada en `main`; último commit local `a376e07`
+> (fast-forward previo `85a5205`; 64 tests de backend, 15/15 tests PlayMode).
 > **Objetivo:** desbloquear la validación real de F7/Supabase y usar el nodo Frontend para publicar
 > y probar el build de `main`.
 >
@@ -233,3 +234,38 @@ Santiago puede responder marcando o adjuntando:
 
 Con esos datos podemos ejecutar la validación real, generar las evidencias F7 y actualizar
 `Plan.md`, `docs/api.md`, `README.md` y los handoffs sin volver a bloquear el trabajo.
+
+---
+
+## 7. Respuesta local — 2026-11-24
+
+Sí se encontró este documento (`docs/handoff/solicitud-datos-santiago.md`) y se revisó punto por
+punto. **No se inventó ningún dato sensible**: no llegaron claves, URLs privadas ni acceso al nodo,
+y nada de eso se pegó en el repositorio.
+
+### 7.1 Lo que ya se pudo entregar desde aquí
+
+| Sección solicitada | Estado | Detalle / evidencia |
+| :--- | :--- | :--- |
+| §0 Contexto | ✅ actualizado | `Yoann` integrada en `main` (`a376e07`); 64/64 tests de backend y 15/15 PlayMode |
+| §1 Datos de Supabase/JWT | ⛔ pendiente de Santiago | No hay claves ni proyecto confirmado; no se generaron valores falsos |
+| §1.2 Migraciones y `004` | ⛔ pendiente de Santiago | Sin acceso a Supabase; el repositorio solo contiene los `.sql` |
+| §1.3 Imagen y despliegue | ⛔ pendiente de Santiago | `costamarindo-backend:latest` sigue pendiente; Docker estaba apagado |
+| §2 Nodo Frontend | 🟡 parcial | No hay acceso al nodo; sí se verificó el build en local con el servidor de desarrollo |
+| §2.4 Validación en navegador | ✅ en local | `Login → Jugar → Game`, fin de partida, panel legible y estado offline; ver [evidencia F7](../../evidencias/F7/13-respuesta-local-frontend.md) |
+| §3 Contrato anónimo/claim | ✅ confirmado por código | Falta la aceptación explícita de Santiago antes de publicar |
+| §4 Evidencias | ✅ para frontend | [`/evidencias/F7/13-respuesta-local-frontend.md`](../../evidencias/F7/13-respuesta-local-frontend.md) y capturas `14` y `15`; backend/DB siguen pendientes |
+| §5 Entrega de secretos | ✅ sin cambios | No se usó Git, chat ni documentos para secretos; se mantiene la regla de oro |
+| §6 Checklist | 🟡 parcial | Marcado lo verificable en local; el resto espera respuesta de Santiago |
+
+Detalles de la respuesta local: **16,5 MB**, `unityReady: true`, **1,2 s**, 0 errores de app,
+bocadillo con alpha 0,55 y textos del fin de partida sin solapamiento. Los dos 404 de `/api`
+que aparecen en local son esperados: el servidor de desarrollo no despliega backend y el juego
+ahora muestra «Sin conexión: puntaje guardado en este dispositivo.» en vez de un error rojo.
+
+### 7.2 Lo que necesitamos que Santiago confirme para cerrar
+
+Las casillas sin marcar de §1–§4 siguen vigentes, en especial: proyecto **DEV**, migración `004`
+con `check_db.py` en verde, responsable de `costamarindo-backend:latest`, ruta/comando de
+publicación del build y la URL real del juego. Con eso se puede repetir la medición con
+Nginx/TLS y generar las evidencias F7 contra el backend real.

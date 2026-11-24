@@ -139,6 +139,9 @@ Resultados (`10-webgl-simulacion.txt`):
 - `11-webgl-pensamiento.png`: diseño actual de pensamiento, encima de la cabeza y con puntos.
   La captura usa el fallback local porque el build oficial arranca en `Game` (sin login).
 - `12-webgl-pensamiento-game-over.png`: diseño actual en `game_over`, arriba del panel final.
+- `13-respuesta-local-frontend.md`: respuesta local del 2026-11-24 a `docs/handoff/solicitud-datos-santiago.md`.
+- `14-webgl-bocadillo-translucido.png`: bocadillo con alpha 0,55 sobre la partida en curso.
+- `15-webgl-game-over-legible.png`: panel final con franjas separadas y estado offline neutral.
 
 ---
 
