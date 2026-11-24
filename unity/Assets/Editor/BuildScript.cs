@@ -22,6 +22,22 @@ namespace CosTamarindo.EditorTools
     {
         private const string OutputFolder = "builds/webgl";
 
+        /// <summary>
+        /// Regenera `Login` y `Game` desde los constructores. Se ejecuta en modo
+        /// batch antes del build para que las escenas reflejen los tokens y el
+        /// arte curado:
+        /// <code>
+        /// Unity.exe -batchmode -quit -projectPath unity ^
+        ///   -executeMethod CosTamarindo.EditorTools.BuildScript.RebuildScenes
+        /// </code>
+        /// </summary>
+        public static void RebuildScenes()
+        {
+            CosTamarindoLoginSceneBuilder.BuildLoginScene();
+            CosTamarindoSceneBuilder.BuildGameScene();
+            AssetDatabase.SaveAssets();
+        }
+
         [MenuItem("CosTamarindo/Build WebGL (Release)", priority = 40)]
         public static void BuildWebGL()
         {
