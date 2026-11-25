@@ -27,11 +27,18 @@ alter table private.schema_migrations enable row level security;
 revoke all on private.schema_migrations from public, anon, authenticated;
 
 -- Migrar el historial si ya existia en public y quitarlo de ahi.
-insert into private.schema_migrations (version, checksum, applied_at)
-select version, checksum, applied_at
-from public.schema_migrations
-on conflict (version) do nothing;
+-- (En una base recien creada `public.schema_migrations` no existe; por eso el
+--  paso va guardado con to_regclass para que la migracion sea idempotente.)
+do $$
+begin
+    if to_regclass('public.schema_migrations') is not null then
+        insert into private.schema_migrations (version, checksum, applied_at)
+        select version, checksum, applied_at
+        from public.schema_migrations
+        on conflict (version) do nothing;
 
-drop table if exists public.schema_migrations;
+        drop table if exists public.schema_migrations;
+    end if;
+end $$;
 
 commit;
