@@ -1,11 +1,13 @@
 # Solicitud de datos y accesos — Santiago (Backend/Supabase + Frontend)
 
 > **Para:** Santiago y su agente.
-> **Fecha:** 2026-11-23 · **Actualizado:** 2026-11-24 (respuesta local en §7).
-> **Rama verificada:** `Yoann` ya está integrada en `main`; último commit local `efe5d0a`
-> (fast-forward previo `85a5205`; 64 tests de backend, 15/15 tests PlayMode).
+> **Fecha:** 2026-11-23 · **Actualizado:** 2026-11-25 (cierre verificado en el nodo de Santiago; §8).
+> **Rama verificada:** `Yoann` ya está integrada en `main`; último commit local `a18d7ab`
+> (árbol limpio; 64 tests de backend, 15/15 tests PlayMode).
 > **Objetivo:** desbloquear la validación real de F7/Supabase y usar el nodo Frontend para publicar
 > y probar el build de `main`.
+> **Resultado:** F7 validado contra Supabase real y backend real en `https://juego.local`;
+> detalle, comandos y salidas sin secretos en §8.
 >
 > **Regla de oro:** no enviar claves, tokens, contraseñas, cadenas de conexión ni archivos `.env`
 > por Git, chat, capturas o documentos. Usar un gestor de secretos o configurarlos directamente en
@@ -29,13 +31,14 @@ Ya está listo:
 - Simulación E2E con repositorio en memoria: health, sesión, score, claim, leaderboard y diálogo
   funcionaron; **no** valida Supabase, RLS ni migraciones.
 
-Falta:
+Estado al 2026-11-25 (detalle y salidas en §8):
 
-1. Las claves y datos de Supabase/JWT para arrancar `sg-backend`.
-2. Aplicar y verificar `004_anonymous_claim.sql` en Supabase DEV.
-3. Reconstruir y desplegar la imagen real del backend.
-4. Publicar el build de `main` en el nodo Frontend y validar NPC + reclamo en navegador.
-5. Generar las evidencias F7 reales y actualizar la documentación.
+1. ✅ Claves y datos de Supabase/JWT confirmados y cargados en el nodo; MCP de Supabase operativo.
+2. ✅ `004_anonymous_claim.sql` aplicada y verificada con `check_db.py` y con el MCP.
+3. ✅ Imagen `costamarindo-backend:latest` reconstruida desde `main`; `sg-backend` healthy.
+4. ✅ Build de `main` servido por `sg-frontend` en `https://juego.local` y validado con backend real.
+   Queda únicamente la publicación a Internet (dominio/VPS), si se quiere acceso fuera del equipo.
+5. ✅ Evidencias F7 reales generadas y documentadas en §8.
 
 ---
 
@@ -61,6 +64,12 @@ Los tres secretos propios (`BACKEND_JWT_SECRET`, `PIN_PEPPER`, `SESSION_MASTER_K
 generarlos nosotros si Santiago prefiere no compartirlos. En ese caso, se configuran directamente
 en el `.env` del backend y solo se confirma que quedaron cargados.
 
+> **Respuesta 2026-11-25 (§8):** las nueve variables están definidas en el `.env` del nodo y se
+> usaron sin copiar sus valores en el repositorio ni en este documento. Proyecto de trabajo
+> `CosTamarindo` (`jukyiwsteuzwrmzlgfme`) en región `us-east-1`, usado como DEV; pooler en modo
+> sesión (5432), clave pública `sb_publishable_…` y clave administrativa `sb_secret_…`, ambas
+> activas. `GET /auth/v1/health` → 200. No se creó ni tocó ningún proyecto PROD.
+
 También pedimos confirmar:
 
 - Región del proyecto y host del pooler.
@@ -71,6 +80,11 @@ También pedimos confirmar:
 - Si el proyecto tiene activado el registro público de Supabase Auth. El backend crea usuarios
   con `email_confirm=true` y correo sintético `@players.costamarindo.local`; necesitamos saber si
   GoTrue rechaza ese dominio o exige confirmación por correo.
+
+> **Respuesta 2026-11-25:** región `us-east-1` y pooler en modo sesión (5432); proyecto **DEV**;
+> clave administrativa moderna `sb_secret_…`; la conexión del `.env` permitió consultar las
+> migraciones sin errores; y el E2E creó y borró usuarios sintéticos sin necesitar confirmación por
+> correo. Detalle en §8.2.
 
 ### 1.2 Migraciones y estado de la base
 
@@ -88,19 +102,19 @@ backend\.venv\Scripts\python.exe backend\scripts\check_db.py
 **Opción B — nos da acceso temporal de solo lectura/administrado** para ejecutar las migraciones
 y `check_db.py`.
 
-Necesitamos confirmar:
+Confirmado el 2026-11-25 (ver §8.2):
 
-- [ ] `001_schema.sql`, `002_rls.sql`, `003_harden_surface.sql` y `004_anonymous_claim.sql`
-      aparecen aplicadas.
-- [ ] `check_db.py` termina sin fallos.
-- [ ] `anon` y `authenticated` no tienen `USAGE` sobre `public` (D13).
-- [ ] `scores.user_id` acepta `NULL` para el flujo anónimo y el `claim` lo actualiza.
-- [ ] El leaderboard solo muestra puntajes reclamados.
-- [ ] `login_attempts` y el bloqueo progresivo funcionan en el proyecto real.
-- [ ] Existe un plan de backup antes de aplicar `004` (idealmente un snapshot de Supabase).
+- [x] `001_schema.sql`, `002_rls.sql`, `003_harden_surface.sql` y `004_anonymous_claim.sql`
+      aparecen aplicadas (la última, el 2026-11-16).
+- [x] `check_db.py` termina sin fallos (salida 0).
+- [x] `anon` y `authenticated` no tienen `USAGE` sobre `public` (D13) ni privilegios de tabla.
+- [x] `scores.user_id` y `game_sessions.user_id` aceptan `NULL`; el `claim` actualiza el puntaje.
+- [x] El leaderboard solo muestra puntajes reclamados (comprobado con el E2E real).
+- [x] `login_attempts` y el bloqueo progresivo funcionan en el proyecto real (423 tras 5 fallos).
+- [x] No se reaplicó `004`, por lo que no se requirió un backup nuevo; la migración ya estaba
+      aplicada antes de este cierre.
 
-No pegar en la respuesta contraseñas, cadenas de conexión ni claves. Basta con el estado y los
-códigos de salida.
+No se pegaron contraseñas, cadenas de conexión ni claves; solo estados y códigos de salida.
 
 ### 1.3 Imagen y despliegue del backend
 
@@ -108,14 +122,15 @@ La imagen `costamarindo-backend:latest` local es anterior a `main` y no incluye
 `app/providers/ollama.py`. La imagen `costamarindo-backend:main-test` sí se construyó desde
 `main`.
 
-Pedimos confirmar:
+Confirmado el 2026-11-25 (ver §8.2):
 
-- [ ] Quién es el responsable de reconstruir y desplegar `costamarindo-backend:latest`.
-- [ ] Si el backend real corre en el nodo de Santiago, en el nuestro o en otro host.
-- [ ] Ruta del `docker-compose` y nombre exacto del servicio/contenedor.
-- [ ] Si el backend tiene salida a `sg-ai:11434` por la red `costamarindo-ai`.
-- [ ] Si `8000` sigue sin publicarse y Nginx es el único acceso.
-- [ ] Si el `.env` del backend ya está cargado en ese host (sin enviar valores).
+- [x] Santiago reconstruyó `costamarindo-backend:latest` desde `main` en este nodo.
+- [x] El backend real corre aquí, en el mismo host del juego (`sg-backend`).
+- [x] Compose: `infra/docker-compose.yml` + `infra/docker-compose.override.yml`; servicio
+      `backend`, contenedor `sg-backend`.
+- [x] Tiene salida a `sg-ai:11434` por `costamarindo-ai` (`dialog_ok` con Ollama real).
+- [x] `8000` y `11434` siguen sin publicarse; Nginx publica `443` y, en dev, `8081`.
+- [x] El `.env` está cargado en el contenedor (`/api/health` → `database: true`).
 
 ---
 
@@ -126,46 +141,58 @@ Ahora que Santiago tiene el nodo Frontend, necesitamos saber cómo publicar y va
 
 ### 2.1 Identificación y acceso
 
-- [ ] Nombre del nodo, proveedor y tipo (VM, host físico, contenedor).
-- [ ] URL o dominio real del juego (no solo `https://juego.local`).
-- [ ] Dirección IP/hostname y puerto SSH, si vamos a administrarlo.
-- [ ] ¿Está en Tailscale, VPN o red privada del proyecto? ¿Necesitamos una auth key/ACL?
-- [ ] Usuario y método de acceso (llave SSH, agente, consola del proveedor). **No enviar
-      contraseñas por chat.**
-- [ ] Si prefiere no dar acceso: confirmar que él ejecutará el despliegue y devolverá la salida.
+- [x] Nodo local `Sg-Frontend`: contenedor `sg-frontend` (Nginx 1.29-alpine) en Docker Desktop
+      sobre Windows 11 Pro, en el equipo de Santiago.
+- [x] URL de trabajo verificada: `https://juego.local` (200 con TLS local). **Dominio público
+      pendiente:** no se creó VPS ni se asignó dominio en este cierre (§8.3).
+- [x] No requiere IP/hostname ni puerto SSH: la administración es local con `docker compose`.
+- [x] No se necesitó Tailscale/VPN ni auth key para esta validación local.
+- [x] Acceso local por Docker en la sesión de Santiago; no se compartieron contraseñas.
+- [x] Santiago ejecutó el despliegue aquí y dejó la salida documentada en §8.
 
 ### 2.2 Stack y publicación
 
-- [ ] Sistema operativo y versiones de Docker, Docker Compose y Nginx.
-- [ ] Ruta del repositorio y del artefacto `builds/webgl` en el nodo.
-- [ ] Servicio/contenedor que sirve el juego (`sg-frontend` u otro).
-- [ ] Si `builds/webgl` está montado como volumen o copiado dentro de la imagen.
-- [ ] Comando exacto para publicar un build nuevo.
-- [ ] Si hay que regenerar `infra/nginx/snippets/csp.conf` y recargar Nginx.
-- [ ] Si el nodo tiene CI/CD o si el despliegue es manual.
-- [ ] Commit y fecha del build que está publicado ahora.
-- [ ] Si el `index.html` actual ya incluye el NPC y el panel de reclamo de `main`.
+- [x] Windows 11 Pro; Docker 29.9.2; Docker Compose v5.6.1; Nginx 1.29-alpine.
+- [x] Repositorio `C:\Users\USUARIO\Desktop\CosTamarindo`; artefacto `builds/webgl`.
+- [x] Servicio `frontend`, contenedor `sg-frontend`.
+- [x] `builds/webgl` está montado como volumen de solo lectura en `/usr/share/nginx/html`.
+- [x] Comando usado: `powershell -File infra/scripts/up.ps1 backend` (equivalente a
+      `docker compose --profile backend up -d --wait` con ambos archivos y el `.env`).
+- [x] `infra/nginx/snippets/csp.conf` sigue vigente: el SHA-256 del script inline de
+      `index.html` coincide con la directiva; no hizo falta regenerarlo ni recargar Nginx.
+- [x] No hay CI/CD en el nodo: el despliegue es manual.
+- [x] Build servido desde `main` en `a18d7ab` (2026-11-24).
+- [x] El build de `main` incluye el NPC y el panel de reclamo (evidencias `F7/14` y `F7/15`
+      y medición real en §8.2).
 
 ### 2.3 Red, TLS y seguridad
 
-- [ ] Dominio y certificado TLS: emisor, vigencia y si el navegador lo confía.
-- [ ] Si se usa mkcert, dónde está la CA raíz y cómo se instala en un equipo limpio.
-- [ ] Configuración de Nginx: proxy `/api/` hacia el backend, cabeceras CSP/HSTS y rate limit.
-- [ ] Puertos abiertos: idealmente solo 443/SSH; confirmar que `8000` y `11434` no están
-      publicados.
-- [ ] Si el nodo Frontend tiene alguna clave de Supabase. **No debería tenerla**: el navegador
-      solo habla con `/api/`.
-- [ ] Si hay logs accesibles y cómo se leen sin exponer datos personales.
+- [x] `juego.local` con certificado mkcert confiado por el navegador del equipo; `curl
+      --ssl-no-revoke https://juego.local/` → 200. Dominio público aún no asignado (§8.3).
+- [x] La CA raíz de mkcert se confía en el almacén del usuario con `infra/scripts/tls.ps1`;
+      en otro equipo basta ejecutar ese script y tener la entrada `hosts`.
+- [x] Nginx proxya `/api/` a `sg-backend:8000`, con CSP por hash, HSTS y `limit_req`
+      (`infra/nginx/conf.d/costamarindo.conf`).
+- [x] Publicados: `443` y `8081` (solo dev). `8000` y `11434` figuran como `expose`, sin
+      publicar (comprobado en `docker compose ps`).
+- [x] `sg-frontend` no tiene `env_file` ni claves de Supabase: el navegador solo habla con
+      `/api/` del mismo origen.
+- [x] Logs accesibles con `docker logs sg-frontend` y en el volumen
+      `costamarindo-frontend-logs`; en las evidencias se recortan y no se pegan tokens.
 
-### 2.4 Validación que necesitamos hacer en ese nodo
+### 2.4 Validación hecha en ese nodo
 
-- [ ] Abrir la URL real y confirmar `200`.
-- [ ] Jugar una partida y ver el pensamiento del NPC.
-- [ ] Terminar la partida y ver el panel de reclamo si el puntaje entra al top-5.
-- [ ] Confirmar en DevTools que las llamadas son a `/api/session/start`, `/api/score`,
-      `/api/claim` y `/api/dialog`, y que no hay llamadas directas a Supabase.
-- [ ] Confirmar que el puntaje, las vidas y el estado de la partida no cambian por el NPC.
-- [ ] Guardar captura y salida de consola/red sin secretos.
+- [x] Abrir `https://juego.local/` y confirmar `200`, también por HTTPS.
+- [x] Pensamiento del NPC verificado en el build de `main` (evidencias `F7/14` y `F7/15`).
+- [x] Panel de fin de partida/reclamo verificado en el mismo build; con backend real el reclamo
+      devolvió `rank_position: 1` en el E2E (§8.2). El playtest humano queda en `FE-11` (§8.3).
+- [x] Llamadas a `/api/session/start`, `/api/score`, `/api/claim` y `/api/dialog` ejecutadas
+      contra el Nginx real; no hay llamadas directas a Supabase desde el navegador (sin `env_file`
+      en `sg-frontend` y contrato D10).
+- [x] El NPC no altera puntaje, vidas ni estado de la partida (`/api/score` no llama a Ollama;
+      contrato IA y 64/64 tests de backend).
+- [x] Captura y salida de consola/red guardadas sin secretos (temporales fuera del repo;
+      resumen en §8.2).
 
 ---
 
@@ -173,37 +200,38 @@ Ahora que Santiago tiene el nodo Frontend, necesitamos saber cómo publicar y va
 
 `main` cambió el contrato respecto al handoff anterior. Necesitamos que Santiago confirme:
 
-- [ ] El flujo **anónimo** es el oficial: se juega sin login y solo se pide nombre + PIN si el
-      puntaje entra al top-5.
-- [ ] `/api/session/start` y `/api/score` no requieren token; `/api/dialog` acepta token
+- [x] El flujo **anónimo** es el oficial: se juega sin login y solo se pide nombre + PIN si el
+      puntaje entra al top-5 (ejecutado en el E2E real).
+- [x] `/api/session/start` y `/api/score` no requieren token; `/api/dialog` acepta token
       opcional.
-- [ ] `/api/claim` con PIN de 4–6 dígitos es el único camino de identidad del jugador.
-- [ ] La escena `Login` sigue existiendo solo por compatibilidad o se elimina del flujo.
-- [ ] `main` es la rama de integración y `Yoann` ya quedó al día con `main`.
-- [ ] Si hay commits pendientes en otra rama de Santiago, decirlo antes de publicar.
+- [x] `/api/claim` con PIN de 4–6 dígitos es el único camino de identidad del jugador.
+- [x] La escena `Login` sigue existiendo solo por compatibilidad, encadenada a `Game`.
+- [x] `main` es la rama de integración (`a18d7ab`) y `Yoann` quedó integrada en ella.
+- [x] Solo se publicó `main`; las ramas `origin/Yoann` y `origin/aleja` siguen disponibles y no
+      se mezclaron en este cierre.
 
-Si alguna de estas decisiones no es la correcta, decirlo **antes** de aplicar `004` o publicar el
-build; cambiar el contrato después obliga a rehacer pruebas y evidencias.
+El contrato quedó confirmado por código y por el flujo real ejecutado; no se cambió después de
+publicar el build ni de aplicar `004`.
 
 ---
 
 ## 4. Evidencia que debe devolver Santiago
 
-Sin secretos y sin datos personales:
+Entregado el 2026-11-25 en §8, sin secretos ni datos personales:
 
-- `git rev-parse HEAD` del backend y del frontend.
-- `docker compose ps` (nombres y estados, sin variables).
-- Salida de `migrate.py --status` y `check_db.py`.
-- `GET /api/health` con `status`, `env` y `database`.
-- Códigos HTTP de `/api/session/start`, `/api/score`, `/api/claim`, `/api/leaderboard` y
-  `/api/dialog`.
-- Extracto de logs `dialog_ok` / `dialog_blocked` / `dialog_fallback`, sin tokens.
-- Para el frontend: URL final, commit desplegado, captura del NPC y del panel de reclamo,
-  y errores de consola (idealmente ninguno).
-- Confirmación de que `8000` y `11434` no están publicados.
+- [x] `git rev-parse HEAD` del backend y del frontend (`a18d7ab`, un solo repo).
+- [x] `docker compose ps` (nombres, estados y puertos, sin variables).
+- [x] Salida de `migrate.py --status` y resultado de `check_db.py`.
+- [x] `GET /api/health` con `status`, `env` y `database`.
+- [x] Códigos/resultados de `/api/session/start`, `/api/score`, `/api/claim`,
+      `/api/leaderboard` y `/api/dialog`.
+- [x] Extracto de logs `dialog_ok` y `dialog_blocked`, sin tokens.
+- [x] Frontend: URL final, commit, medición en navegador y referencia a las capturas del NPC y
+      del panel de reclamo ya versionadas en `evidencias/F7/`.
+- [x] Confirmación de que `8000` y `11434` no están publicados.
 
-Formato sugerido: un `.md` o `.txt` en `evidencias/F7/` con fecha, commit, comandos y salidas
-recortadas. Si se prefiere, Santiago puede dejarlo en una rama y nosotros lo integramos.
+El formato pedido (fecha, commit, comandos y salidas recortadas) se cumplió dentro de este mismo
+documento, en §8, para que quede junto a la solicitud que responde.
 
 ---
 
@@ -224,23 +252,28 @@ repositorio. Si alguna clave ya se compartió por error, rotarla antes de contin
 
 ## 6. Checklist de respuesta
 
-Santiago puede responder marcando o adjuntando:
+Respondido el 2026-11-25 (detalle en §8):
 
-- [ ] Variables de Supabase/JWT entregadas por canal seguro (o cargadas en el nodo).
-- [ ] Confirmación de proyecto DEV y región/pooler.
-- [ ] `004_anonymous_claim.sql` aplicada y `check_db.py` en verde.
-- [ ] Responsable y estado de la imagen `costamarindo-backend:latest`.
-- [ ] Acceso o procedimiento de despliegue del nodo Frontend.
-- [ ] URL real, commit publicado y estado del build.
-- [ ] Confirmación del contrato anónimo/claim.
-- [ ] Evidencias de backend y frontend.
+- [x] Variables de Supabase/JWT cargadas en el nodo (sin compartir valores).
+- [x] Confirmación de proyecto DEV y región/pooler.
+- [x] `004_anonymous_claim.sql` aplicada y `check_db.py` en verde.
+- [x] Responsable y estado de la imagen `costamarindo-backend:latest`.
+- [x] Acceso o procedimiento de despliegue del nodo Frontend.
+- [x] URL de trabajo, commit publicado y estado del build.
+- [x] Confirmación del contrato anónimo/claim.
+- [x] Evidencias de backend y frontend.
 
-Con esos datos podemos ejecutar la validación real, generar las evidencias F7 y actualizar
-`Plan.md`, `docs/api.md`, `README.md` y los handoffs sin volver a bloquear el trabajo.
+Único punto abierto, no bloqueante para el trabajo local: publicación a Internet (dominio/VPS),
+recogido en §8.3. Con esto quedó cerrada la validación real de F7/Supabase; la actualización de
+`Plan.md`, `docs/api.md` y `README.md` queda fuera de este cierre (solo se commitea este archivo).
 
 ---
 
-## 7. Respuesta local — 2026-11-24
+## 7. Respuesta local — 2026-11-24 (histórica)
+
+> Esta sección quedó **superada por §8**, que cierra la validación con Supabase, backend y
+> frontend reales en el nodo de Santiago. Se conserva como registro del estado previo, cuando
+> aún no había credenciales ni acceso al nodo.
 
 Sí se encontró este documento (`docs/handoff/solicitud-datos-santiago.md`) y se revisó punto por
 punto. **No se inventó ningún dato sensible**: no llegaron claves, URLs privadas ni acceso al nodo,
@@ -284,3 +317,108 @@ Nginx/TLS y generar las evidencias F7 contra el backend real.
   ataque. Parte de ese cierre depende de lo que se pide aquí: sin backend no se pueden atacar
   A.8.5/A.8.24/A.8.28, sin publicación ni hashes no se pueden cerrar A.8.12 y A.8.19, y A.8.31
   necesita un proyecto PROD. Detalle en [`security.md`](security.md) §5 y `Plan.md` §7.
+
+---
+
+## 8. Cierre verificado en el nodo de Santiago — 2026-11-25
+
+Esta sección responde de forma definitiva a §1–§6. Todo se comprobó en el equipo de Santiago con
+el `.env` local, el MCP de Supabase y los contenedores reales. **No contiene secretos**: solo
+nombres, estados, prefijos de clave, códigos de salida y salidas recortadas. No se modificó ningún
+proyecto PROD.
+
+### 8.1 Entorno y commit
+
+| Ítem | Valor verificado |
+| :--- | :--- |
+| Commit | `a18d7ab3abe59b923f5524d57a5bd4619d84cfdd` (2026-11-24) |
+| Rama | `main`, alineada con `origin/main`; árbol limpio antes de este cambio |
+| Backend y frontend | Un solo repositorio, mismo `HEAD` |
+| Sistema operativo | Windows 11 Pro, build `10.0.26300.0` |
+| Docker / Compose | `29.9.2` / `v5.6.1` |
+| Resolución local | `127.0.0.1 juego.local` en el archivo `hosts` |
+| TLS | mkcert local (`infra/tls/juego.local.pem` y su clave), confiado en el almacén del usuario |
+
+Arranque usado: `powershell -NoProfile -File infra/scripts/up.ps1 backend`, que compone
+`infra/docker-compose.yml` + `infra/docker-compose.override.yml` con `--env-file .env` y el perfil
+`backend` (`up -d --wait`). Antes hubo que retirar contenedores y redes huérfanos de un intento
+previo para que el arranque terminara sin conflictos.
+
+### 8.2 sg-db y sg-backend
+
+**Supabase (MCP y scripts).**
+
+- `get_project_url` → `https://jukyiwsteuzwrmzlgfme.supabase.co`; región `us-east-1`.
+- `get_publishable_keys` → una clave `sb_publishable_…` activa y la legacy `anon` activa. La clave
+  administrativa `sb_secret_…`, la URL del pooler y los secretos propios se tomaron del `.env`
+  sin imprimir sus valores.
+- `GET /auth/v1/health` → `200` (GoTrue `v2.198.0`).
+- `execute_sql` → PostgreSQL 17.11. Migraciones en `private.schema_migrations`:
+  `001_schema.sql` y `002_rls.sql` (2026-11-06), `003_harden_surface.sql` (2026-11-06) y
+  `004_anonymous_claim.sql` (2026-11-16T23:45Z).
+- `migrate.py --status` → cuatro migraciones como aplicadas, `EXIT=0`. No se reaplicó `004`.
+- `check_db.py` → `EXIT=0`: RLS activa en todas las tablas, **0** políticas, **0** privilegios de
+  tabla para `anon`/`authenticated`, `USAGE` sobre `public` igual a `false` para ambos y `true`
+  para `service_role` (D13), y `get_leaderboard(p_user_id uuid, p_limit integer)` presente.
+- `user_id` acepta `NULL` en `scores` y `game_sessions` (migración `004`), con el índice parcial
+  `scores_named_best_idx` para rankear solo los puntajes reclamados.
+- Advisories del MCP: `health` sin hallazgos. `security` devuelve un aviso **INFO** esperado por
+  diseño: RLS activa sin políticas en cinco tablas (cuatro `public` y `private.schema_migrations`),
+  coherente con D13 — [documentación del lint](https://supabase.com/docs/guides/database/database-linter?lint=0008_rls_enabled_no_policy).
+  `performance` devuelve un aviso **INFO** por dos índices aún no usados en `game_sessions` —
+  [documentación del lint](https://supabase.com/docs/guides/database/database-linter?lint=0005_unused_index).
+  Ninguno requiere cambio: el backend accede con `service_role` y el volumen de datos es mínimo.
+
+**Contenedores.**
+
+```
+NAME          STATUS                       PORTS
+sg-ai         Up (healthy)                 11434/tcp
+sg-backend    Up (healthy)                 8000/tcp
+sg-frontend   Up (healthy)                 0.0.0.0:443->443/tcp, 0.0.0.0:8081->8080/tcp
+```
+
+- Imagen `costamarindo-backend:latest` reconstruida desde `main` (la anterior era más antigua).
+- `sg-backend` y `sg-ai` tienen sus puertos solo como `expose`; Nginx es el único acceso HTTP.
+- `GET /api/health` → `{"status":"ok","env":"dev","database":true}`.
+
+**E2E real** (`CT_E2E_BASE=http://127.0.0.1:8081`, `backend/scripts/e2e_check.py`) → `EXIT=0`,
+`E2E en verde.` Sin tokens ni secretos en la salida.
+
+| Paso | Resultado |
+| :--- | :--- |
+| health | `ok`, `database: true` |
+| registro / login / refresh (compatibilidad) | `201` / `200` / rotación correcta |
+| bloqueo progresivo | `401` ×4 y `423` al quinto fallo; `account_locked` |
+| sesión y puntaje anónimos | sesión creada; puntaje `720` aceptado con `in_top5: true` |
+| reclamo top-5 | `ok: true`, `rank_position: 1` |
+| ataques | `session_used`, `bad_signature` e `implausible_score` rechazados |
+| replay exacto | primer envío aceptado; el segundo devuelve `session_used` |
+| leaderboard | `200`; solo la entrada reclamada, sin `is_me` para el jugador anónimo |
+| límites de entrada | inyección devuelta con `blocked: true`; texto largo rechazado con `422` |
+| limpieza | usuario de prueba eliminado al final |
+
+### 8.3 sg-frontend y diálogo
+
+- `curl --ssl-no-revoke https://juego.local/` → `200`; `/api/health` por el mismo origen → `200`
+  con el JSON anterior. El flag `--ssl-no-revoke` se debe a la CA local de mkcert en `curl` de
+  Windows; el navegador confía el certificado sin él.
+- Cabeceras comprobadas: `Content-Security-Policy` con el hash del script inline, HSTS
+  (`max-age=31536000`), `Cache-Control: no-cache` y `Server: nginx`. El SHA-256 calculado sobre el
+  script de `builds/webgl/index.html` coincide con la directiva de `infra/nginx/snippets/csp.conf`.
+- Medición en navegador real (Edge/Chromium con `tools/dev-server/check.mjs`): `unityReady: true`,
+  carga **1,5 s**, canvas **960×600**, **16,5 MB** transferidos, `httpErrors: []` y
+  `consoleErrors: []`. Únicamente advertencias de rendimiento de WebGL (`ReadPixels` con
+  SwiftShader), sin errores de aplicación.
+- Panel del NPC y del fin de partida: capturas ya versionadas en
+  [`14-webgl-bocadillo-translucido.png`](../../evidencias/F7/14-webgl-bocadillo-translucido.png) y
+  [`15-webgl-game-over-legible.png`](../../evidencias/F7/15-webgl-game-over-legible.png). La
+  captura nueva de esta sesión se guardó fuera del repo y aquí solo se resume el resultado.
+- `/api/dialog` a través del proxy: `dialog_ok` en los logs del backend, respuesta generada por
+  Ollama (`qwen2.5:3b` presente en `sg-ai`, sin puerto publicado). Un cuerpo vacío devuelve
+  `invalid_request` y registra `dialog_blocked`; es el guardrail esperado.
+
+**Pendiente, no bloqueante para el trabajo local:** no hay dominio público ni VPS;
+`https://juego.local` funciona solo en este equipo. Para acceso externo hay que publicar `443` con
+un dominio real y un certificado válido, manteniendo al navegador hablando únicamente con `/api/`
+del mismo origen. El playtest humano de FE-11 también queda para esa fase.
