@@ -149,5 +149,5 @@ if [ -x /var/ossec/bin/wazuh-control ]; then
 fi
 
 log "Listo. Credenciales del dashboard en /root/wazuh-install-files.tar"
-log "Si no necesitás depurar, eliminá /var/log/costamarindo-provision.log y /var/log/wazuh-install.log: pueden contener credenciales generadas."
+log "Si no necesitas depurar, elimina /var/log/costamarindo-provision.log y /var/log/wazuh-install.log: pueden contener credenciales generadas."
 echo "PROVISION_OK"

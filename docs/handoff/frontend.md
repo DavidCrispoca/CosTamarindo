@@ -124,8 +124,8 @@ para “cuadrar”**: si un playtest real los supera, se ajusta el servidor con 
 | `implausible_score` | registrar en consola y no reintentar |
 | `bad_session` / `not_top5` en `/api/claim` | no se puede reclamar ese puntaje; cerrar el panel |
 | `invalid_credentials` / `account_locked` | en `/api/claim`: PIN incorrecto o cuenta bloqueada; respetar `Retry-After` |
-| `weak_pin` / `username_taken` | “Elegí otro PIN” / “Ese usuario ya existe” |
-| `database_unavailable` / `upstream_error` | “Servicio no disponible, intentá de nuevo” |
+| `weak_pin` / `username_taken` | “Elige otro PIN” / “Ese usuario ya existe” |
+| `database_unavailable` / `upstream_error` | “Servicio no disponible, intenta de nuevo” |
 | red caída / HTTP 404 en local | estado offline neutral; el puntaje ya quedó en el dispositivo |
 
 #### Dónde engancharlo
@@ -194,7 +194,7 @@ node tools/dev-server/check.mjs https://juego.local/
 
 ## 4. Trampas que ya costaron tiempo
 
-1. **El 8080 del host es de Unity MCP** si lo tenés corriendo (el proyecto ya no lo trae como
+1. **El 8080 del host es de Unity MCP** si lo tienes corriendo (el proyecto ya no lo trae como
    dependencia). `tools/dev-server/server.mjs` acepta otro puerto: `node … 8090`.
 2. **La CSP se lee al arrancar.** Si se regenera `csp.conf` (o `index.html` cambia), hay que
    recargar Nginx o el juego se queda cargando.

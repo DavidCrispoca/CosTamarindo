@@ -74,12 +74,12 @@ namespace CosTamarindo.EditorTools
             title.rectTransform.anchoredPosition = new Vector2(0f, 170f);
             title.rectTransform.sizeDelta = new Vector2(700f, 110f);
 
-            var subtitle = CreateText(cardContent, "Subtitle", "Entrá y ayudá a la Palenquera", 40f, TextAlignmentOptions.Center, bodyFont);
+            var subtitle = CreateText(cardContent, "Subtitle", "Entra y ayuda a la Palenquera", 40f, TextAlignmentOptions.Center, bodyFont);
             subtitle.rectTransform.anchoredPosition = new Vector2(0f, 100f);
             subtitle.rectTransform.sizeDelta = new Vector2(700f, 50f);
 
             var status = CreateText(cardContent, "StatusText",
-                "Jugás de forma anónima. Si entrás al top 5, vas a poder reclamar tu nombre.",
+                "Juegas de forma anónima. Si entras al top 5, puedes reclamar tu nombre.",
                 34f, TextAlignmentOptions.Center, bodyFont);
             status.rectTransform.anchoredPosition = new Vector2(0f, 0f);
             status.rectTransform.sizeDelta = new Vector2(700f, 120f);

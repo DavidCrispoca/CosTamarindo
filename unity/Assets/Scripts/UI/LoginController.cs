@@ -41,7 +41,7 @@ namespace CosTamarindo.UI
 
             // Flujo actualizado: se juega de forma anónima. Si el puntaje entra al
             // top 5, el nombre + PIN se piden al final para reclamarlo.
-            SetStatus("Jugás de forma anónima. Si entrás al top 5, vas a poder reclamar tu nombre.", InfoColor);
+            SetStatus("Juegas de forma anónima. Si entras al top 5, puedes reclamar tu nombre.", InfoColor);
 
             if (pinInput != null)
             {

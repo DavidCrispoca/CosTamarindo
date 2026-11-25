@@ -24,7 +24,7 @@ function Resolve-Docker {
     $known = 'C:\Program Files\Docker\Docker\resources\bin\docker.exe'
     if (Test-Path $known) { return $known }
 
-    throw 'No se encontró docker.exe. Abrí Docker Desktop o agregá Docker al PATH.'
+    throw 'No se encontró docker.exe. Abre Docker Desktop o agrega Docker al PATH.'
 }
 
 $docker = Resolve-Docker

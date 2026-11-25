@@ -48,7 +48,7 @@ docker compose down -v       # borra volúmenes
 > **Secretos:** el `.env` de la raíz es la fuente para `WAZUH_MANAGER` y
 > `WAZUH_REGISTRATION_PASSWORD` (generada en la VM, nunca en el repo). Los scripts
 > `up.ps1`/`up.sh` lo pasan con `--env-file`; si ejecutás Compose a mano desde
-> `infra/`, agregá `--env-file ../.env`.
+> `infra/`, agrega `--env-file ../.env`.
 
 ## Nodos, perfiles y dueño
 

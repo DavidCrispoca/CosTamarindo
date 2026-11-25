@@ -184,7 +184,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "Jugar\xE1s de forma an\xF3nima. Si entras al top 5, vas a poder escribir
+  m_text: "Juegas de forma an\xF3nima. Si entras al top 5, puedes reclamar
     tu nombre."
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 245977259d2cb8741956f121cb4f40b8, type: 2}
@@ -314,7 +314,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "Entr\xE1 y ayud\xE1 a la Palenquera"
+  m_text: "Entra y ayuda a la Palenquera"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 245977259d2cb8741956f121cb4f40b8, type: 2}
   m_sharedMaterial: {fileID: 1515592201794328350, guid: 245977259d2cb8741956f121cb4f40b8, type: 2}
@@ -1054,7 +1054,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Manejala con el mouse para recolectar las frutas costeras, evita los desechos
+  m_text: Man\xE9jala con el mouse para recolectar las frutas costeras, evita los desechos
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 245977259d2cb8741956f121cb4f40b8, type: 2}
   m_sharedMaterial: {fileID: 1515592201794328350, guid: 245977259d2cb8741956f121cb4f40b8, type: 2}

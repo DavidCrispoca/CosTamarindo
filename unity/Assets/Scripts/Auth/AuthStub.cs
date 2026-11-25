@@ -123,7 +123,7 @@ namespace CosTamarindo.Auth
             {
                 onDone?.Invoke(new AuthResult(
                     AuthStatus.Locked,
-                    "Demasiados intentos. Esperá " + Mathf.CeilToInt(SecondsUntilUnlock) + " s."));
+                    "Demasiados intentos. Espera " + Mathf.CeilToInt(SecondsUntilUnlock) + " s."));
                 yield break;
             }
 
@@ -157,14 +157,14 @@ namespace CosTamarindo.Auth
 
             if (backend.Status == BackendStatus.InvalidCredentials)
             {
-                onDone?.Invoke(new AuthResult(AuthStatus.WrongCredentials, "PIN incorrecto. Verificá tus datos."));
+                onDone?.Invoke(new AuthResult(AuthStatus.WrongCredentials, "PIN incorrecto. Verifica tus datos."));
                 yield break;
             }
 
             if (backend.Status == BackendStatus.Locked)
             {
                 lockedUntilRealtime = Time.realtimeSinceStartup + LockoutSeconds;
-                onDone?.Invoke(new AuthResult(AuthStatus.Locked, "Cuenta bloqueada. Esperá un momento."));
+                onDone?.Invoke(new AuthResult(AuthStatus.Locked, "Cuenta bloqueada. Espera un momento."));
                 yield break;
             }
 
@@ -176,7 +176,7 @@ namespace CosTamarindo.Auth
 
             if (backend.Status == BackendStatus.ServerError)
             {
-                onDone?.Invoke(new AuthResult(AuthStatus.ServerError, "El servidor no está disponible. Intentá más tarde."));
+                onDone?.Invoke(new AuthResult(AuthStatus.ServerError, "El servidor no está disponible. Intenta más tarde."));
                 yield break;
             }
 
@@ -368,7 +368,7 @@ namespace CosTamarindo.Auth
                 string message = ReadError(registerBody);
                 onDone?.Invoke(new BackendAttempt(
                     BackendStatus.InvalidInput,
-                    message: string.IsNullOrEmpty(message) ? "Revisá el usuario y el PIN." : message));
+                    message: string.IsNullOrEmpty(message) ? "Revisa el usuario y el PIN." : message));
                 yield break;
             }
 

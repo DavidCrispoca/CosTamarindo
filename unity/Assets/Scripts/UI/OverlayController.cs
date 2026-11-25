@@ -181,7 +181,7 @@ namespace CosTamarindo.UI
             scoreSubmitted = true;
             if (scoreRes.Data.in_top5)
             {
-                SetSubmitStatus("¡Entraste al top 5! Reclamá tu nombre.", OkColor);
+                SetSubmitStatus("¡Entraste al top 5! Reclama tu nombre.", OkColor);
                 ShowClaimUI(true);
             }
             else
@@ -199,7 +199,7 @@ namespace CosTamarindo.UI
 
             if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(pin))
             {
-                SetClaimStatus("Ingresá nombre y PIN (4 a 6 dígitos).", ErrorColor);
+                SetClaimStatus("Ingresa nombre y PIN (4 a 6 dígitos).", ErrorColor);
                 return;
             }
 
@@ -215,7 +215,7 @@ namespace CosTamarindo.UI
             var api = EnsureApiClient();
             if (api == null)
             {
-                SetClaimStatus("Sin conexión: intentá reclamar más tarde.", InfoColor);
+                SetClaimStatus("Sin conexión: intenta reclamar más tarde.", InfoColor);
                 claimBusy = false;
                 if (claimButton != null) claimButton.interactable = true;
                 yield break;
@@ -233,7 +233,7 @@ namespace CosTamarindo.UI
 
             if (IsOffline(res))
             {
-                SetClaimStatus("Sin conexión: intentá reclamar más tarde.", InfoColor);
+                SetClaimStatus("Sin conexión: intenta reclamar más tarde.", InfoColor);
                 SetSubmitStatus("Sin conexión: el nombre no se pudo registrar.", InfoColor);
             }
             else if (res != null && res.Ok && res.Data != null)
@@ -366,9 +366,9 @@ namespace CosTamarindo.UI
                 case "invalid_credentials": return "PIN incorrecto para ese nombre.";
                 case "account_locked":
                     if (int.TryParse(res.RetryAfter, out int secs) && secs > 0)
-                        return "Nombre bloqueado. Reintentá en " + secs + " s.";
-                    return "Nombre bloqueado temporalmente. Reintentá más tarde.";
-                case "weak_pin": return "Ese PIN es muy predecible. Elegí otro (4 a 6 dígitos).";
+                        return "Nombre bloqueado. Reintenta en " + secs + " s.";
+                    return "Nombre bloqueado temporalmente. Reintenta más tarde.";
+                case "weak_pin": return "Ese PIN es muy predecible. Elige otro (4 a 6 dígitos).";
                 case "username_taken": return "Ese nombre ya está en uso.";
                 case "invalid_request": return "Nombre o PIN con formato inválido.";
                 default:
