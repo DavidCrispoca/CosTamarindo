@@ -109,7 +109,7 @@ namespace CosTamarindo.UI
         {
             var gm = GameManager.Instance;
             if (finalScoreText != null) finalScoreText.text = score.ToString();
-            if (finalBestText != null) finalBestText.text = "Récord " + (gm != null ? gm.BestScore : score);
+            if (finalBestText != null) finalBestText.text = string.Empty;
             if (breakdownText != null && gm != null) breakdownText.text = BuildBreakdown(gm.CaughtCounts);
 
             scoreSubmitted = false;
@@ -337,14 +337,15 @@ namespace CosTamarindo.UI
 
         /// <summary>
         /// Sin backend no hay nada que reclamar: es un estado normal del juego
-        /// offline, no un error. El récord ya quedó en PlayerPrefs (GameManager).
+        /// offline, no un error. Sin conexión el puntaje no se persiste: solo se
+        /// registra en el leaderboard de Supabase cuando hay backend.
         /// </summary>
         private static bool IsOffline<T>(ApiResult<T> res) where T : class =>
             res == null || res.ErrorCode == "network_error" || res.HttpStatus <= 0;
 
         private void SetOfflineScoreStatus()
         {
-            SetSubmitStatus("Sin conexión: puntaje guardado en este dispositivo.", InfoColor);
+            SetSubmitStatus("Sin conexión: no se pudo enviar el puntaje.", InfoColor);
             ShowClaimUI(false);
         }
 

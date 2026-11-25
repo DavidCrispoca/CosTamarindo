@@ -44,7 +44,12 @@ class Settings(BaseSettings):
 
     # Reglas de juego y de seguridad
     session_ttl_minutes: int = Field(default=15, ge=1, le=60)
-    max_points_per_second: int = Field(default=12, ge=1, le=100)
+    # Recalibrado al balance real: los ítems dan 10-25 pts y el spawner suelta
+    # ~1.5-2.6 ítems/s, así que un buen jugador supera con holgura 12 pts/s.
+    # 40 pts/s (4800 pts en 120 s) queda por encima del máximo humano
+    # (~20-25 pts/s) sin anular la defensa antifraude: las reglas de captura
+    # (score <= catches*25) y de ritmo (catches <= seconds*3) siguen activas.
+    max_points_per_second: int = Field(default=40, ge=1, le=100)
     max_score: int = 100_000
     login_max_attempts: int = Field(default=5, ge=3, le=20)
     login_lock_seconds: int = Field(default=60, ge=10, le=3600)

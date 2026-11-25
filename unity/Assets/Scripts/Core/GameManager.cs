@@ -13,8 +13,6 @@ namespace CosTamarindo.Core
     [DisallowMultipleComponent]
     public sealed class GameManager : MonoBehaviour
     {
-        private const string BestScoreKey = "ct.best_score";
-
         public static GameManager Instance { get; private set; }
 
         [Header("Reglas")]
@@ -25,7 +23,6 @@ namespace CosTamarindo.Core
         public int Score { get; private set; }
         public int Lives { get; private set; }
         public float TimeLeft { get; private set; }
-        public int BestScore => PlayerPrefs.GetInt(BestScoreKey, 0);
 
         /// <summary>Tiempo jugado en la partida actual (ms), para el envío al backend.</summary>
         public int ElapsedMs { get; private set; }
@@ -139,8 +136,6 @@ namespace CosTamarindo.Core
                     return;
                 }
             }
-
-            if (Score > BestScore) PlayerPrefs.SetInt(BestScoreKey, Score);
         }
 
         public void EndMatch()
@@ -153,8 +148,6 @@ namespace CosTamarindo.Core
             if (ElapsedMs < 0) ElapsedMs = 0;
 
             Time.timeScale = 1f;
-            if (Score > BestScore) PlayerPrefs.SetInt(BestScoreKey, Score);
-            PlayerPrefs.Save();
 
             SetState(GameState.GameOver);
             MatchEnded?.Invoke(Score);

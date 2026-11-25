@@ -31,7 +31,7 @@ namespace CosTamarindo.UI
             OnScoreChanged(gm.Score);
             OnLivesChanged(gm.Lives);
             OnTimeChanged(gm.TimeLeft);
-            RefreshBest(gm.BestScore);
+            if (bestText != null) bestText.text = string.Empty;
         }
 
         private void OnDestroy()
@@ -47,7 +47,6 @@ namespace CosTamarindo.UI
         private void OnScoreChanged(int score)
         {
             if (scoreText != null) scoreText.text = score.ToString();
-            if (GameManager.Instance != null) RefreshBest(GameManager.Instance.BestScore);
         }
 
         private void OnLivesChanged(int lives)
@@ -71,11 +70,6 @@ namespace CosTamarindo.UI
 
             int s = Mathf.CeilToInt(secondsLeft);
             timerText.text = $"{s / 60:00}:{s % 60:00}";
-        }
-
-        private void RefreshBest(int best)
-        {
-            if (bestText != null) bestText.text = "Récord " + best;
         }
     }
 }
