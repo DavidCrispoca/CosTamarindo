@@ -3,9 +3,10 @@
 > **Control:** ISO/IEC 27001:2022 A.8.19 — *Security of information in installation*
 > **Fecha de ejecución:** 2026-11-25
 > **Herramientas:** `Get-FileHash` (SHA-256), GnuPG 2.5.24
-> **Estado:** ⚠️ `SHA256SUMS` regenerado sobre el build final (2026-11-25); la firma GPG
-> quedó pendiente de re-firma (la clave privada vive en el keyring de la división Security y
-> no está disponible en este equipo). El `.asc` actual corresponde a la versión anterior del build.
+> **Estado:** ⚠️ `SHA256SUMS` regenerado sobre el build con controles de audio (2026-11-25);
+> la firma GPG quedó pendiente de re-firma (la clave privada vive en el keyring de la división
+> Security y no está disponible en este equipo). El `.asc` actual corresponde a una versión
+> anterior del build.
 > **Riesgo asociado:** R-07 (reemplazo o manipulación del artefacto desplegado).
 
 ---
@@ -57,7 +58,7 @@ gpg --verify evidencias/A.8.19/SHA256SUMS.asc evidencias/A.8.19/SHA256SUMS
 | :--- | :--- |
 | Comando | `Get-FileHash -Algorithm SHA256 -LiteralPath deploy\render\webgl\Build\<archivo>` + `gpg --verify SHA256SUMS.asc SHA256SUMS` |
 | Resultado esperado | Hash coincide y firma GPG válida |
-| Resultado observado | Coincide; `Firma correcta` (2026-11-25) |
+| Resultado observado | Los hashes coinciden con el build versionado; la firma `.asc` es anterior al último `SHA256SUMS` y este equipo tampoco tiene importada la clave pública, así que no se puede dar por verificada |
 | Fecha/hora | 2026-11-25 |
 
 ---

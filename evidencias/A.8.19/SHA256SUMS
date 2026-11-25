@@ -1,5 +1,5 @@
-# SHA256SUMS - build WebGL de deploy/render/webgl/Build (generado 2026-11-25)
-f721ac4760039652f589ed39cc914e1d6097492f1a09c3445636f937c77ea6f6  webgl.data.gz
-3b32efcf07977787f5775f26f5646bd86f8891299de50abf0d13f6bf0fd23cfd  webgl.framework.js.gz
-fda39a9600e8ce56b9e1310bc64d516284c98ea6bb72c886f4b2b36c8014108f  webgl.loader.js
-08ec9ca03d81e01995726ca99fe6705814e49e94ed44eb940102ed8bac6f9f83  webgl.wasm.gz
+# SHA256SUMS - build WebGL de deploy/render/webgl/Build (generado 2026-11-25 tras control de audio)
+ad7255890b959c90c797cff3e693f3cd35f51060bf91acfdeca3abed84621f99  webgl.data.gz
+fb56baea3253707025933e8cdb67fb88802851364d0014c1e17b17d6c292279d  webgl.framework.js.gz
+0f87cb058e8153f960dcb7cb681c7ec20b65526ecbe9109567935bff495fc93f  webgl.loader.js
+f8ef5723fde22f898313f5d4c9cf3755c6c8b51deddbaf8585ef6f34e6794bfe  webgl.wasm.gz

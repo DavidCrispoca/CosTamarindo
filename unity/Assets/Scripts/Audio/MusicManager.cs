@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using CosTamarindo.Audio;
 
 namespace CosTamarindo
 {
@@ -8,15 +9,12 @@ namespace CosTamarindo
     {
         public static MusicManager Instance { get; private set; }
 
-        [Header("Configuración de Pistas")]
-        [Tooltip("Arrastra aquí todas tus pistas de música")]
+        [Header("ConfiguraciÃ³n de pistas")]
+        [Tooltip("Arrastra aquÃ­ todas tus pistas de mÃºsica")]
         public List<AudioClip> playlist = new List<AudioClip>();
 
-        [Tooltip("Si está activo, las canciones se intercalan al azar sin repetir la anterior")]
+        [Tooltip("Si estÃ¡ activo, las canciones se intercalan al azar sin repetir la anterior")]
         public bool modoAleatorio = true;
-
-        [Range(0f, 1f)]
-        public float volumen = 0.5f;
 
         private AudioSource audioSource;
         private int indiceActual = -1;
@@ -35,10 +33,12 @@ namespace CosTamarindo
             audioSource = GetComponent<AudioSource>();
             audioSource.loop = false;
             audioSource.playOnAwake = false;
-            audioSource.volume = volumen;
+            ApplyVolume();
+
+            // El volumen ya no se fija aquÃ­: lo controla el jugador desde la pausa.
+            AudioSettingsService.Changed += ApplyVolume;
         }
 
-        // Start is called once before the first execution of Update after the MonoBehaviour is created
         void Start()
         {
             if (playlist.Count > 0)
@@ -47,15 +47,22 @@ namespace CosTamarindo
             }
         }
 
-        // Update is called once per frame
         void Update()
         {
-            audioSource.volume = volumen;
-
             if (playlist.Count > 0 && !audioSource.isPlaying && Application.isFocused)
             {
                 ReproducirSiguientePista();
             }
+        }
+
+        void OnDestroy()
+        {
+            AudioSettingsService.Changed -= ApplyVolume;
+        }
+
+        private void ApplyVolume()
+        {
+            if (audioSource != null) audioSource.volume = AudioSettingsService.MusicOutput;
         }
 
         public void ReproducirSiguientePista()
@@ -78,6 +85,7 @@ namespace CosTamarindo
             }
 
             audioSource.clip = playlist[indiceActual];
+            ApplyVolume();
             audioSource.Play();
         }
     }

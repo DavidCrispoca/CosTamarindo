@@ -64,6 +64,8 @@ namespace CosTamarindo.UI
                 claimPinInput.characterLimit = 6;
             }
             if (claimUsernameInput != null) claimUsernameInput.characterLimit = 16;
+
+            PauseAudioSettings.Install(pausePanel != null ? pausePanel.transform : null);
         }
 
         private void Start()

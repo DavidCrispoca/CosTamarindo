@@ -96,7 +96,7 @@ namespace CosTamarindo.UI
 
         private void Play(AudioClip clip)
         {
-            if (audioSource != null && clip != null) audioSource.PlayOneShot(clip);
+            AudioSettingsService.PlaySfx(audioSource, clip);
         }
 
         private void SpawnLabel(string label, Color color)

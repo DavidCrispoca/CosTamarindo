@@ -6,6 +6,9 @@ Videojuego *catcher* 2D desarrollado en **Unity 6 (WebGL)** como objeto de audit
 **ISO/IEC 27001:2022**. Incluye autenticación y leaderboard online con **Supabase**,
 infraestructura de 5 nodos con **Docker** y diálogos de NPC generados por **Ollama** local.
 
+En partida, **Esc** o **P** abre la pausa: allí se ajustan y silencian la música y los
+efectos por separado. La preferencia se guarda para la siguiente partida.
+
 - [`docs/handoff/`](docs/handoff/README.md) — puesta en marcha y handoff por división
 - Plan de ejecución por divisiones: [`Plan.md`](Plan.md)
 - Especificación ISO 27001: [`docs/CosTamarindo.md`](docs/CosTamarindo.md)
