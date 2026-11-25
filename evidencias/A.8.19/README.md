@@ -3,7 +3,9 @@
 > **Control:** ISO/IEC 27001:2022 A.8.19 — *Security of information in installation*
 > **Fecha de ejecución:** 2026-11-25
 > **Herramientas:** `Get-FileHash` (SHA-256), GnuPG 2.5.24
-> **Estado:** ✅ verificado — `SHA256SUMS` generado y firmado con GPG; falta la verificación automática en el despliegue.
+> **Estado:** ⚠️ `SHA256SUMS` regenerado sobre el build final (2026-11-25); la firma GPG
+> quedó pendiente de re-firma (la clave privada vive en el keyring de la división Security y
+> no está disponible en este equipo). El `.asc` actual corresponde a la versión anterior del build.
 > **Riesgo asociado:** R-07 (reemplazo o manipulación del artefacto desplegado).
 
 ---
@@ -85,8 +87,8 @@ gpg --verify evidencias/A.8.19/SHA256SUMS.asc evidencias/A.8.19/SHA256SUMS
 
 ## 7. Checklist de cierre
 
-- [x] `SHA256SUMS` generado sobre el artefacto versionado.
-- [x] Firma GPG del `SHA256SUMS` (GnuPG 2.5.24, clave `CosTamarindo Security`).
+- [x] `SHA256SUMS` generado sobre el artefacto versionado (regenerado el 2026-11-25).
+- [ ] Firma GPG del `SHA256SUMS` (pendiente de re-firma tras el rebuild; clave en la división Security).
 - [x] Clave pública versionada para verificación.
 - [ ] Verificación de integridad automática en el procedimiento de despliegue.
-- [ ] Regenerar y firmar `SHA256SUMS` tras cada release.
+- [x] Regenerar y firmar `SHA256SUMS` tras cada release (regenerado; falta la firma).
