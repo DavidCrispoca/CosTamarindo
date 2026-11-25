@@ -79,10 +79,13 @@ Los secretos (`BACKEND_JWT_SECRET`, `PIN_PEPPER`, `SESSION_MASTER_KEY`) se gener
 ## 2. Oracle Cloud Always Free — crear la VM
 
 1. Entra en [cloud.oracle.com](https://cloud.oracle.com) → *Compute → Instances → Create*.
-2. **Shape:** `VM.Standard.A1.Flex` (Arm) con **4 OCPU / 24 GB RAM** (es el Always Free). Con
-   24 GB sobra para Ollama (`qwen2.5:3b` ~3 GB) + backend + Nginx.
-3. **Imagen:** Ubuntu 22.04 o 24.04 LTS.
-4. **Clave SSH:** sube tu clave pública (o genera una en el sitio y descarga la privada).
+2. **Shape:** `VM.Standard.A1.Flex` (Arm). **Atención (junio 2026):** Oracle redujo el Always Free
+   Ampere de 4 OCPU/24 GB a **2 OCPU / 12 GB**. Fija los deslizadores en **2 OCPU y 12 GB** y
+   fíate del indicador *"Always Free eligible"* de la consola (algunas cuentas aún muestran 4/24;
+   usa lo que marque tu cuenta). Con 12 GB alcanza para Ollama (`qwen2.5:3b` ~3 GB) + backend +
+   Nginx.
+3. **Imagen:** Ubuntu 22.04 o 24.04 LTS (marca la que diga *Always Free eligible*).
+4. **Clave SSH:** sube tu clave pública (o usa *Generate a key pair for me* y descarga la privada).
 5. **Red / Seguridad:** abre los puertos **80/tcp** y **443/tcp** en la *Ingress Rule* del VCN
    (y 22/tcp para SSH, restringido a tu IP si puedes).
 6. Reserva la **IP pública** (la "ephemeral" cambia al reiniciar; mejor **reserved public IP**).
@@ -168,9 +171,10 @@ curl https://tudominio.com/api/health
 
 - **Supabase free:** 500 MB de base, 2 proyectos, ~50 000 usuarios de Auth/mes, ~5 GB de salida.
   Para una demo del juego es de sobra. El proyecto se pausa tras ~1 semana sin actividad.
-- **Oracle Always Free:** 4 OCPU / 24 GB Arm + 200 GB de disco por cuenta. Suficiente para los 4
-  contenedores. El tráfico de salida del Always Free tiene un límite mensual generoso (~10 TB),
-  muy por encima del uso de un juego 2D con API ligera.
+- **Oracle Always Free:** 2 OCPU / 12 GB Arm (reducido desde 4/24 en junio 2026) + 200 GB de
+  disco por cuenta. Suficiente para los 4 contenedores (Ollama ~3 GB + backend + Nginx). El
+  tráfico de salida del Always Free tiene un límite mensual generoso (~10 TB), muy por encima del
+  uso de un juego 2D con API ligera.
 - **Ollama:** autocontenido y gratis; solo consume RAM/CPU de la VM.
 - **Dominio:** único gasto opcional si quieres un dominio "bonito"; duckdns.org lo evita.
 
