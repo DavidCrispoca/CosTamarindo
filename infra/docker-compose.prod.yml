@@ -1,0 +1,28 @@
+# CosTamarindo · override de PRODUCCIÓN (Oracle Always Free + Let's Encrypt)
+#
+# Se usa JUNTO al compose base, SIN el override de dev (que publica el 8081):
+#
+#   docker compose -f infra/docker-compose.yml -f infra/docker-compose.prod.yml \
+#                  --env-file .env --profile backend up -d --build
+#
+# Cambios respecto a dev:
+#   · publica 80 (ACME + redirect) y 443 (juego con TLS real), y NO el 8081.
+#   · monta infra/nginx-prod (dominio real + Let's Encrypt) en vez del conf.d de dev.
+#   · monta infra/certs (fullchain.pem + privkey.pem) en vez de infra/tls (mkcert).
+#   · fija ENV=prod y CORS_ALLOWED_ORIGINS desde CT_PUBLIC_URL.
+
+services:
+  frontend:
+    ports:
+      - "80:80"      # Let's Encrypt (HTTP-01) + redirección a HTTPS
+      - "443:443"    # juego con TLS real
+    volumes:
+      # Reemplaza el conf.d de dev (juego.local + mkcert) por el de producción.
+      - ./nginx-prod:/etc/nginx/conf.d:ro
+      # Reemplaza ./tls (mkcert) por los certificados Let's Encrypt.
+      - ./certs:/etc/nginx/certs:ro
+
+  backend:
+    environment:
+      ENV: "prod"
+      CORS_ALLOWED_ORIGINS: "${CT_PUBLIC_URL:-https://juego.local}"
