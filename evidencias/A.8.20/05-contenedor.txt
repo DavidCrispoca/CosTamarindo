@@ -1,0 +1,23 @@
+== A.8.20 · prueba de aislamiento desde contenedor (2026-11-25) ==
+
+-- topología (docker network inspect) --
+sg-ai       : costamarindo-ai                          (10.83.0.3)
+sg-backend  : costamarindo-ai, costamarindo-app, costamarindo-data, costamarindo-mgmt
+sg-frontend : costamarindo-app, costamarindo-dmz, costamarindo-mgmt   (NO está en costamarindo-ai)
+
+-- nmap desde el host (127.0.0.1) --
+PORT      STATE    SERVICE
+443/tcp   open     https
+5432/tcp  closed   postgresql
+8000/tcp  closed   http-alt
+8081/tcp  open     blackice-icecap   (override de desarrollo activo)
+11434/tcp closed   unknown
+
+-- alcance desde contenedores --
+1) sg-frontend -> sg-ai:11434   => NO_ALCANZABLE ("nc: bad address 'sg-ai'": el nombre no
+   resuelve porque sg-frontend no está en costamarindo-ai)
+2) sg-backend  -> sg-ai:11434   => ALCANZABLE (el backend necesita el diálogo con Ollama)
+3) sg-frontend -> sg-backend:8000 => ALCANZABLE (Nginx proxifica /api/ al backend)
+
+Lectura: la DMZ (sg-frontend) no puede alcanzar la IA; solo el backend (red ai) sí. 8000 y
+11434 no están publicados en el host.

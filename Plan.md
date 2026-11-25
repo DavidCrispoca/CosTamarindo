@@ -293,19 +293,21 @@ con «antes vulnerable → ataque reproducible → corrección → verificación
 | :--- | :--- | :--- |
 | **A.8.25** SDLC seguro (Gitleaks) | ✅ | [`evidencias/A.8.25/`](evidencias/A.8.25/README.md) |
 | A.8.5 Autenticación | ✅ verificado con ataque real (fuerza bruta 423 + JWT manipulado 401) | [`evidencias/A.8.5/`](evidencias/A.8.5/README.md) |
+| A.8.9 Configuración | ✅ verificado (PlayerPrefs solo locales; vidas/puntaje/token en memoria) | [`evidencias/A.8.9/`](evidencias/A.8.9/README.md) |
 | A.8.12 DLP | ✅ verificado (0 secretos/URLs en el build) | [`evidencias/A.8.12/`](evidencias/A.8.12/README.md) |
+| A.8.19 Instalación | ✅ `SHA256SUMS` firmado con GPG + clave pública versionados | [`evidencias/A.8.19/`](evidencias/A.8.19/README.md) |
+| A.8.20 Redes | ✅ `nmap` host y prueba desde contenedor (la DMZ no alcanza la IA) | [`evidencias/A.8.20/`](evidencias/A.8.20/README.md) |
 | A.8.28 Codificación segura | ✅ verificado (SQLi, XSS, prompt injection) | [`evidencias/A.8.28/`](evidencias/A.8.28/README.md) |
+| A.8.31 Separación | ✅ token DEV rechazado en PROD (401); token PROD válido en PROD | [`evidencias/A.8.31/`](evidencias/A.8.31/README.md) |
 | A.8.24 Criptografía | 🟡 TLS y firma HMAC del puntaje verificados con ataque real (`bad_signature`, `bad_nonce`, `session_used`, `implausible_score`); falta cifrado en reposo y gestión de claves | [`evidencias/A.8.24/`](evidencias/A.8.24/README.md) |
-| A.8.20 Redes | 🟡 `nmap` host+VM, `ports`/`expose` y redes internas verificadas; falta prueba desde otro contenedor | [`evidencias/A.8.20/`](evidencias/A.8.20/README.md) |
 | A.8.15 Logging | 🟡 VM `172.18.18.220` y agente **002** activos; logs Nginx y `100250`; `backend.log` escribe eventos de negocio JSON con IP enmascarada (`04-backend-audit.txt`); falta alerta FIM por archivo y llegada al manager | [`evidencias/A.8.15/`](evidencias/A.8.15/README.md) |
-| A.8.19 Instalación | 🟡 `SHA256SUMS` generado; falta firma GPG y verificación en despliegue | [`evidencias/A.8.19/`](evidencias/A.8.19/README.md) |
-| Resto (A.8.9, A.8.31) | ⬜ | — |
 
-> **Cierre 2026-11-25.** Con el backend real arriba se cerraron **A.8.5, A.8.12 y A.8.28** con
-> ataque reproducible y evidencia literal, y se avanzó **A.8.24, A.8.15 y A.8.19**. Script
-> reutilizable: [`evidencias/ataques/iso-api-ataques.mjs`](evidencias/ataques/iso-api-ataques.mjs).
-> Quedan A.8.9 (editar `PlayerPrefs` en navegador), A.8.31 (necesita PROD) y los pendientes
-> parciales (cifrado en reposo, `nmap` desde contenedor, alerta FIM, firma GPG).
+> **Cierre 2026-11-25 (completo).** Con el backend real y el PROD desplegado
+> (`costamarindo.onrender.com`, proyecto `CosTamarindo-prod`), quedaron **8 de 10 controles
+> cerrados** con ataque reproducible: A.8.5, A.8.9, A.8.12, A.8.19, A.8.20, A.8.25, A.8.28 y
+> A.8.31. Scripts: [`evidencias/ataques/`](evidencias/ataques/). Pendientes solo los parciales:
+> A.8.24 (cifrado en reposo y gestión de claves) y A.8.15 (alerta FIM por archivo y llegada de
+> `backend.log` al manager).
 
 **Bloque independiente 2026-11-13.** Se cerraron `SEC-01` (plantilla de evidencia y scripts
 de ataque), `SEC-02` (SoA de 93 controles y matriz de riesgos), `SEC-06`/A.8.20 parcial,

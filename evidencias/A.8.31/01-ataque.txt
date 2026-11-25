@@ -1,0 +1,14 @@
+== A.8.31 · separación de entornos DEV/PROD ==
+DEV  health: {"status":"ok","env":"dev","database":true}
+PROD health: {"status":"ok","env":"prod","database":true}
+DEV registro: 201 (compatibilidad)
+token DEV claims: {"iss":"costamarindo","env":"dev","sub":"7fe269f6-2910-4514-885a-ba6818ecf915"}
+PROD con token DEV (logout): 401 {"code":"invalid_token","message":"Sesion invalida o expirada"}
+DEV con token DEV (logout): 204
+PROD con token PROD (logout): 204
+
+RESULTADO: token DEV rechazado en PROD = true | token DEV válido en DEV = true
+
+entornos:
+  DEV  = https://juego.local            (Supabase CosTamarindo, ref jukyiwsteuzwrmzlgfme)
+  PROD = https://costamarindo.onrender.com (Supabase CosTamarindo-prod, env=prod)

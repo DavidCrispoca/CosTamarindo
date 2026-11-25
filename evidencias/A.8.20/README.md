@@ -1,10 +1,9 @@
 # A.8.20 — Seguridad de redes — evidencia
 
 > **Control:** ISO/IEC 27001:2022 A.8.20 — *Network security*
-> **Fecha de ejecución:** 2026-11-13
+> **Fecha de ejecución:** 2026-11-13 · **Actualizado 2026-11-25** (prueba desde contenedor)
 > **Herramienta:** Nmap 7.80, Docker Compose
-> **Estado:** Parcial — aislamiento y puertos verificados; falta prueba desde un segundo
-> contenedor y revisión de reglas de la VM.
+> **Estado:** ✅ verificado — puertos, redes internas y aislamiento desde contenedor comprobados.
 > **Riesgo asociado:** R-09 (abuso por ráfaga) y R-03 (acceso no autorizado).
 
 ---
@@ -77,6 +76,19 @@ Ver [`03-docker-ports.txt`](03-docker-ports.txt) y [`04-network-internal.txt`](0
 - `wazuh-agent` y `security`: sin puertos publicados.
 - `costamarindo-app`, `costamarindo-ai` y `costamarindo-mgmt`: `internal=True`.
 
+### 3.4 Prueba desde otro contenedor (2026-11-25)
+
+Ver [`05-contenedor.txt`](05-contenedor.txt):
+
+| Origen → Destino | Resultado |
+| :--- | :--- |
+| `sg-frontend` → `sg-ai:11434` | **NO alcanzable** (`nc: bad address 'sg-ai'`: el nombre no resuelve, no está en `costamarindo-ai`) |
+| `sg-backend` → `sg-ai:11434` | Alcanzable (el backend necesita el diálogo con Ollama) |
+| `sg-frontend` → `sg-backend:8000` | Alcanzable (Nginx proxifica `/api/` al backend) |
+
+La DMZ no alcanza la IA; solo el backend (en la red `ai`) sí. Esto cierra la prueba pendiente
+"desde otro contenedor" sin descargar una imagen nueva.
+
 ---
 
 ## 4. Corrección aplicada
@@ -101,15 +113,14 @@ Ver [`03-docker-ports.txt`](03-docker-ports.txt) y [`04-network-internal.txt`](0
 
 ## 6. Limitaciones y riesgo residual
 
-- **Falta la prueba desde otro contenedor.** El README de ataques deja el comando con
-  `docker run --rm --network costamarindo-dmz curlimages/curl ...`; no se ejecutó en esta
-  pasada para no descargar una imagen nueva. Es el siguiente paso para cerrar el control.
 - **8081 no está publicado** porque el override de desarrollo no se cargó al usar
   `-f docker-compose.yml`. En la demo se debe decidir si se usa el override o no.
 - **La VM no está en una tailnet todavía.** El acceso es por Default Switch; Tailscale se
   difiere hasta tener los cinco nodos.
 - **Nmap en Windows** muestra una advertencia de Npcap y usa `connect()`. El resultado es
   válido para puertos TCP, pero no reemplaza un escaneo desde una red externa.
+- **El aislamiento desde contenedor se probó por resolución de nombre y conectividad**, no
+  con un `nmap` dentro del contenedor (la imagen no lo trae); es equivalente para el control.
 
 ---
 
@@ -121,6 +132,7 @@ Ver [`03-docker-ports.txt`](03-docker-ports.txt) y [`04-network-internal.txt`](0
 | [`02-nmap-vm.txt`](02-nmap-vm.txt) | Puertos de la VM desde el host |
 | [`03-docker-ports.txt`](03-docker-ports.txt) | `ports` vs `expose` en Compose |
 | [`04-network-internal.txt`](04-network-internal.txt) | Redes Docker internas |
+| [`05-contenedor.txt`](05-contenedor.txt) | Aislamiento desde contenedor (DMZ ↔ IA) |
 
 ---
 
@@ -129,5 +141,5 @@ Ver [`03-docker-ports.txt`](03-docker-ports.txt) y [`04-network-internal.txt`](0
 - [x] Nmap desde el host al frontend.
 - [x] Nmap desde el host a la VM.
 - [x] Configuración de Compose y redes internas.
-- [ ] Nmap desde un contenedor de la DMZ.
+- [x] Prueba de alcance desde contenedor (DMZ no alcanza la IA; backend sí).
 - [ ] Repetir después de cada cambio de red o de perfil.

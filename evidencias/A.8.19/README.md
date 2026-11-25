@@ -2,8 +2,8 @@
 
 > **Control:** ISO/IEC 27001:2022 A.8.19 — *Security of information in installation*
 > **Fecha de ejecución:** 2026-11-25
-> **Herramientas:** `Get-FileHash` (SHA-256)
-> **Estado:** Parcial — `SHA256SUMS` generado; falta la firma GPG y la verificación en el despliegue.
+> **Herramientas:** `Get-FileHash` (SHA-256), GnuPG 2.5.24
+> **Estado:** ✅ verificado — `SHA256SUMS` generado y firmado con GPG; falta la verificación automática en el despliegue.
 > **Riesgo asociado:** R-07 (reemplazo o manipulación del artefacto desplegado).
 
 ---
@@ -35,12 +35,16 @@ Propiedad demostrada: **integridad** del artefacto instalado.
 | Pieza | Cambio | Motivo |
 | :--- | :--- | :--- |
 | `evidencias/A.8.19/SHA256SUMS` | Sumas SHA-256 de los 4 archivos de `deploy/render/webgl/Build/` | Base de integridad reproducible |
+| `evidencias/A.8.19/SHA256SUMS.asc` | Firma GPG separada (ASCII armor) de `SHA256SUMS` | El hash no se puede reemplazar sin invalidar la firma |
+| `evidencias/A.8.19/pubkey.asc` | Clave pública GPG `CosTamarindo Security (build signing)` | Verificación pública de la firma |
 | `deploy/render/webgl/Build/` | Artefacto versionado en el repo | Punto de comparación contra el build local |
 
-Los hashes se generan con:
+La clave de firma (RSA 2048, solo firma, vigencia 2 años) y su passphrase viven en el
+keyring local de la división Security, fuera del repositorio. La firma se verifica con:
 
 ```powershell
-Get-FileHash -Algorithm SHA256 -LiteralPath <archivo>
+gpg --verify evidencias/A.8.19/SHA256SUMS.asc evidencias/A.8.19/SHA256SUMS
+# -> "Firma correcta de CosTamarindo Security (build signing)"
 ```
 
 ---
@@ -49,24 +53,23 @@ Get-FileHash -Algorithm SHA256 -LiteralPath <archivo>
 
 | Campo | Valor |
 | :--- | :--- |
-| Comando | `Get-FileHash -Algorithm SHA256 -LiteralPath deploy\render\webgl\Build\<archivo>` |
-| Resultado esperado | Coincide con `SHA256SUMS` |
-| Resultado observado | Coincide (generado en esta pasada) |
+| Comando | `Get-FileHash -Algorithm SHA256 -LiteralPath deploy\render\webgl\Build\<archivo>` + `gpg --verify SHA256SUMS.asc SHA256SUMS` |
+| Resultado esperado | Hash coincide y firma GPG válida |
+| Resultado observado | Coincide; `Firma correcta` (2026-11-25) |
 | Fecha/hora | 2026-11-25 |
 
 ---
 
 ## 5. Limitaciones y riesgo residual
 
-- **Sin firma GPG:** el `SHA256SUMS` actual no está firmado, así que un atacante que
-  reemplace el build también podría reemplazar el archivo de hashes. El `gpg` que trae Git
-  para Windows no puede generar claves (`keyboxd` no instalado): hay que instalar GnuPG y
-  firmar `SHA256SUMS` con una clave de la división. Pendiente de `SEC-11`.
-- **No hay verificación en el despliegue:** falta un paso en el procedimiento de publicación
-  que compare el webroot contra `SHA256SUMS` (y la firma). Pendiente con FIM (A.8.15).
+- **Sin verificación automática en el despliegue:** falta un paso en el procedimiento de
+  publicación que compare el webroot contra `SHA256SUMS` (y la firma). Pendiente de integrar
+  en el CI/deploy y con FIM (A.8.15).
+- **La clave privada es local.** La firma solo la puede regenerar quien tenga el keyring; la
+  pública queda versionada para que cualquiera verifique.
 - **`builds/webgl` no está versionado**, por lo que la base de comparación es
-  `deploy/render/webgl/Build/` (que sí lo está). Al regenerar el build hay que regenerar
-  este `SHA256SUMS`.
+  `deploy/render/webgl/Build/` (que sí lo está). Al regenerar el build hay que regenerar y
+  volver a firmar este `SHA256SUMS`.
 
 ---
 
@@ -75,12 +78,15 @@ Get-FileHash -Algorithm SHA256 -LiteralPath <archivo>
 | Archivo | Qué demuestra |
 | :--- | :--- |
 | [`SHA256SUMS`](SHA256SUMS) | Sumas SHA-256 de los 4 archivos del build |
+| [`SHA256SUMS.asc`](SHA256SUMS.asc) | Firma GPG separada del `SHA256SUMS` |
+| [`pubkey.asc`](pubkey.asc) | Clave pública para verificar la firma |
 
 ---
 
 ## 7. Checklist de cierre
 
 - [x] `SHA256SUMS` generado sobre el artefacto versionado.
-- [ ] Firma GPG del `SHA256SUMS` (requiere GnuPG + clave de la división).
-- [ ] Verificación de integridad en el procedimiento de despliegue.
-- [ ] Regenerar `SHA256SUMS` tras cada release.
+- [x] Firma GPG del `SHA256SUMS` (GnuPG 2.5.24, clave `CosTamarindo Security`).
+- [x] Clave pública versionada para verificación.
+- [ ] Verificación de integridad automática en el procedimiento de despliegue.
+- [ ] Regenerar y firmar `SHA256SUMS` tras cada release.

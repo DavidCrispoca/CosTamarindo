@@ -1,0 +1,22 @@
+== A.8.9 · inspección del almacenamiento del cliente (PlayerPrefs) ==
+URL: https://costamarindo.onrender.com (build WebGL, env=prod)
+fecha: 2026-11-25
+
+-- localStorage --
+(vacío)
+
+-- IndexedDB (bases y object stores) --
+/idbfs      v21  -> FILE_DATA          (sistema de archivos virtual de Unity: aquí viven PlayerPrefs)
+UnityCache  v4   -> RequestMetaDataStore (cache de assets, p. ej. webgl.data.gz)
+
+-- claves encontradas --
+UnityCache/RequestMetaDataStore: https://costamarindo.onrender.com/Build/webgl.data.gz
+
+Conclusión: PlayerPrefs se persisten en IndexedDB (/idbfs), no en localStorage, y el
+almacenamiento del cliente solo contiene la caché de assets y (tras jugar) el récord local
+y la colección. No hay tokens, claves ni lógica autoritativa.
+
+-- qué guarda PlayerPrefs en el código --
+GameManager:  ct.best_score  -> récord local (solo display; Score y Lives viven en memoria)
+CollectionBook: ct.book.<itemId> -> progreso de la colección (local)
+AuthStub:  el token JWT vive solo en memoria, nunca en PlayerPrefs (comentario A.8.9)
