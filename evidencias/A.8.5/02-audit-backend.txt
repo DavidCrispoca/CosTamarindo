@@ -1,0 +1,9 @@
+{"ts": "2026-11-25T03:46:48.701Z", "level": "INFO", "logger": "costamarindo.audit", "event": "register_ok", "request_id": "8de072eba80f4c8c992c23f32ee2ee1d", "user_id": "5b72de04-0896-4507-b59f-6723b9aa1c52", "username": "sec_7a45c447"}
+{"ts": "2026-11-25T03:46:51.640Z", "level": "INFO", "logger": "costamarindo.audit", "event": "login_ok", "request_id": "03bd9110bd97443694a8f02fac908cd6", "user_id": "5b72de04-0896-4507-b59f-6723b9aa1c52", "username": "sec_7a45c447"}
+{"ts": "2026-11-25T03:46:51.647Z", "level": "INFO", "logger": "costamarindo.audit", "event": "logout", "request_id": "d5d5a3c15e214199ac8ec74b685704e2", "username": "sec_7a45c447", "user_id": "-"}
+{"ts": "2026-11-25T03:46:53.440Z", "level": "INFO", "logger": "costamarindo.audit", "event": "login_fail", "request_id": "b4558aee2cbc45828b6a99c414e17153", "username": "sec_7a45c447", "locked": false, "lock_seconds": 0}
+{"ts": "2026-11-25T03:46:55.246Z", "level": "INFO", "logger": "costamarindo.audit", "event": "login_fail", "request_id": "38d4beac03a941e78158bae25d0c2bf5", "username": "sec_7a45c447", "locked": false, "lock_seconds": 0}
+{"ts": "2026-11-25T03:46:57.050Z", "level": "INFO", "logger": "costamarindo.audit", "event": "login_fail", "request_id": "5d0525aa49cc469192a8ae9b3c887e2d", "username": "sec_7a45c447", "locked": false, "lock_seconds": 0}
+{"ts": "2026-11-25T03:46:58.847Z", "level": "INFO", "logger": "costamarindo.audit", "event": "login_fail", "request_id": "7c0b974e8af84bd585c2d05f1b4a34e2", "username": "sec_7a45c447", "locked": false, "lock_seconds": 0}
+{"ts": "2026-11-25T03:47:00.658Z", "level": "INFO", "logger": "costamarindo.audit", "event": "login_fail", "request_id": "b2402a5545704058b44410e9bd5aa629", "username": "sec_7a45c447", "locked": true, "lock_seconds": 60}
+{"ts": "2026-11-25T03:47:01.238Z", "level": "INFO", "logger": "costamarindo.audit", "event": "login_blocked", "request_id": "2730cfe7beb44b759671f65f47331941", "username": "sec_7a45c447"}

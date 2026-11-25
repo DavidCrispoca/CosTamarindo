@@ -38,16 +38,16 @@ Lo que **todavía no** se puede atacar y por qué:
 
 | # | Control | Implementación | Evidencia | Falta |
 | :--- | :--- | :--- | :--- | :--- |
-| 1 | **A.8.24** Criptografía | HMAC-SHA256 + nonce + TTL + TLS local mkcert, HSTS y CSP | 🟡 | ataque con Burp y captura de `bad_signature`; cifrado en reposo y gestión de claves |
-| 2 | **A.8.5** Autenticación | Supabase Auth + bloqueo 5/60 s + PIN débil rechazado (flujo anónimo + claim) | ⬜ | fuerza bruta, JWT manipulado y captura del 423; backend ya arriba |
+| 1 | **A.8.24** Criptografía | HMAC-SHA256 + nonce + TTL + TLS local mkcert, HSTS y CSP | 🟡 | firma del puntaje y TLS verificados con ataque real (`bad_signature`, `bad_nonce`, `session_used`, `implausible_score`); falta cifrado en reposo y gestión de claves |
+| 2 | **A.8.5** Autenticación | Supabase Auth + bloqueo 5/60 s + PIN débil rechazado (flujo anónimo + claim) | ✅ | cerrado 2026-11-25: fuerza bruta (423 + `Retry-After: 60`), JWT manipulado (401), `weak_pin`/`username_taken` |
 | 3 | **A.8.9** Configuración | servidor autoritativo; el cliente solo presenta | ⬜ | editar `PlayerPrefs` contra backend real (ya arriba) |
 | 4 | **A.8.20** Redes | 5 redes Docker, un solo puerto público | 🟡 | `nmap` host+VM hecho; falta prueba desde otro contenedor |
-| 5 | **A.8.12** DLP | sin secretos en cliente; IP enmascarada en logs | ⬜ | consola + `strings` del build ya generado |
-| 6 | **A.8.15** Logging | JSON a stdout con `request_id` + `backend.log` en volumen | 🟡 | Wazuh activo, `100250` (36) y `backend.log` escribiéndose; falta alerta FIM por archivo |
-| 7 | **A.8.28** Codificación segura | Pydantic, SQL parametrizado, saneo, RLS | ⬜ | SQLi, XSS/rich text, prompt injection contra backend real |
+| 5 | **A.8.12** DLP | sin secretos en cliente; IP enmascarada en logs | ✅ | cerrado 2026-11-25: escaneo del build 0 secretos/URLs; consola sin errores |
+| 6 | **A.8.15** Logging | JSON a stdout con `request_id` + `backend.log` en volumen | 🟡 | `backend.log` con eventos de negocio e IP enmascarada (evidencia `04-backend-audit.txt`); falta alerta FIM por archivo y llegada al manager |
+| 7 | **A.8.28** Codificación segura | Pydantic, SQL parametrizado, saneo, RLS | ✅ | cerrado 2026-11-25: SQLi (422), XSS/rich text (422 / sin etiquetas), prompt injection (`blocked: true`) |
 | 8 | **A.8.31** Separación | guard `assert_environment` + claim `env` | ⬜ | token DEV contra PROD (necesita PROD) |
 | 9 | **A.8.25** SDLC | Gitleaks + hook + historial (84 commits, 0 hallazgos) | ✅ | CI creada en `.github/workflows/security.yml`; falta ejecución remota |
-| 10 | **A.8.19** Instalación | build WebGL generado y medido | ⬜ | `SHA256SUMS` + GPG y verificación en despliegue |
+| 10 | **A.8.19** Instalación | build WebGL generado y medido; `SHA256SUMS` generado | 🟡 | `SHA256SUMS` hecho; falta firma GPG (GnuPG completo) y verificación en despliegue |
 
 **Nivel 2 ya cubierto sin querer:** A.8.13 (copia de seguridad) tiene evidencia real en
 [`../../evidencias/F4/`](../../evidencias/F4/README.md) §5: `pg_dump`, hash y restauración
@@ -246,21 +246,22 @@ el hook parecía funcionar y dejaba pasar los commits por un problema de `PATH`.
 | :--- | :--- | :--- |
 | `SEC-01` | Plantilla de evidencia y scripts en `evidencias/ataques/` | ✅ cerrado |
 | `SEC-02` | `docs/soa.md` + matriz de riesgos (93 controles) | ✅ cerrado |
-| `SEC-03` | A.8.24: Burp + replay + TLS | ⬜ TLS verificado; falta ataque real y cifrado en reposo |
-| `SEC-04` | A.8.5: fuerza bruta + JWT | ⬜ backend real arriba; falta ejecutar el ataque |
-| `SEC-05` | A.8.9: `PlayerPrefs`/IndexedDB | ⬜ `FE-07` y el backend real listos; falta ejecutar el ataque |
+| `SEC-03` | A.8.24: Burp + replay + TLS | 🟡 firma HMAC y TLS verificados con ataque real (`evidencias/A.8.24/04-score-ataques.txt`); falta cifrado en reposo y gestión de claves |
+| `SEC-04` | A.8.5: fuerza bruta + JWT | ✅ cerrado 2026-11-25 (`evidencias/A.8.5/`) |
+| `SEC-05` | A.8.9: `PlayerPrefs`/IndexedDB | ⬜ `FE-07` y el backend real listos; falta ejecutar el ataque en navegador |
 | `SEC-06` | A.8.20: `nmap` host y contenedor | 🟡 host+VM hechos; falta prueba desde otro contenedor |
-| `SEC-07` | A.8.12: consola + `strings` | ⬜ `FE-12` listo; falta ejecutar sobre build publicado |
-| `SEC-08` | A.8.15: Wazuh + reglas + FIM | 🟡 Wazuh, reglas y `backend.log` activos; falta la alerta FIM end-to-end |
-| `SEC-09` | A.8.28: SQLi, XSS, prompt injection | ⬜ backend real arriba; falta ejecutar y guardar la evidencia |
+| `SEC-07` | A.8.12: consola + `strings` | ✅ cerrado 2026-11-25 (`evidencias/A.8.12/`): 0 secretos/URLs en el build |
+| `SEC-08` | A.8.15: Wazuh + reglas + FIM | 🟡 `backend.log` con eventos de negocio (`evidencias/A.8.15/04-backend-audit.txt`); falta alerta FIM end-to-end |
+| `SEC-09` | A.8.28: SQLi, XSS, prompt injection | ✅ cerrado 2026-11-25 (`evidencias/A.8.28/`) |
 | `SEC-10` | A.8.31: DEV contra PROD | ⬜ proyecto PROD |
-| `SEC-11` | A.8.19: `SHA256SUMS` + GPG + FIM | ⬜ `FE-12` listo; faltan hash firmado y verificación en despliegue |
+| `SEC-11` | A.8.19: `SHA256SUMS` + GPG + FIM | 🟡 `SHA256SUMS` generado (`evidencias/A.8.19/`); falta firma GPG y verificación en despliegue |
 | `SEC-12` | `pip-audit`/`npm audit` | ✅ cerrado (`npm audit` y SonarQube diferidos) |
 | `SEC-13` | CI en GitHub Actions (Gitleaks + tests) | ✅ creada; falta primera ejecución remota |
 | `SEC-14` | Quitar `com.coplaydev.unity-mcp` del `manifest.json` | ✅ cerrado con `FE-14` |
 
-`FE-12`, `FE-13` y `FE-14` ya están cerrados, así que los ataques de `SEC-07` y `SEC-11`
-ya no esperan al build: esperan a que se publique y a que exista una cadena de hashes.
+**Cierre 2026-11-25:** con el backend real arriba se ejecutaron y evidenciaron los ataques de
+A.8.5 (`SEC-04`), A.8.12 (`SEC-07`) y A.8.28 (`SEC-09`), y se avanzó A.8.24 (`SEC-03`),
+A.8.15 (`SEC-08`) y A.8.19 (`SEC-11`). Script reutilizable: [`evidencias/ataques/iso-api-ataques.mjs`](../../evidencias/ataques/iso-api-ataques.mjs).
 
 ---
 
@@ -275,7 +276,7 @@ ya no esperan al build: esperan a que se publique y a que exista una cadena de h
 | `preloadedAssets` vaciado en `ProjectSettings.asset` | Baja | ✅ verificado en WebGL con `FE-13` |
 | Wazuh apagado y sin reglas | Media | 🟡 Wazuh y reglas activos y `backend.log` escribiéndose; falta la alerta FIM end-to-end (`SEC-08`) |
 | Sin CI | Media | ✅ CI creada (`SEC-13`); falta ejecución remota |
-| Sin `SHA256SUMS` | Alta | ⬜ pendiente (`SEC-11`); ya hay build sobre el que generarlo |
+| Sin `SHA256SUMS` | Alta | 🟡 `SHA256SUMS` generado (`evidencias/A.8.19/`); falta firma GPG y verificación en despliegue (`SEC-11`) |
 
 ---
 

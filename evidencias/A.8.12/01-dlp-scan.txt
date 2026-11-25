@@ -1,0 +1,24 @@
+== A.8.12 · escaneo del build WebGL (sin secretos ni URLs internas) ==
+build: builds/webgl/Build (webgl.loader.js, webgl.framework.js.gz, webgl.wasm.gz, webgl.data.gz)
+fecha: 2026-11-25
+
+-- patrones buscados en loader.js y framework.js (descomprimido) --
+sb_secret                : 0
+sb_publishable           : 0
+service_role             : 0
+supabase.co              : 0
+SUPABASE_                : 0
+PIN_PEPPER               : 0
+SESSION_MASTER_KEY       : 0
+BACKEND_JWT_SECRET       : 0
+BEGIN.*PRIVATE KEY       : 0
+
+-- binarios (.wasm.gz, .data.gz) --
+webgl.wasm.gz : sin coincidencias (sb_secret/supabase/juego.local/PIN_PEPPER/SESSION_MASTER)
+webgl.data.gz : sin coincidencias (idem)
+
+-- única coincidencia de IP en loader.js (benigna) --
+...br"==r[0]&&"http:"==location.protocol&&(r=-1!=["localhost","127.0.0.1"].indexOf(location.hostname)?"":"Migrate your server to use HTTPS.",n=...
+Veredicto: es el chequeo de HTTPS del loader.js de Unity (localhost/127.0.0.1), no una URL ni una IP real.
+
+Conclusión: 0 secretos, 0 claves de Supabase, 0 URLs internas, 0 claves privadas en el cliente.

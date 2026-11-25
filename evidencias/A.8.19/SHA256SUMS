@@ -1,0 +1,5 @@
+# SHA256SUMS - build WebGL de deploy/render/webgl/Build (generado 2026-11-25)
+83c6340845b03881e91455ed997fb0fa3433d412d5dcb7b78fb75a0436cc6d51  webgl.data.gz
+502c6737eba2eebbfc74d22c8c69c4f2ca34a448c031facac53b541534edf75c  webgl.framework.js.gz
+9afc0558c23b933b64d692f84b994c415423047991583a97c2f807be8b2acc48  webgl.loader.js
+fce78fb6e8e61aa600e446164d8e876b60f51fa8bb47c50e10f0537135cdd3aa  webgl.wasm.gz

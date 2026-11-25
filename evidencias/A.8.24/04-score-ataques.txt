@@ -1,0 +1,12 @@
+== A.8.24 · firma HMAC del puntaje ==
+session/start: {"status":200,"session_id":"b7b2ed…5ff0","nonce":"36YvOh…cRkw","key_len":64}
+firma válida aceptada: {"ok":true,"score":180,"best_score":0,"rank_position":null,"in_top5":true}
+score alterado -> bad_signature: {"code":"bad_signature","message":"bad_signature"}
+nonce incorrecto -> bad_nonce: {"code":"bad_nonce","message":"bad_nonce"}
+primer envío aceptado: 200
+replay -> session_used: {"code":"session_used","message":"session_used"}
+implausible -> implausible_score: {"code":"implausible_score","message":"implausible_score"}
+
+base: https://juego.local
+canonical: session_id|score|duration_ms|catches|nonce
+signature = hex(HMAC-SHA256(bytes.fromhex(session_key), canonical))

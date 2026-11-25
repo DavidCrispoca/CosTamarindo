@@ -1,0 +1,13 @@
+== A.8.5 · autenticación (flujo de compatibilidad) ==
+registro válido 201: ""
+PIN débil rechazado -> weak_pin: {"code":"weak_pin","message":"Ese PIN es demasiado predecible"}
+usuario duplicado -> username_taken: {"code":"username_taken","message":"Ese usuario ya existe"}
+login correcto 200: ""
+JWT manipulado -> 401 invalid_token: {"code":"invalid_token","message":"Sesion invalida o expirada"}
+token válido -> logout 204: 204
+secuencia de estados en 5 fallos: [401,401,401,401,423]
+bloqueo tras fallos -> 423 account_locked: {"code":"account_locked","message":"Cuenta bloqueada temporalmente"}
+Retry-After presente: "60"
+
+base: https://juego.local
+usuario de prueba: sec_XXXX (creado y usado solo para esta evidencia)

@@ -1,0 +1,8 @@
+== A.8.28 · validación de entradas ==
+SQLi en username -> 422 (patrón rechaza): {"code":"invalid_request","message":"Datos de entrada invalidos"}
+rich text en username -> 422: {"code":"invalid_request","message":"Datos de entrada invalidos"}
+prompt injection -> blocked: {"reply":"Esa pregunta no está en mi auditoría. ¿Hablamos de contraseñas?","blocked":true}
+XSS en diálogo -> salida sin etiquetas: "¡Hola! ¿Cómo va el juego? ¿Necesitas ayuda con algo?"
+texto largo -> 422: {"code":"invalid_request","message":"Datos de entrada invalidos"}
+
+base: https://juego.local

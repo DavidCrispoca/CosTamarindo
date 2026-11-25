@@ -1,13 +1,13 @@
 # A.8.15 — Registro de eventos — evidencia
 
 > **Control:** ISO/IEC 27001:2022 A.8.15 — *Logging*
-> **Fecha de ejecución:** 2026-11-13
+> **Fecha de ejecución:** 2026-11-13 · **Actualizado 2026-11-25** (backend.log real con eventos de negocio)
 > **Nodo:** VM `sg-security` (`172.18.18.220`, Ubuntu 24.04.5, Wazuh 4.14.10 all-in-one)
 > **Agente:** `sg-game-host` (ID **002**, grupo `game`)
-> **Estado:** Parcial — logs de Nginx y regla `100250` verificados; FIM guarda estado sin
-> alerta por archivo. **Actualización 2026-11-25:** el backend ya arranca healthy y
-> `backend.log` se escribe en el volumen `costamarindo-backend-logs`; falta capturar los
-> eventos de negocio en el manager. El cuerpo de abajo conserva el estado del 2026-11-13.
+> **Estado:** Parcial — logs de Nginx y regla `100250` verificados; `backend.log` escribe
+> eventos de negocio en JSON estructurado con `request_id` e IP enmascarada (evidencia
+> `04-backend-audit.txt`); falta confirmar su llegada al manager de Wazuh y la alerta FIM por
+> archivo. El cuerpo de abajo conserva el estado del 2026-11-13.
 > **Riesgo asociado:** R-04 (pérdida o manipulación de logs).
 
 ---
@@ -131,13 +131,21 @@ porque faltaban las claves de Supabase/JWT en `.env`:
 pydantic_core._pydantic_core.ValidationError: 7 validation errors for Settings
 ```
 
-**Estado actual:** el backend arranca healthy y `backend.log` se escribe. Lo que queda es
-generar los eventos de negocio y confirmar su llegada al manager:
+**Estado actual:** el backend arranca healthy y `backend.log` se escribe en JSON
+estructurado. Los eventos de negocio ya se generan y registran con `request_id` e IP
+enmascarada (ver [`04-backend-audit.txt`](04-backend-audit.txt)). Lo que queda es confirmar su
+llegada al manager de Wazuh:
 
 1. ~~Levantar `sg-backend` con el perfil `backend`.~~ Hecho.
-2. Generar tráfico real de login, sesión y puntaje.
-3. Verificar `backend.log` dentro del volumen y su llegada al manager.
-4. Cerrar las reglas de negocio con alertas reales.
+2. ~~Generar tráfico real de login, sesión y puntaje.~~ Hecho (ataques de A.8.5/A.8.24/A.8.28).
+3. ~~Verificar `backend.log` dentro del volumen.~~ Hecho: JSON con `logger: costamarindo.audit`.
+4. Confirmar la llegada de esos eventos al manager y cerrar las reglas de negocio con alertas reales.
+
+Eventos observados en `04-backend-audit.txt` (todos con `request_id`): `register_ok`,
+`login_ok`, `login_fail` (con `locked`/`lock_seconds`), `login_blocked`, `logout`,
+`session_start`, `score_accepted`, `score_rejected` (con `reason`), `dialog_ok` (con
+`latency_ms`) y `dialog_blocked`. La IP se enmascara en el último octeto (`10.80.0.0`) y el
+usuario anónimo aparece como `anon:10.80.0.0`.
 
 ---
 
@@ -180,6 +188,7 @@ ssh -i C:\Users\yoann\.ssh\multipass_id_rsa ubuntu@172.18.18.220 `
 | [`01-wazuh-status.txt`](01-wazuh-status.txt) | Servicios, agente 002, UFW, puertos y conteo 100250 |
 | [`02-100250-alert.json`](02-100250-alert.json) | Alerta real de Nginx 429 con `location` y agente |
 | [`03-fim-state.txt`](03-fim-state.txt) | Estado FIM en manager y agente; ausencia de alerta por archivo |
+| [`04-backend-audit.txt`](04-backend-audit.txt) | Eventos de negocio JSON con `request_id` e IP enmascarada |
 
 ---
 
