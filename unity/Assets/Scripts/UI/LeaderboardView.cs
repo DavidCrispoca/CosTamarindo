@@ -23,6 +23,12 @@ namespace CosTamarindo.UI
         [Header("Referencias")]
         [SerializeField] private TMP_FontAsset displayFont;
         [SerializeField] private TMP_FontAsset bodyFont;
+        [Tooltip("Fondo de madera de la tarjeta (fondo.png).")]
+        [SerializeField] private Sprite backgroundSprite;
+        [Tooltip("Título dibujado 'Top 5' (top5.png).")]
+        [SerializeField] private Sprite titleSprite;
+        [Tooltip("Ícono de cerrar (iconocerrar.png).")]
+        [SerializeField] private Sprite closeSprite;
 
         [Header("Disposición")]
         [SerializeField] private Vector2 cardSize = new Vector2(700f, 720f);
@@ -164,16 +170,36 @@ namespace CosTamarindo.UI
             cardRt.anchorMax = new Vector2(0.5f, 0.5f);
             cardRt.pivot = new Vector2(0.5f, 0.5f);
             cardRt.sizeDelta = cardSize;
-            card.GetComponent<Image>().color = PanelColor;
+            card.GetComponent<Image>().sprite = backgroundSprite;
+            card.GetComponent<Image>().color = backgroundSprite != null ? Color.white : PanelColor;
 
             // ── Título ──
-            var title = CreateText(card.transform, "Title", "Top 5", 64f, displayFont, InkColor);
-            var titleRt = title.rectTransform;
-            titleRt.anchorMin = new Vector2(0.5f, 1f);
-            titleRt.anchorMax = new Vector2(0.5f, 1f);
-            titleRt.pivot = new Vector2(0.5f, 1f);
-            titleRt.sizeDelta = new Vector2(cardSize.x - 80f, 72f);
-            titleRt.anchoredPosition = new Vector2(0f, -28f);
+            if (titleSprite != null)
+            {
+                var titleImg = new GameObject("Title", typeof(RectTransform), typeof(Image));
+                titleImg.transform.SetParent(card.transform, false);
+                var titleRt = titleImg.GetComponent<RectTransform>();
+                titleRt.anchorMin = new Vector2(0.5f, 1f);
+                titleRt.anchorMax = new Vector2(0.5f, 1f);
+                titleRt.pivot = new Vector2(0.5f, 1f);
+                titleRt.sizeDelta = new Vector2(360f, 110f);
+                titleRt.anchoredPosition = new Vector2(0f, -28f);
+                var img = titleImg.GetComponent<Image>();
+                img.sprite = titleSprite;
+                img.color = Color.white;
+                img.raycastTarget = false;
+                img.preserveAspect = true;
+            }
+            else
+            {
+                var title = CreateText(card.transform, "Title", "Top 5", 64f, displayFont, InkColor);
+                var titleRt = title.rectTransform;
+                titleRt.anchorMin = new Vector2(0.5f, 1f);
+                titleRt.anchorMax = new Vector2(0.5f, 1f);
+                titleRt.pivot = new Vector2(0.5f, 1f);
+                titleRt.sizeDelta = new Vector2(cardSize.x - 80f, 72f);
+                titleRt.anchoredPosition = new Vector2(0f, -28f);
+            }
 
             var subtitle = CreateText(card.transform, "Subtitle", "Mejores puntajes", 32f, bodyFont, Theme.InkSoft);
             var subtitleRt = subtitle.rectTransform;
@@ -204,7 +230,15 @@ namespace CosTamarindo.UI
             statusRt.anchoredPosition = new Vector2(0f, 96f);
 
             // ── Botón cerrar ──
-            var close = CreateButton(card.transform, "CloseLeaderboardButton", "Cerrar", 32f, new Vector2(240f, 64f), bodyFont);
+            Button close;
+            if (closeSprite != null)
+            {
+                close = CreateIconButton(card.transform, "CloseLeaderboardButton", closeSprite, new Vector2(72f, 72f));
+            }
+            else
+            {
+                close = CreateButton(card.transform, "CloseLeaderboardButton", "Cerrar", 32f, new Vector2(240f, 64f), bodyFont);
+            }
             var closeRt = close.GetComponent<RectTransform>();
             closeRt.anchorMin = new Vector2(0.5f, 0f);
             closeRt.anchorMax = new Vector2(0.5f, 0f);
@@ -360,6 +394,25 @@ namespace CosTamarindo.UI
             if (chosen != null) text.font = chosen;
 
             return text;
+        }
+
+        private static Button CreateIconButton(Transform parent, string name, Sprite sprite, Vector2 size)
+        {
+            var go = new GameObject(name, typeof(RectTransform), typeof(Image), typeof(Button));
+            go.transform.SetParent(parent, false);
+
+            var rt = go.GetComponent<RectTransform>();
+            rt.sizeDelta = size;
+
+            var image = go.GetComponent<Image>();
+            image.sprite = sprite;
+            image.color = Color.white;
+            image.raycastTarget = true;
+
+            var button = go.GetComponent<Button>();
+            button.targetGraphic = image;
+
+            return button;
         }
 
         private static Button CreateButton(
