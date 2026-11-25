@@ -55,6 +55,9 @@ secrets/
 [Oo]bj/
 [Bb]uild/
 [Bb]uilds/
+# Excepción: el build WebGL que Render necesita desplegar desde el repo.
+!deploy/render/webgl/Build/
+!deploy/render/webgl/Build/**
 [Ll]ogs/
 [Uu]ser[Ss]ettings/
 MemoryCaptures/
