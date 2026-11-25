@@ -21,7 +21,7 @@ namespace CosTamarindo.Gameplay
         [Tooltip("Intervalo entre apariciones: inicio → final de la partida.")]
         [SerializeField] private Vector2 spawnInterval = new Vector2(0.95f, 0.38f);
         [Tooltip("Velocidad de caída: inicio → final de la partida.")]
-        [SerializeField] private Vector2 fallSpeed = new Vector2(3.6f, 7.5f);
+        [SerializeField] private Vector2 fallSpeed = new Vector2(3.6f, 9.0f);
         [SerializeField] private float matchDurationSeconds = 120f;
 
         [Header("Zona de captura")]
@@ -231,6 +231,8 @@ namespace CosTamarindo.Gameplay
 
                 if (expired)
                 {
+                    // Dejar caer un ítem bueno penaliza puntos (fruta/comida).
+                    GameManager.Instance?.RegisterDrop(item.Definition);
                     Destroy(item.gameObject);
                     active.RemoveAt(i);
                 }

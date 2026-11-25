@@ -38,6 +38,7 @@ namespace CosTamarindo.UI
         private GameObject panel;
         private RectTransform gridRoot;
         private TMP_Text counterText;
+        private bool pausedByMe;
 
         private readonly Dictionary<string, Sprite> spritesById = new Dictionary<string, Sprite>();
 
@@ -80,11 +81,29 @@ namespace CosTamarindo.UI
             RefreshCells();
             panel.SetActive(true);
             panel.transform.SetAsLastSibling();
+            PauseGame();
         }
 
         public void Close()
         {
             if (panel != null) panel.SetActive(false);
+            ResumeGame();
+        }
+
+        private void PauseGame()
+        {
+            var gm = GameManager.Instance;
+            if (gm == null || gm.State != GameState.Playing) return;
+            pausedByMe = true;
+            gm.Pause();
+        }
+
+        private void ResumeGame()
+        {
+            if (!pausedByMe) return;
+            pausedByMe = false;
+            var gm = GameManager.Instance;
+            if (gm != null && gm.State == GameState.Paused) gm.Resume();
         }
 
         // ── Construcción de la UI ────────────────────────────────────────

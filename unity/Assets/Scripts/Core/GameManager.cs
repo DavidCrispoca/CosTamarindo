@@ -138,6 +138,14 @@ namespace CosTamarindo.Core
             }
         }
 
+        /// <summary>Penaliza dejar caer un ítem bueno (fruta/comida).</summary>
+        public void RegisterDrop(ItemDef def)
+        {
+            if (State != GameState.Playing || def == null || def.Kind != ItemKind.Good) return;
+            Score = Mathf.Max(0, Score - def.Points);
+            ScoreChanged?.Invoke(Score);
+        }
+
         public void EndMatch()
         {
             if (State == GameState.GameOver) return;

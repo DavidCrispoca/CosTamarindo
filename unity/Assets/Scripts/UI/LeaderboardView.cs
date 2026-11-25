@@ -38,6 +38,7 @@ namespace CosTamarindo.UI
         private Transform rowsRoot;
         private TMP_Text statusText;
         private Coroutine loadRoutine;
+        private bool pausedByMe;
 
         public bool IsOpen => panel != null && panel.activeSelf;
 
@@ -68,6 +69,7 @@ namespace CosTamarindo.UI
             if (panel == null) return;
             panel.SetActive(true);
             panel.transform.SetAsLastSibling();
+            PauseGame();
             Refresh();
         }
 
@@ -75,6 +77,23 @@ namespace CosTamarindo.UI
         {
             if (panel != null) panel.SetActive(false);
             if (loadRoutine != null) { StopCoroutine(loadRoutine); loadRoutine = null; }
+            ResumeGame();
+        }
+
+        private void PauseGame()
+        {
+            var gm = GameManager.Instance;
+            if (gm == null || gm.State != GameState.Playing) return;
+            pausedByMe = true;
+            gm.Pause();
+        }
+
+        private void ResumeGame()
+        {
+            if (!pausedByMe) return;
+            pausedByMe = false;
+            var gm = GameManager.Instance;
+            if (gm != null && gm.State == GameState.Paused) gm.Resume();
         }
 
         private void Refresh()
