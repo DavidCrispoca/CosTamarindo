@@ -299,16 +299,16 @@ bocadillo con alpha 0,55 y textos del fin de partida sin solapamiento. Los dos 4
 que aparecen en local son esperados: el servidor de desarrollo no despliega backend y el juego
 ahora muestra «Sin conexión: puntaje guardado en este dispositivo.» en vez de un error rojo.
 
-### 7.2 Lo que necesitamos que Santiago confirme para cerrar
+### 7.2 Lo que necesitábamos que Santiago confirmara para cerrar — ✅ resuelto en §8
 
-Las casillas sin marcar de §1–§4 siguen vigentes, en especial: proyecto **DEV**, migración `004`
-con `check_db.py` en verde, responsable de `costamarindo-backend:latest`, ruta/comando de
-publicación del build y la URL real del juego. Con eso se puede repetir la medición con
-Nginx/TLS y generar las evidencias F7 contra el backend real.
+La medición con Nginx/TLS se repitió y las evidencias F7 contra el backend real **ya existen**
+(`evidencias/F7/16-backend-real.txt` y `17-e2e-real.md`). Queda solo el punto de publicación
+pública (§8.3): dominio/VPS o demo estática.
 
 ### 7.3 Publicación web e ISO/IEC 27001:2022
 
-- **Web:** el build WebGL se compila y mide en local, pero **no hay URL pública**. Para compartir
+- **Web:** el build WebGL se compila, se mide y se sirve en `https://juego.local` validado contra el
+  backend real, pero **no hay URL pública**. Para compartir
   rápido alcanza una demo estática (por ejemplo itch.io, sin ranking online); para la versión
   completa hace falta el VPS con Docker + Nginx + HTTPS descrito en §2. El navegador debe hablar
   siempre a `/api/` del mismo origen; los secretos quedan solo en el backend.

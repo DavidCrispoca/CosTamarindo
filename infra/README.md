@@ -3,10 +3,10 @@
 Diseño completo de nodos, redes y responsabilidades: [`../docs/arquitectura.md`](../docs/arquitectura.md).
 Backlog por división y criterios de terminado: [`../Plan.md`](../Plan.md).
 
-> **Estado (2026-11-13):** `Sg-Frontend` está *healthy* y escribe `access.log` real en el
+> **Estado (2026-11-25):** `Sg-Frontend` está *healthy* y escribe `access.log` real en el
 > volumen `frontend-logs`; el agente Wazuh lo lee y `100250` ya disparó 36 veces con una
-> ráfaga `429`. `Sg-Backend` tiene imagen construida y dependencias actualizadas, pero
-> **no arranca** hasta cargar las claves de Supabase/JWT en `.env`; `Sg-AI` está
+> ráfaga `429`. `Sg-Backend` está **healthy** con la imagen `latest` reconstruida, las claves
+> de Supabase/JWT en `.env` y `backend.log` escribiéndose en `backend-logs`; `Sg-AI` está
 > **healthy** con `qwen2.5:3b` (1,9 GB), sin puerto publicado y solo en `costamarindo-ai`.
 > `Sg-Security` es la VM externa
 > `sg-security` (`172.18.18.220`, Ubuntu 24.04 + Wazuh 4.14.10), con agente **002**

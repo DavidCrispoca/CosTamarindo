@@ -42,12 +42,11 @@ La VM que lo ejecuta es `sg-security` (Multipass, Ubuntu 24.04, Wazuh 4.14.10).
   emite la alerta por archivo: solo llegan `scan_start`/`scan_end` y el `fimsync`.
   El FIM local del manager muestra la misma limitación. `100240/100241` quedan
   cargadas y documentadas; no se presenta una alerta FIM end-to-end como evidencia.
-- **Backend:** la imagen se construyó y el volumen `backend-logs` está listo. El
-  contenedor no arranca porque el `.env` real solo tiene las variables de Wazuh;
-  faltan `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SECRET_KEY`,
-  `SUPABASE_DB_URL`, `BACKEND_JWT_SECRET`, `PIN_PEPPER` y `SESSION_MASTER_KEY`.
-  Esas claves no se versionan. Cuando estén, el `FileHandler` escribirá
-  `backend.log` y el `localfile` del agente ya está configurado.
+- **Backend:** imagen reconstruida (`latest`) y volumen `backend-logs` listo. El 2026-11-25 el
+  contenedor arrancó con las variables de `.env` (`SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`,
+  `SUPABASE_SECRET_KEY`, `SUPABASE_DB_URL`, `BACKEND_JWT_SECRET`, `PIN_PEPPER` y
+  `SESSION_MASTER_KEY`), quedó `healthy` y el `FileHandler` ya escribe
+  `backend.log`; el `localfile` del agente está configurado. Esas claves no se versionan.
 - Credenciales fuera del repo: en la VM `/root/wazuh-registration-password.txt` y
   `/root/wazuh-dashboard-admin-password.txt`; en el host `.env` (ignorado por git) y
   `C:\Users\yoann\.config\costamarindo\wazuh-dashboard-admin.txt`.

@@ -86,8 +86,9 @@ docker compose --env-file .env -f infra/docker-compose.yml --profile backend bui
 SonarQube no se desplegó en esta pasada. Motivos:
 
 1. Requiere un servidor adicional, volumen, token y configuración de Quality Gate.
-2. El backend todavía no arranca sin las claves de Supabase/JWT; el análisis estático puede
-   ejecutarse, pero el valor real llega cuando el código de negocio esté completo.
+2. En ese momento el backend todavía no arrancaba sin las claves de Supabase/JWT (ya arranca
+   desde el 2026-11-25); el análisis estático puede ejecutarse, pero el valor real llega
+   cuando el código de negocio esté completo.
 3. El bloque independiente priorizó lo que no depende de terceros: plantilla, SoA, TLS,
    `nmap`, Wazuh y auditoría de dependencias.
 

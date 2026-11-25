@@ -5,7 +5,9 @@
 > **Nodo:** VM `sg-security` (`172.18.18.220`, Ubuntu 24.04.5, Wazuh 4.14.10 all-in-one)
 > **Agente:** `sg-game-host` (ID **002**, grupo `game`)
 > **Estado:** Parcial — logs de Nginx y regla `100250` verificados; FIM guarda estado sin
-> alerta por archivo; `backend.log` pendiente de claves de Supabase/JWT.
+> alerta por archivo. **Actualización 2026-11-25:** el backend ya arranca healthy y
+> `backend.log` se escribe en el volumen `costamarindo-backend-logs`; falta capturar los
+> eventos de negocio en el manager. El cuerpo de abajo conserva el estado del 2026-11-13.
 > **Riesgo asociado:** R-04 (pérdida o manipulación de logs).
 
 ---
@@ -120,19 +122,19 @@ El archivo de prueba se eliminó después de capturar la evidencia; el directori
 
 ---
 
-## 6. `backend.log`: pendiente
+## 6. `backend.log`: pendiente al 2026-11-13 — **desbloqueado el 2026-11-25**
 
-El backend tiene `FileHandler` y el volumen `backend-logs`, pero no arranca porque faltan las
-claves de Supabase/JWT en `.env`:
+El 2026-11-13 el backend tenía `FileHandler` y el volumen `backend-logs`, pero no arrancaba
+porque faltaban las claves de Supabase/JWT en `.env`:
 
 ```text
 pydantic_core._pydantic_core.ValidationError: 7 validation errors for Settings
 ```
 
-Por eso las reglas `100200/100201`, `100210/100211/100212` y `100220/100221/100222` todavía
-no tienen eventos reales del backend. Cuando existan las claves:
+**Estado actual:** el backend arranca healthy y `backend.log` se escribe. Lo que queda es
+generar los eventos de negocio y confirmar su llegada al manager:
 
-1. Levantar `sg-backend` con el perfil `backend`.
+1. ~~Levantar `sg-backend` con el perfil `backend`.~~ Hecho.
 2. Generar tráfico real de login, sesión y puntaje.
 3. Verificar `backend.log` dentro del volumen y su llegada al manager.
 4. Cerrar las reglas de negocio con alertas reales.
@@ -162,7 +164,8 @@ ssh -i C:\Users\yoann\.ssh\multipass_id_rsa ubuntu@172.18.18.220 `
 
 - **FIM sin alerta por archivo** en Wazuh 4.14 all-in-one. Compensación: estado en `002.db`,
   revisión manual y alertas de logs. Riesgo residual R-04 aceptado.
-- **`backend.log` no existe** hasta que el backend arranque con claves reales.
+- **`backend.log` ya existe** (2026-11-25) en el volumen `costamarindo-backend-logs`; falta la
+  alerta de las reglas de negocio en el manager.
 - **Tailscale no está configurado.** El transporte actual es Default Switch; la VM no se
   publica a Internet.
 - **Retención de logs** no está definida; los archivos diarios se conservan en la VM.
@@ -187,6 +190,7 @@ ssh -i C:\Users\yoann\.ssh\multipass_id_rsa ubuntu@172.18.18.220 `
 - [x] Logs reales de Nginx y regla `100250` con 36 alertas.
 - [x] FIM guarda estado de `/fim/webgl` en `002.db`.
 - [x] Limitación de alerta FIM documentada.
-- [ ] `backend.log` real y reglas de negocio.
+- [x] `backend.log` real escribiéndose (2026-11-25).
+- [ ] Reglas de negocio del backend con alertas reales en el manager.
 - [ ] Retención y protección de logs.
 - [ ] Tailscale o transporte definitivo.

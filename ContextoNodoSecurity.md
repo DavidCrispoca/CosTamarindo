@@ -28,8 +28,8 @@
 > escribe `access.log` real; una ráfaga contra `/api/` generó `429` y `100250` disparó
 > **36 alertas** en el manager. El FIM guarda estado en `002.db`, pero Wazuh 4.14 no emite
 > la alerta por archivo en este all-in-one; se documenta como limitación. El backend se
-> construyó y sus dependencias se actualizaron, pero no arranca porque el `.env` real no
-> tiene las claves de Supabase/JWT; `backend.log` queda pendiente hasta que existan. La IP
+> construyó, se reconstruyó como `latest` y **arranca healthy** desde el 2026-11-25 con las
+> claves de `.env`; `backend.log` ya se escribe en `costamarindo-backend-logs`. La IP
 > secundaria vieja `172.30.224.2/20` sigue en el host y requiere elevación para retirarla.
 >
 > **Bloque independiente 2026-11-13.** Se agregaron `evidencias/_plantilla/`,
@@ -563,8 +563,9 @@ El backlog completo y los controles restantes están en `Plan.md` §7.
   la alerta por archivo en este all-in-one; la limitación ya está documentada en
   `evidencias/A.8.15/README.md` y no se afirma que `100240/100241` dispararon.
 - Crear la tailnet nueva, tags/ACL y unir la VM; ajustar UFW para `tailscale0`.
-- Cargar las claves de Supabase/JWT y levantar el backend para generar `backend.log`;
-  después producir las evidencias de ataque.
+- ~~Cargar las claves de Supabase/JWT y levantar el backend para generar `backend.log`~~
+  **Hecho el 2026-11-25:** backend healthy y `backend.log` escribiéndose; ahora toca producir
+  las evidencias de ataque con el backend real.
 - Completar A.8.20 con `nmap` desde un contenedor de la DMZ.
 - Completar A.8.24 con cifrado en reposo y gestión de claves.
 - SonarQube, Bearer y las pruebas de F9/F8 al final.
@@ -581,7 +582,7 @@ El backlog completo y los controles restantes están en `Plan.md` §7.
 | `SEC-05` | A.8.9: IndexedDB | depende de `FE-07` |
 | `SEC-06` | A.8.20: `nmap` host y contenedor | 🟡 host+VM listos; falta contenedor |
 | `SEC-07` | A.8.12: consola + `strings` | depende de `FE-12` |
-| `SEC-08` | A.8.15: Wazuh + reglas + FIM | 🟡 Nginx real y `100250` (36); falta `backend.log`, alerta FIM y tailnet |
+| `SEC-08` | A.8.15: Wazuh + reglas + FIM | 🟡 Nginx real, `100250` (36) y `backend.log`; falta alerta FIM end-to-end y tailnet |
 | `SEC-09` | A.8.28: SQLi, XSS, prompt injection | API lista |
 | `SEC-11` | A.8.19: `SHA256SUMS` + GPG + FIM | depende de `FE-12` |
 | `SEC-12` | SonarQube + `pip-audit`/`npm audit` | 🟡 `pip-audit` en 0; SonarQube diferido |
@@ -595,7 +596,8 @@ El backlog completo y los controles restantes están en `Plan.md` §7.
   `172.19.224.0/20`.
 - El FIM de Wazuh 4.14 no emite alerta por archivo en este all-in-one; solo se
   confirma el estado en `002.db`. Es una limitación de la versión, no de la regla.
-- El backend no arranca porque faltan las claves de Supabase/JWT en el `.env` real.
+- ~~El backend no arranca porque faltan las claves de Supabase/JWT en el `.env` real.~~
+  **Resuelto el 2026-11-25:** backend healthy y `backend.log` disponible.
 - Tailscale se difiere hasta tener los cinco nodos; `Sg-AI` está healthy y el endpoint de
   diálogo ya llama a Ollama. El bocadillo ya está probado en WebGL con backend temporal;
   falta validarlo con el backend real de Supabase.

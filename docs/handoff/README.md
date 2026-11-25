@@ -1,8 +1,9 @@
 # Handoff · CosTamarindo 2D
 
 > **Para quién:** las personas que toman Frontend, Security e IA.
-> **Estado del proyecto:** 2026-11-24 (`main` en `a18d7ab`, alineada con `origin/main`).
-> **Fuente de verdad del avance:** [`../../Plan.md`](../../Plan.md) §3 (verificación del 2026-11-24).
+> **Estado del proyecto:** 2026-11-25 (`main`; último commit de código `e2de1e5`, más este cierre
+> documental). `sg-backend`, `sg-db` y `sg-frontend` están operativos y validados en el equipo.
+> **Fuente de verdad del avance:** [`../../Plan.md`](../../Plan.md) §3 y [`../../contexto.md`](../../contexto.md).
 > **Contratos de la API:** [`../api.md`](../api.md).
 
 Este paquete explica **qué hay hecho, qué falta, cómo se levanta y qué reglas no se tocan**,
@@ -10,6 +11,7 @@ división por división. No reemplaza a `Plan.md`: lo hace accionable.
 
 | Documento | Para qué |
 | :--- | :--- |
+| [`contexto.md`](../../contexto.md) | **contexto completo del proyecto**: qué es, arquitectura, estado por nodo, evidencias y todo lo pendiente/en curso |
 | [`frontend.md`](frontend.md) | estado del cliente Unity/WebGL, contrato anónimo y backlog `FE-01`…`FE-14` |
 | [`security.md`](security.md) | atacar y evidenciar los 10 controles (`SEC-01`…`SEC-14`) |
 | [`ia.md`](ia.md) | conectar Ollama al NPC sin romper el puntaje (`IA-01`…`IA-07`) |
@@ -25,36 +27,37 @@ división por división. No reemplaza a `Plan.md`: lo hace accionable.
 
 | División | Nodo | Estado | Qué falta |
 | :--- | :--- | :--- | :--- |
-| **Frontend** | `Sg-Frontend` | 🟡 build Release del 2026-11-24 (16,5 MB, 1,2 s, 0 errores de app) verificado en local; 12 ítems curados, UI legible y API cliente implementada; `builds/` no se versiona | publicar el build en URL pública y validar NPC + reclamo con backend real; `FE-05`/`FE-06` y `FE-11` |
-| **Backend** | `Sg-Backend` | 🚧 API y **64/64 tests**; imagen `main-test` construida; `latest` pendiente | cargar Supabase/JWT, migrar `004` y validar arranque |
-| **DB** | `Sg-DB` | 🟡 esquema 001–003 y backup probados; `004_anonymous_claim.sql` pendiente en DEV | aplicar `004` y validar claim/RLS |
-| **Security** | `Sg-Security` | 🟡 A.8.25, SEC-01, SEC-02, SEC-06 (parcial), SEC-08 (parcial), SEC-12, SEC-13 y SEC-14 cerrados; SoA de 93 | ataques reales de los 10 controles, `backend.log` y FIM con alerta |
-| **IA** | `Sg-AI` | ✅ Ollama healthy, `qwen2.5:3b`, endpoint y pensamiento probados; simulación E2E con Ollama real y capturas actuales (`F7/14`, `F7/15`) | validar con backend real/Supabase |
+| **Frontend** | `Sg-Frontend` | ✅ build Release del 2026-11-24 (16,5 MB, 1,5 s, 0 errores de app) servido en `https://juego.local` y validado contra el backend real; 12 ítems curados, UI legible y API cliente implementada; `builds/` no se versiona | publicar el build en URL pública; `FE-05`/`FE-06` (bloqueados por `FIGMA_TOKEN`) y `FE-11` (playtest humano) |
+| **Backend** | `Sg-Backend` | ✅ API y **64/64 tests**; imagen `costamarindo-backend:latest` reconstruida desde `main`; `sg-backend` healthy; E2E real en verde (`EXIT=0`) | nada bloqueante; ver evidencias `F7/16` y `F7/17` |
+| **DB** | `Sg-DB` | ✅ esquema 001–004 aplicado y verificado con `check_db.py` (`EXIT=0`); RLS sin acceso de cliente; backup 2026-11-06 probado | proyecto PROD al desplegar (DB-08) |
+| **Security** | `Sg-Security` | 🟡 A.8.25, SEC-01, SEC-02, SEC-06 (parcial), SEC-08 (parcial), SEC-12, SEC-13 y SEC-14 cerrados; SoA de 93. **`backend.log` ya se escribe** en `costamarindo-backend-logs` | ataques reales de los 10 controles (ya desbloqueados por el backend real), alerta FIM end-to-end y prueba de aislamiento |
+| **IA** | `Sg-AI` | ✅ Ollama healthy, `qwen2.5:3b`, endpoint y pensamiento probados; **validado contra el backend real/Supabase** (`dialog_ok`, `F7/16` y `F7/17`) | nada bloqueante |
 
-### 1.1 Pendientes consolidados (revisión 2026-11-24)
+### 1.1 Pendientes consolidados (revisión 2026-11-25)
 
-Todo lo que sigue está **documentado y abierto**; no se inventó estado ni se subió ningún secreto.
+Leyenda: ✅ hecho · 🟡 en curso · ⬜ pendiente · ⛔ bloqueado. Todo lo abierto está documentado;
+no se inventó estado ni se subió ningún secreto.
 
-| Pendiente | Responsable / bloqueo | Seguir en |
-| :--- | :--- | :--- |
-| Publicar el WebGL en URL pública (dominio/VPS o demo estática) | nodo de Santiago: dominio, acceso y procedimiento | [`solicitud-datos-santiago-pendientes.md`](solicitud-datos-santiago-pendientes.md) §2.4 |
-| Claves Supabase/JWT y proyecto DEV confirmado | Santiago, por canal seguro | ídem §2.1 |
-| Migración `004_anonymous_claim.sql` + `check_db.py` en verde | Santiago / DB | ídem §2.2 |
-| Imagen `costamarindo-backend:latest` y despliegue del backend | Santiago / Backend | ídem §2.3 |
-| `FE-05`/`FE-06`: 10 prefabs y kit de Figma | `FIGMA_TOKEN` (0/~30 componentes) | [`frontend.md`](frontend.md) §2.4 |
-| `FE-11`: playtest humano de 10–15 min | una persona real | [`frontend.md`](frontend.md) §2.4 |
-| Ataques ISO reales y evidencias (A.8.5, A.8.9, A.8.12, A.8.19, A.8.24, A.8.28, A.8.31) | backend desplegado + PROD para A.8.31 | [`security.md`](security.md) §5 |
-| Informe final de entrega | después del despliegue real | [`../../Plan.md`](../../Plan.md) §3 |
+| Pendiente | Estado | Responsable / bloqueo | Seguir en |
+| :--- | :--- | :--- | :--- |
+| Sincronizar la documentación y generar las evidencias F7 reales | 🟡 en curso | Santiago / docs | este README y `F7/16`, `F7/17` |
+| Publicar el WebGL en URL pública (dominio/VPS o demo estática) | 🟡 en curso | decisión de dominio/acceso | [`solicitud-datos-santiago.md`](solicitud-datos-santiago.md) §8.3 |
+| `FE-05`/`FE-06`: 10 prefabs y kit de Figma | ⛔ bloqueado por `FIGMA_TOKEN` | Frontend | [`frontend.md`](frontend.md) §2.4 |
+| `FE-11`: playtest humano de 10–15 min | ⬜ pendiente de una persona | Frontend | [`frontend.md`](frontend.md) §2.4 |
+| Ataques ISO reales y evidencias (A.8.5, A.8.9, A.8.12, A.8.19, A.8.24, A.8.28, A.8.31) | 🟡 en curso (backend real arriba y `backend.log` disponible) | Security | [`security.md`](security.md) §5 |
+| Proyecto PROD y `pg_dump` inicial (DB-08 / A.8.31) | ⬜ pendiente al desplegar | DB / Security | `Plan.md` §6 |
+| Informe final de entrega | ⬜ después del despliegue real | — | [`../../Plan.md`](../../Plan.md) §3 |
 
 ### 1.2 Estado del despliegue web
 
-- **Listo:** build WebGL Release generado y medido (`tools/dev-server/check.mjs`), servidor local
-  en `http://localhost:8080/` y CSP/compresión reproducidas por `tools/dev-server/server.mjs`.
-- **No listo:** no hay URL pública ni commit desplegado. `localhost` solo es accesible desde esta PC.
+- **Listo:** build WebGL Release generado y medido (`tools/dev-server/check.mjs`), servido por
+  `sg-frontend` en `https://juego.local` (Nginx con TLS mkcert, CSP por hash y `/api/` proxificado),
+  y validado contra el backend real (`F7/16` y `F7/17`).
+- **No listo:** no hay URL pública ni commit desplegado. `juego.local` solo es accesible desde esta PC.
 - **Dos rutas:** demo estática (por ejemplo itch.io; sin ranking online) para compartir rápido, o
   VPS con Docker + Nginx + HTTPS + `/api/` para la versión completa. La arquitectura definitiva ya
-  está descrita en `solicitud-datos-santiago.md` §2; falta que Santiago confirme dominio, nodo y
-  procedimiento de publicación.
+  está descrita en `solicitud-datos-santiago.md` §2; falta decidir dominio y procedimiento de
+  publicación.
 - **Regla:** secretos solo en el backend; nunca en Unity/WebGL ni en Git.
 
 ---
@@ -97,9 +100,10 @@ powershell -File infra/scripts/up.ps1 backend
 curl.exe --ssl-no-revoke https://juego.local/api/health
 ```
 
-Resultado esperado: `sg-frontend` en `healthy` y `{"status":"ok","env":"dev","database":true}`.
-`sg-ai` y `sg-backend` requieren, respectivamente, descargar el modelo y cargar las claves
-de Supabase/JWT; sin eso quedan detenidos o no arrancan. El build WebGL ya está generado; regenerarlo si se cambia Unity.
+Resultado esperado: `sg-frontend`, `sg-backend` y `sg-ai` en `healthy` y
+`{"status":"ok","env":"dev","database":true}`. Las variables de Supabase/JWT ya están en `.env` y
+el modelo `qwen2.5:3b` ya está descargado; solo hay que cargar `.env` en una máquina nueva. El
+build WebGL ya está generado; regenerarlo si se cambia Unity.
 
 ### 2.3 Verificación rápida de que todo está sano
 

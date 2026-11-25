@@ -5,8 +5,9 @@
 > backend real de Supabase.
 > **Actualizado 2026-11-23:** `main` ya incluye el flujo anónimo + `/api/claim`; el backend tiene
 > **64 tests** y `/api/dialog` acepta token opcional. La evidencia `01`–`12` es de la simulación
-> anterior; la validación real sigue pendiente. Datos que faltan:
-> [`../handoff/solicitud-datos-santiago.md`](../handoff/solicitud-datos-santiago.md).
+> anterior.
+> **Actualizado 2026-11-25:** la validación real contra el backend y Supabase DEV quedó **cerrada**
+> (`evidencias/F7/16-backend-real.txt` y `17-e2e-real.md`).
 > **Depende de:** [F6](F6.md) (compose), F5 (backend), F4 (auth)
 > **Handoff:** [`../handoff/ia.md`](../handoff/ia.md)
 > **Backlog:** [`Plan.md` §8](../../Plan.md) (`IA-01`–`IA-07`)
@@ -40,9 +41,13 @@ Dejar el NPC de la Palenquera funcionando de punta a punta:
 
 **Estado 2026-11-13.** `Sg-AI` está operativo y el endpoint genera texto real. La prueba de
 extremo a extremo se hizo con un backend temporal (`sg-backend-sim`: código real + repositorio
-en memoria + auth falsa) porque el backend completo sigue bloqueado por las claves de
-Supabase/JWT. El navegador obtuvo un JWT de tres partes, el NPC mostró respuestas de Ollama y el
-puntaje no cambió. La validación con Supabase/RLS/migraciones queda para Santiago.
+en memoria + auth falsa) porque en ese momento el backend completo seguía bloqueado por las
+claves de Supabase/JWT. El navegador obtuvo un JWT de tres partes, el NPC mostró respuestas de
+Ollama y el puntaje no cambió.
+
+**Cierre 2026-11-25.** La validación con el backend real y Supabase DEV se repitió y pasó en
+verde (`F7/16` y `F7/17`): `/api/dialog` responde `dialog_ok` a través del proxy y el diálogo no
+altera `scores` ni `game_sessions`.
 
 Durante la simulación se corrigieron tres fallos de integración:
 
@@ -250,7 +255,7 @@ Unity consume el contrato.
 | :--- | :--- |
 | El modelo tarda o no cabe en 4 GB | Medir en F7.1; bajar a un modelo menor o ajustar límites antes de integrar |
 | Descarga sin Internet o lenta | `pull-model.sh` deja el volumen persistente; reintentar sin tocar el runtime |
-| Backend sin claves de Supabase/JWT | Avanzar con backend temporal; smoke test real cuando `.env` esté completo |
+| Backend sin claves de Supabase/JWT | ✅ resuelto 2026-11-25: `.env` completo, backend healthy y smoke test real (`F7/16`) |
 | Inyección o rich text | Guardrails existentes + pruebas explícitas en F7.5 |
 | El NPC afecta el juego | Prohibido llamar a `session`/`score`; test dedicado `IA-07` |
 | Red interna mal configurada | Verificar `docker port` y `NetworkSettings.Networks` en F7.1 |

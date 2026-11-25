@@ -2,7 +2,8 @@
 
 > **División:** Backend · **Nodo:** `Sg-Backend`
 > **Versión:** 2.0.0 · **Base:** `https://juego.local/api` (mismo origen que el juego)
-> **Estado:** flujo anónimo + reclamo top-5 implementado (pendiente de desplegar/verificar contra Supabase DEV con migración `004_anonymous_claim.sql`).
+> **Estado:** flujo anónimo + reclamo top-5 implementado y **verificado contra Supabase DEV** con la
+> migración `004_anonymous_claim.sql` aplicada (E2E real en `evidencias/F7/17-e2e-real.md`).
 
 El cliente Unity **nunca** habla con Supabase. Habla solo con esta API, que es la
 única que conoce la clave secreta, la base y la IA.

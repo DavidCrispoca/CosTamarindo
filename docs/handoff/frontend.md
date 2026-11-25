@@ -3,7 +3,9 @@
 > **División:** Frontend · **Nodo:** `Sg-Frontend`
 > **Backlog:** `Plan.md` §4 (`FE-01`…`FE-14`)
 > **Contratos:** [`../api.md`](../api.md)
-> **Estado:** juego jugable offline verificado en WebGL; API online lista y sin consumir.
+> **Estado:** juego jugable verificado en WebGL y **validado contra el backend real** en
+> `https://juego.local` (flujo anónimo + claim + NPC). Queda publicarlo en URL pública y cerrar
+> `FE-05`/`FE-06`/`FE-11`.
 
 ---
 
@@ -18,7 +20,7 @@
 | Tokens visuales (17 colores, 5 estilos) | ✅ | `Assets/Scripts/Core/Theme.cs` |
 | Tipografías SDF | ✅ | `Assets/Art/Fonts/` |
 | Escena de login `/ Jugar` → `Game` | ✅ anónima; el PIN se pide solo al reclamar | `Assets/Scenes/Login.unity`, `UI/LoginController.cs` |
-| Build + Nginx + TLS | ✅ build Release 2026-11-24 (16,5 MB) verificado con `check.mjs`; regenerar si cambia Unity | `builds/webgl`, `infra/nginx/` |
+| Build + Nginx + TLS | ✅ build Release 2026-11-24 (16,5 MB) servido en `https://juego.local` y validado contra el backend real (`F7/16`, `F7/17`); regenerar si cambia Unity | `builds/webgl`, `infra/nginx/` |
 | Pensamiento del NPC | ✅ runtime anclado al sprite, “escribiendo…”, historial de una línea por entrada, fondo translúcido | `Assets/Scripts/UI/NpcDialogueController.cs`, `Core/Theme.cs` |
 | Fin de partida | ✅ textos en franjas separadas; sin backend muestra “Sin conexión…” en tono neutro, no un error rojo | `Assets/Scripts/UI/OverlayController.cs`, `Assets/Editor/CosTamarindoSceneBuilder.cs` |
 | 15 pruebas PlayMode | ✅ 15/15 (2026-11-24) | `Assets/Tests/PlayMode/` |
@@ -137,6 +139,10 @@ para “cuadrar”**: si un playtest real los supera, se ajusta el servidor con 
 | `OverlayController` | ✅ envío automático al terminar, panel top-5/claim, estado de error y modo offline neutral |
 
 ### 2.4 Resto del backlog
+
+**Estado 2026-11-25:** `FE-07`…`FE-10`, `FE-12`…`FE-14` cerrados y validados contra el backend
+real. En curso queda la publicación pública. `FE-05`/`FE-06` siguen bloqueados por `FIGMA_TOKEN`
+y `FE-11` necesita una persona.
 
 | Tarea | Qué falta |
 | :--- | :--- |

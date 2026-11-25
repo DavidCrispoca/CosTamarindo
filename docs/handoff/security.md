@@ -16,10 +16,10 @@ Todo lo que sigue funciona **ahora**, con el entorno levantado:
 
 | Superficie | Dónde | Estado |
 | :--- | :--- | :--- |
-| API | `https://juego.local/api/*` | 🚧 código y tests listos; backend no arranca sin claves |
-| Auth | `/api/auth/register`, `/login`, `/refresh` | 🚧 contrato listo; depende del backend |
-| Puntaje | `/api/session/start` + `/api/score` | 🚧 HMAC, nonce, TTL y tests; falta ataque real |
-| Diálogo | `/api/dialog` | ✅ saneo, rate limit, Ollama y fallback; inyección bloqueada |
+| API | `https://juego.local/api/*` | ✅ backend real healthy y E2E en verde |
+| Auth | `/api/auth/register`, `/login`, `/refresh` | ✅ contrato probado contra Supabase DEV |
+| Puntaje | `/api/session/start` + `/api/score` | 🟡 HMAC, nonce, TTL y tests; E2E ya rechaza `bad_signature`; falta captura del ataque |
+| Diálogo | `/api/dialog` | ✅ saneo, rate limit, Ollama y fallback; inyección bloqueada y `dialog_ok` real |
 | Base | PostgREST (`/rest/v1/`) | ✅ cerrado: `anon` recibe 401 |
 | Frontend | build WebGL | ✅ Nginx y TLS operativos; build Release del 2026-11-24 verificado en local y sirviendo en `https://juego.local/`; sin URL pública |
 
@@ -27,10 +27,10 @@ Lo que **todavía no** se puede atacar y por qué:
 
 | Control | Bloqueo |
 | :--- | :--- |
-| A.8.9 (editar `PlayerPrefs`/IndexedDB) | `FE-07` ya envía puntajes, pero el backend real no está desplegado: hoy solo se puede atacar el récord local |
+| A.8.9 (editar `PlayerPrefs`/IndexedDB) | desbloqueado: `FE-07` envía puntajes y el backend real está arriba; falta ejecutar el ataque y guardar la evidencia |
 | A.8.12 (consola y `strings`) | `FE-12` ya está cerrado; falta ejecutar el ataque sobre el build publicado |
 | A.8.19 (reemplazar `.wasm`) | `FE-12` ya está cerrado; falta `SHA256SUMS` firmado y verificación en despliegue |
-| A.8.15 (Wazuh) | Wazuh está activo y `100250` dispara; falta `backend.log` y la alerta FIM por archivo |
+| A.8.15 (Wazuh) | Wazuh está activo, `100250` dispara y `backend.log` ya se escribe; falta la alerta FIM por archivo |
 
 ---
 
@@ -39,11 +39,11 @@ Lo que **todavía no** se puede atacar y por qué:
 | # | Control | Implementación | Evidencia | Falta |
 | :--- | :--- | :--- | :--- | :--- |
 | 1 | **A.8.24** Criptografía | HMAC-SHA256 + nonce + TTL + TLS local mkcert, HSTS y CSP | 🟡 | ataque con Burp y captura de `bad_signature`; cifrado en reposo y gestión de claves |
-| 2 | **A.8.5** Autenticación | Supabase Auth + bloqueo 5/60 s + PIN débil rechazado (flujo anónimo + claim) | ⬜ | fuerza bruta, JWT manipulado, captura del 423; backend sin claves |
-| 3 | **A.8.9** Configuración | servidor autoritativo; el cliente solo presenta | ⬜ | editar `PlayerPrefs` contra backend real (sin desplegar) |
+| 2 | **A.8.5** Autenticación | Supabase Auth + bloqueo 5/60 s + PIN débil rechazado (flujo anónimo + claim) | ⬜ | fuerza bruta, JWT manipulado y captura del 423; backend ya arriba |
+| 3 | **A.8.9** Configuración | servidor autoritativo; el cliente solo presenta | ⬜ | editar `PlayerPrefs` contra backend real (ya arriba) |
 | 4 | **A.8.20** Redes | 5 redes Docker, un solo puerto público | 🟡 | `nmap` host+VM hecho; falta prueba desde otro contenedor |
 | 5 | **A.8.12** DLP | sin secretos en cliente; IP enmascarada en logs | ⬜ | consola + `strings` del build ya generado |
-| 6 | **A.8.15** Logging | JSON a stdout con `request_id` | 🟡 | Wazuh activo, `100250` (36); falta `backend.log` y alerta FIM por archivo |
+| 6 | **A.8.15** Logging | JSON a stdout con `request_id` + `backend.log` en volumen | 🟡 | Wazuh activo, `100250` (36) y `backend.log` escribiéndose; falta alerta FIM por archivo |
 | 7 | **A.8.28** Codificación segura | Pydantic, SQL parametrizado, saneo, RLS | ⬜ | SQLi, XSS/rich text, prompt injection contra backend real |
 | 8 | **A.8.31** Separación | guard `assert_environment` + claim `env` | ⬜ | token DEV contra PROD (necesita PROD) |
 | 9 | **A.8.25** SDLC | Gitleaks + hook + historial (84 commits, 0 hallazgos) | ✅ | CI creada en `.github/workflows/security.yml`; falta ejecución remota |
@@ -213,7 +213,8 @@ El nodo Wazuh ya está activo y el agente **002** está en el grupo `game`. Lo q
 1. El perfil `security` del host ya está levantado; si se reinicia, usar
    `powershell -File infra/scripts/up.ps1 security`.
 2. Reglas `100200–100250` (no `100100/100101`): `100250` ya disparó 36 veces con una
-   ráfaga `429`; las reglas de negocio esperan `backend.log`.
+   ráfaga `429`, y `backend.log` ya se escribe en `costamarindo-backend-logs`; falta la
+   evidencia de las reglas de negocio leyendo ese archivo.
 3. FIM sobre `/fim/webgl` (en el host, `builds/webgl`), no sobre
    `/usr/share/nginx/html`; el manager guarda estado en `002.db`.
 4. `wazuh-logtest` ya se usó para validar el decoder JSON; falta la alerta FIM por archivo,
@@ -246,12 +247,12 @@ el hook parecía funcionar y dejaba pasar los commits por un problema de `PATH`.
 | `SEC-01` | Plantilla de evidencia y scripts en `evidencias/ataques/` | ✅ cerrado |
 | `SEC-02` | `docs/soa.md` + matriz de riesgos (93 controles) | ✅ cerrado |
 | `SEC-03` | A.8.24: Burp + replay + TLS | ⬜ TLS verificado; falta ataque real y cifrado en reposo |
-| `SEC-04` | A.8.5: fuerza bruta + JWT | ⬜ backend con claves de Supabase/JWT |
-| `SEC-05` | A.8.9: `PlayerPrefs`/IndexedDB | ⬜ `FE-07` listo; falta backend desplegado |
+| `SEC-04` | A.8.5: fuerza bruta + JWT | ⬜ backend real arriba; falta ejecutar el ataque |
+| `SEC-05` | A.8.9: `PlayerPrefs`/IndexedDB | ⬜ `FE-07` y el backend real listos; falta ejecutar el ataque |
 | `SEC-06` | A.8.20: `nmap` host y contenedor | 🟡 host+VM hechos; falta prueba desde otro contenedor |
 | `SEC-07` | A.8.12: consola + `strings` | ⬜ `FE-12` listo; falta ejecutar sobre build publicado |
-| `SEC-08` | A.8.15: Wazuh + reglas + FIM | 🟡 Wazuh y reglas activos; falta `backend.log` y alerta FIM |
-| `SEC-09` | A.8.28: SQLi, XSS, prompt injection | ⬜ backend real (diálogo ya validado en simulación) |
+| `SEC-08` | A.8.15: Wazuh + reglas + FIM | 🟡 Wazuh, reglas y `backend.log` activos; falta la alerta FIM end-to-end |
+| `SEC-09` | A.8.28: SQLi, XSS, prompt injection | ⬜ backend real arriba; falta ejecutar y guardar la evidencia |
 | `SEC-10` | A.8.31: DEV contra PROD | ⬜ proyecto PROD |
 | `SEC-11` | A.8.19: `SHA256SUMS` + GPG + FIM | ⬜ `FE-12` listo; faltan hash firmado y verificación en despliegue |
 | `SEC-12` | `pip-audit`/`npm audit` | ✅ cerrado (`npm audit` y SonarQube diferidos) |
@@ -272,7 +273,7 @@ ya no esperan al build: esperan a que se publique y a que exista una cadena de h
 | Rate limit del diálogo en memoria | Baja | suficiente con una instancia; si se escala, mover a base/Redis |
 | `com.coplaydev.unity-mcp` en `Packages/manifest.json` | Media | ✅ resuelto el 2026-11-24 con `FE-14`/`SEC-14` |
 | `preloadedAssets` vaciado en `ProjectSettings.asset` | Baja | ✅ verificado en WebGL con `FE-13` |
-| Wazuh apagado y sin reglas | Media | 🟡 Wazuh y reglas activos; falta `backend.log` y alerta FIM (`SEC-08`) |
+| Wazuh apagado y sin reglas | Media | 🟡 Wazuh y reglas activos y `backend.log` escribiéndose; falta la alerta FIM end-to-end (`SEC-08`) |
 | Sin CI | Media | ✅ CI creada (`SEC-13`); falta ejecución remota |
 | Sin `SHA256SUMS` | Alta | ⬜ pendiente (`SEC-11`); ya hay build sobre el que generarlo |
 

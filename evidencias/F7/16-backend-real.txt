@@ -1,0 +1,65 @@
+# F7 · Backend real y Supabase DEV — evidencia (sin secretos)
+
+> Fecha: 2026-11-25
+> Commit base: e2de1e5 (main)
+> Equipo: Windows 11 Pro 10.0.26300.0 · Docker 29.9.2 · Compose v5.6.1
+> Nodo: sg-backend (contenedor healthy) + Supabase DEV (proyecto CosTamarindo, us-east-1)
+> Secretos: ninguno. No se imprimen claves, tokens, cadenas de conexión ni valores de .env.
+
+## 1. Contenedores
+
+NAME          STATUS                    PORTS
+sg-ai         Up (healthy)              11434/tcp
+sg-backend    Up (healthy)              8000/tcp
+sg-frontend   Up (healthy)              0.0.0.0:443->443/tcp, [::]:443->443/tcp, 0.0.0.0:8081->8080/tcp
+
+Imagen: costamarindo-backend:latest
+Id: sha256:32eeb6e18cab4582cae666fe087044fbcbf4bcdbfcf55cf76f0dd17715ac846a
+Creada: 2026-11-25T01:42:10Z
+
+## 2. Salud
+
+GET https://juego.local/api/health -> 200
+{"status":"ok","env":"dev","database":true}
+
+## 3. Migraciones y verificación
+
+`migrate.py --status` (EXIT=0):
+
+    001_schema.sql           aplicada 2026-11-06 23:05
+    002_rls.sql              aplicada 2026-11-06 23:05
+    003_harden_surface.sql   aplicada 2026-11-06 23:05
+    004_anonymous_claim.sql  aplicada 2026-11-16 23:45
+
+`check_db.py` (EXIT=0):
+
+    anon/authenticated: sin privilegios de tabla (correcto)
+    USAGE public: anon=False, authenticated=False, service_role=True (D13)
+    get_leaderboard(p_user_id uuid, p_limit integer) presente
+    constraints clave presentes (scores, game_sessions, profiles, login_attempts)
+    resultado: "Todo en orden."
+
+## 4. Diálogo real por el proxy
+
+POST https://juego.local/api/dialog  {"text":"hola","context":"defecto"} -> 200
+
+    {"reply":"¡Hola amiguito! ¿Cómo estás? ¿Llevas bien el juego?","blocked":false}
+
+Log del backend (sin token ni prompt completo):
+
+    {"event":"dialog_ok","context":"defecto","item":null,"latency_ms":10194,"chars":51}
+
+## 5. El diálogo no escribe en las tablas de juego
+
+Conteos antes y después de la llamada a `/api/dialog`:
+
+    scores:          4 -> 4
+    game_sessions:  13 -> 13
+    profiles:        0 -> 0
+    login_attempts:  0 -> 0
+
+## 6. Conclusión
+
+El backend real arranca con Supabase DEV, responde `/api/health` con `database: true` y
+`/api/dialog` con Ollama real. El cliente no habla con Supabase: todo pasa por Nginx y el
+backend. El diálogo es cosmético y no altera las tablas de juego.

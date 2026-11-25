@@ -1,6 +1,11 @@
 # Handoff — Santiago (Backend/Supabase) · cierre real de F7
 
-> **Actualizado 2026-11-24:** este documento es **contexto histórico**. `main` (`efe5d0a`) ya
+> **Actualizado 2026-11-25:** el backend real **ya arranca y está validado** en el equipo de
+> Santiago: `costamarindo-backend:latest` reconstruida desde `main`, `sg-backend` healthy,
+> `/api/health` con `database: true` y E2E en verde (`F7/16` y `F7/17`). Todo lo que sigue se
+> conserva como guía reproducible; ya no describe un bloqueo activo.
+>
+> **Actualizado 2026-11-24:** este documento es **contexto histórico**. `main` (`e2de1e5`) ya
 > integró el flujo anónimo de sesión/puntaje, `/api/claim` y la migración
 > `004_anonymous_claim.sql`; los tests vigentes son **64/64**, no 53, y `/api/dialog` ya no exige
 > JWT. `FE-10` (`Login → Game`) también está cerrado. Para pedir claves, migraciones y accesos,
@@ -29,8 +34,9 @@
 | Unity/NPC | ✅ compila, build WebGL y captura con Ollama real en simulación |
 | Simulación E2E | ✅ `sg-backend-sim` (código real + memoria) y `evidencias/F7/10-webgl-simulacion.txt` |
 
-El backend completo **no arranca** todavía porque el `.env` de la raíz solo tiene variables de
-Wazuh. Faltan las claves de Supabase y los secretos propios.
+El backend completo **no arrancaba** porque el `.env` de la raíz solo tenía variables de Wazuh;
+faltaban las claves de Supabase y los secretos propios. **Estado 2026-11-25:** esas variables ya
+están cargadas y el contenedor `sg-backend` está healthy; ver `evidencias/F7/16-backend-real.txt`.
 
 La simulación **no valida** Supabase, RLS ni migraciones. El backend temporal `sg-backend-sim`
 no forma parte de Compose y no publica puertos; se usó solo para la prueba visual.
@@ -206,24 +212,15 @@ Pasos:
 
 ## 6. Evidencia que debe devolver
 
-Guardar en `evidencias/F7/` (sin secretos):
+Guardar en `evidencias/F7/` (sin secretos). **Ya generadas el 2026-11-25:**
 
-- `11-backend-real.txt`:
-  - salida de `docker compose ps backend`;
-  - `GET /api/health` (JSON);
-  - códigos HTTP de registro/login;
-  - respuesta de `/api/dialog` para `captura`, `game_over` e inyección (texto recortado si hace
-    falta);
-  - líneas `dialog_ok` / `dialog_blocked` / `dialog_fallback`;
-  - conteos antes/después de `scores` y `game_sessions`;
-  - imagen y commit usados (`docker image inspect`, `git rev-parse HEAD`).
-- `12-e2e-real.md`:
-  - pasos, fecha, navegador y equipo;
-  - captura del bocadillo;
-  - confirmación de que el puntaje no cambió;
-  - cualquier limitación observada.
+- `16-backend-real.txt` — salida real de `docker compose ps`, `/api/health`, `migrate.py --status`,
+  `check_db.py`, `/api/dialog` y conteos de `scores`/`game_sessions` antes y después.
+- `17-e2e-real.md` — pasos, resultados y extracto redactado del E2E real contra el backend.
 
-No commitear `.env`, tokens, claves ni `builds/`.
+Los nombres `11`/`12` del plan original ya estaban ocupados por las capturas
+`11-webgl-pensamiento.png` y `12-webgl-pensamiento-game-over.png`, por eso la evidencia real usa
+`16` y `17`.
 
 ---
 

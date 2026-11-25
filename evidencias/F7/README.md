@@ -1,8 +1,9 @@
 # Evidencias F7 — Nodo de IA y NPC
 
 > **Fecha:** 2026-11-13 · **Nodo:** `Sg-AI` · **Modelo:** `qwen2.5:3b`
-> **Estado:** F7 cerrada en simulación local/WebGL. La validación con el backend real de
-> Supabase sigue pendiente de las claves y de la reconstrucción de la imagen.
+> **Estado:** F7 cerrada en simulación local/WebGL y **validada contra el backend real/Supabase
+> el 2026-11-25** (`16-backend-real.txt` y `17-e2e-real.md`). Las capturas `01`–`15` conservan la
+> evidencia histórica de la simulación.
 > **Actualización 2026-11-23:** `main` ya incluye el flujo anónimo + `/api/claim` y la suite del
 > backend tiene **64 tests**; esta carpeta conserva la evidencia histórica de la simulación. Para
 > los datos y accesos que faltan, ver
@@ -142,19 +143,20 @@ Resultados (`10-webgl-simulacion.txt`):
 - `13-respuesta-local-frontend.md`: respuesta local del 2026-11-24 a `docs/handoff/solicitud-datos-santiago.md`.
 - `14-webgl-bocadillo-translucido.png`: bocadillo con alpha 0,55 sobre la partida en curso.
 - `15-webgl-game-over-legible.png`: panel final con franjas separadas y estado offline neutral.
+- `16-backend-real.txt`: backend real + Supabase DEV (health, migraciones, `check_db.py`, diálogo real y conteos sin cambios).
+- `17-e2e-real.md`: E2E real contra backend + Supabase (flujo anónimo, claim, ataques y leaderboard).
 
 ---
 
-## 5. Límites conocidos
+## 5. Límites conocidos (actualizado 2026-11-25)
 
-- El backend completo sigue sin arrancar por faltar las claves de Supabase/JWT.
-- La simulación usa un repositorio en memoria y un JWT de desarrollo; no valida Supabase, RLS
-  ni migraciones.
-- La imagen `costamarindo-backend:latest` es anterior a los cambios de IA; Santiago debe
-  reconstruirla.
+- ~~El backend completo sigue sin arrancar por faltar las claves de Supabase/JWT.~~ **Resuelto:** el
+  backend arranca y está validado; ver `16-backend-real.txt`.
+- ~~La simulación usa un repositorio en memoria...~~ La evidencia real ahora está en `16` y `17`; la
+  simulación (`10-webgl-simulacion.txt`) se conserva como referencia histórica.
+- ~~La imagen `costamarindo-backend:latest` es anterior a los cambios de IA.~~ **Reconstruida** desde
+  `main` el 2026-11-25.
 - `mkcert` solo es confiable en el equipo de desarrollo; el build WebGL debe probarse en un
   equipo limpio antes de la entrega.
 - El build `builds/webgl` no se versiona; se regenera con `infra/scripts/build_webgl.ps1`.
-- En el build temporal con `Login` como escena inicial apareció un
-  `ArgumentOutOfRangeException` en la consola. No se reprodujo en el build final que arranca en
-  `Game`; parece relacionado con la transición `Login → Game` y queda para Frontend (FE-10).
+- Sigue pendiente la publicación en URL pública; `https://juego.local` solo funciona en este equipo.

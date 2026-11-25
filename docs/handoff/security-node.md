@@ -6,8 +6,8 @@
 > (grupo `game`) y está **Active**. Los logs reales de Nginx llegan al manager y
 > `100250` disparó 36 veces con una ráfaga `429`. El FIM detecta el cambio y lo guarda
 > en `002.db`, pero Wazuh 4.14 no emite la alerta por archivo en este all-in-one; es una
-> limitación documentada, no un fallo de la regla. `backend.log` queda pendiente hasta
-> que el backend tenga las claves de Supabase/JWT. Tailscale se difiere hasta tener los
+> limitación documentada, no un fallo de la regla. `backend.log` ya se escribe desde el
+> 2026-11-25 en el volumen `costamarindo-backend-logs`. Tailscale se difiere hasta tener los
 > cinco nodos.
 >
 > **Reglas reales:** [`infra/wazuh/rules/costamarindo_rules.xml`](../../infra/wazuh/rules/costamarindo_rules.xml)
@@ -59,7 +59,7 @@ y transportar los eventos de los agentes sin abrir puertos a Internet.
 | Reglas | `100200–100250` cargadas; `100200/100210/100250` verificadas con eventos reales. |
 | Logs Nginx | `access.log` real en el volumen; el agente lo lee; `100250` disparó 36 veces. |
 | FIM | Estado en `002.db` (`changes=1`), sin alerta por archivo en Wazuh 4.14 all-in-one. |
-| Backend | Imagen construida y dependencias actualizadas; no arranca sin claves de Supabase/JWT. `backend.log` pendiente. |
+| Backend | `costamarindo-backend:latest` healthy con las claves en `.env`; `backend.log` escribiéndose en `backend-logs` (2026-11-25). |
 | Tailscale | Diferido hasta tener los cinco nodos. |
 | `infra/wazuh/` | Existe con reglas, grupo, README y `provision-security-node.sh`. |
 | Evidencias | `A.8.15`, `A.8.20`, `A.8.24`, `SEC-12`, `SEC-13` y `docs/soa.md`. |
@@ -556,7 +556,7 @@ base se hace con los logs del backend y los audit logs de Supabase, no con un ag
 - [x] Agente `sg-game-host` en estado `active` (ID 002).
 - [x] Reglas 100200–100250 probadas; `100250` con 36 alertas reales.
 - [ ] FIM sobre `/fim/webgl`: estado en `002.db`, sin alerta por archivo en Wazuh 4.14 all-in-one.
-- [ ] Logs de Nginx llegando al agente; `backend.log` pendiente de claves.
+- [x] Logs de Nginx llegando al agente; `backend.log` ya se escribe (2026-11-25).
 - [ ] `nmap` desde host y VM hecho; falta desde un contenedor de la DMZ.
 - [ ] 10 carpetas en `evidencias/`; hay 3 controles parciales + `SEC-12`/`SEC-13`.
 - [x] `docs/arquitectura.md` y `Plan.md` actualizados con la desviación de la VM externa.

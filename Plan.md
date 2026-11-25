@@ -74,18 +74,18 @@ terminado. Nada se da por hecho porque «funciona en el editor»: se verifica en
 | Arte de personaje y fondo | Palenquera y `bg_playa.png` importados y en la escena | `unity/Assets/Art/Characters/`, `.../Backgrounds/` |
 | Arte de ítems | ✅ 12 tipos curados con PNG real en `Assets/Art/Items/curated/` (Single, PPU 100, máx. 512); el `Id` coincide con el nombre del sprite | `unity/Assets/Art/Items/curated/`, `ItemCatalog.cs` |
 | UI de Figma | 🟡 Tokens centralizados en `Theme.cs` (17 colores, 5 estilos); 0/~30 componentes exportados; `Assets/Art/UI/` vacío | `unity/Assets/Scripts/Core/Theme.cs` |
-| Build WebGL | ✅ rebuild Release del 2026-11-24 con el arte curado: 17 archivos, 16,5 MB, `unityReady: true`, 1,2 s de carga y 0 errores de consola con `tools/dev-server/check.mjs`; falta publicarlo en el nodo de Santiago | `builds/` (no versionado) |
-| Nginx / Sg-Frontend | Operativo: 443 (8081 solo con override de dev), TLS local con mkcert, CSP por hash, HSTS, proxy `/api/` | `infra/nginx/`, [`docs/fases/F3.md`](docs/fases/F3.md) |
-| Docker | Compose de 5 nodos declarado y validado. `sg-frontend`, `sg-wazuh-agent` y `sg-ai` arriba; `sg-backend` no arranca sin claves | `infra/docker-compose.yml`, [`evidencias/F6/`](evidencias/F6/README.md) |
-| Modelo de IA | ✅ `qwen2.5:3b` descargado (1,9 GB); `Sg-AI` healthy, sin puerto publicado; NPC probado en WebGL | [`evidencias/F7/`](evidencias/F7/README.md) |
-| Backend | 🚧 API completa en `backend/` y 64/64 tests; imagen `main-test` construida, pero `latest` sigue pendiente y no arranca sin las claves de Supabase/JWT en `.env` | [`evidencias/F5/`](evidencias/F5/README.md) |
-| Base de datos | 🟡 Supabase DEV con esquema 001–003, RLS y backup probados; falta aplicar y validar `004_anonymous_claim.sql` | [`evidencias/F4/`](evidencias/F4/README.md) |
-| Logs / SIEM | 🟡 Wazuh 4.14 en VM, agente **002**, reglas `100200–100250`, logs Nginx reales y `100250`; FIM guarda estado sin alerta por archivo; `backend.log` pendiente | `infra/wazuh/`, `infra/docker-compose.yml` |
+| Build WebGL | ✅ rebuild Release del 2026-11-24 con el arte curado: 17 archivos, 16,5 MB, `unityReady: true`, 1,5 s de carga y 0 errores de consola; servido y validado en el nodo de Santiago; falta URL pública | `builds/` (no versionado) |
+| Nginx / Sg-Frontend | Operativo: 443 (8081 solo con override de dev), TLS local con mkcert, CSP por hash, HSTS, proxy `/api/`; validado contra el backend real | `infra/nginx/`, [`docs/fases/F3.md`](docs/fases/F3.md) |
+| Docker | Compose de 5 nodos declarado y validado. `sg-frontend`, `sg-backend` y `sg-ai` arriba y healthy; el perfil `security` no está levantado en este equipo | `infra/docker-compose.yml`, [`evidencias/F6/`](evidencias/F6/README.md) |
+| Modelo de IA | ✅ `qwen2.5:3b` descargado (1,9 GB); `Sg-AI` healthy, sin puerto publicado; NPC validado contra el backend real | [`evidencias/F7/`](evidencias/F7/README.md) |
+| Backend | ✅ API completa en `backend/` y 64/64 tests; imagen `costamarindo-backend:latest` reconstruida desde `main`; `sg-backend` healthy; E2E real en verde (`F7/16`, `F7/17`) | [`evidencias/F5/`](evidencias/F5/README.md) |
+| Base de datos | ✅ Supabase DEV con esquema 001–004 aplicado y verificado (`check_db.py`, `EXIT=0`), RLS sin acceso de cliente y backup probado | [`evidencias/F4/`](evidencias/F4/README.md) |
+| Logs / SIEM | 🟡 Wazuh 4.14 en VM, agente **002**, reglas `100200–100250`, logs Nginx reales y `100250`; FIM guarda estado sin alerta por archivo; **`backend.log` ya se escribe** en `costamarindo-backend-logs` | `infra/wazuh/`, `infra/docker-compose.yml` |
 | Gitleaks (A.8.25) | ✅ Implementado, hook instalado y probado | [`evidencias/A.8.25/`](evidencias/A.8.25/README.md) |
 | Otros 9 controles ISO | 🟡 A.8.15/A.8.20/A.8.24 parciales; 6 sin implementar ni evidenciar | [`evidencias/`](evidencias/) |
 | CI | ✅ Gitleaks + tests + `pip-audit` + Compose; falta primera ejecución remota | [`.github/workflows/security.yml`](.github/workflows/security.yml) |
 | SoA / informe / `docs/api.md` | SoA ✅ (93 controles); `docs/api.md` ✅; informe final ⬜ | [`docs/soa.md`](docs/soa.md), [`docs/api.md`](docs/api.md) |
-| Remoto Git | `main` publicada; árbol de trabajo limpio tras el cierre del 2026-11-24 | `git status` |
+| Remoto Git | `main` publicada; árbol limpio tras el cierre del 2026-11-25 | `git status` |
 
 ### 3.2 Hallazgos que corrigen la documentación anterior
 
@@ -97,6 +97,11 @@ porque afectan a la planificación:
 > la paleta en `Theme.cs`, se quitó `com.coplaydev.unity-mcp` del manifest y se deshabilitó
 > `SampleScene`. El build final se rehizo ese mismo día (`FE-12`): 16,5 MB y medición limpia
 > con `tools/dev-server/check.mjs`.
+>
+> **Cierre 2026-11-25.** Backend real y Supabase DEV validados: migración `004` aplicada,
+> `check_db.py` en verde, imagen `latest` reconstruida, `sg-backend` healthy y E2E real en verde
+> (`F7/16` y `F7/17`). El estado detallado por nodo y lo pendiente viven en
+> [`contexto.md`](contexto.md).
 
 1. **Los 4 sprites de ítems con arte real ya no existen.** El commit `ee62e8c`
    (*feat(assets): agregar items recolectables y dañinos*) **borró**
@@ -151,7 +156,7 @@ de negocio. El cliente **nunca es fuente de verdad** (A.8.9): solo presenta.
 | Tokens (17 colores, 5 estilos) | ✅ `Theme.cs`, sin colores de paleta sueltos |
 | Build WebGL | ✅ rebuild Release del 2026-11-24 con el arte curado: 16,5 MB y 0 errores de consola |
 | Nginx + TLS + CSP | ✅ operativo |
-| Leaderboard y envío de puntaje | ✅ cliente `ApiClient` + panel top-5/claim; sin backend muestra estado offline neutral, no un error rojo; validación real pendiente de claves |
+| Leaderboard y envío de puntaje | ✅ cliente `ApiClient` + panel top-5/claim; validado contra el backend real (E2E en `F7/17`); sin backend muestra estado offline neutral |
 | Bocadillo del NPC | ✅ fondo translúcido (alpha 0,55) que deja ver los ítems, “escribiendo…”, historial de una línea por entrada y fallback |
 
 > **Ajuste de legibilidad (2026-11-24, segunda pasada).** El panel de fin de partida usa
@@ -198,17 +203,17 @@ documentación interactiva en producción.
 
 ### 5.1 Estado actual
 
-🚧 **API implementada; falta configuración para arrancar.** `backend/` contiene la API
-completa con 43 pruebas herméticas, imagen multi-stage sin privilegios y healthcheck real.
-La imagen se construyó, pero `sg-backend` no arranca hasta cargar las claves de
-Supabase/JWT en el `.env`. Evidencia en [`evidencias/F5/`](evidencias/F5/README.md) y
-contratos en [`docs/api.md`](docs/api.md).
+✅ **API implementada, desplegada y validada.** `backend/` contiene la API completa con 64 pruebas
+herméticas, imagen multi-stage sin privilegios y healthcheck real. La imagen `latest` está
+reconstruida desde `main`, `sg-backend` está healthy y el E2E real contra Supabase DEV pasó en
+verde. Evidencia en [`evidencias/F7/16`](evidencias/F7/16-backend-real.txt) y
+[`F7/17`](evidencias/F7/17-e2e-real.md); contratos en [`docs/api.md`](docs/api.md).
 
 ### 5.2 Backlog
 
-**Estado 2026-11-23:** cerradas `BE-01`…`BE-05` y `BE-07`…`BE-11`. `BE-06` ya llama a Ollama
-con prompt versionado, timeout y fallback; los 64 tests del backend pasan. El arranque real del
-contenedor sigue bloqueado por las claves de Supabase/JWT y la migración `004_anonymous_claim.sql`.
+**Estado 2026-11-25:** cerradas `BE-01`…`BE-11`. `BE-06` llama a Ollama con prompt versionado,
+timeout y fallback; los 64 tests pasan; el contenedor real arranca con `.env` y la migración
+`004_anonymous_claim.sql` está aplicada y verificada.
 
 | ID | Tarea | Depende de | DoD |
 | :--- | :--- | :--- | :--- |
@@ -393,24 +398,24 @@ El modelo se descarga por procedimiento explícito, no en caliente.
 | **F3** | Build WebGL + Nginx | **Frontend** | Security (TLS/CSP) | ✅ cerrada; build regenerado y servido |
 | **F4** | Supabase: Auth, esquema y leaderboard | **DB** | Backend (rate limit), Frontend (AuthClient) | ✅ cerrada en DEV |
 | **F5** | Backend FastAPI + puntaje firmado | **Backend** | DB (service_role), Frontend (clientes) | ✅ cerrada (diálogo IA conectado) |
-| **F6** | Infraestructura Docker de 5 nodos | *Transversal*: un nodo por división | Security (aislamiento) | 🚧 frontend + agente + IA arriba; backend sin claves |
-| **F7** | NPC con Ollama | **IA** | Backend (endpoint), Frontend (bocadillo) | ✅ simulación WebGL con backend temporal; falta validación Supabase |
+| **F6** | Infraestructura Docker de 5 nodos | *Transversal*: un nodo por división | Security (aislamiento) | 🟡 frontend + backend + IA arriba y healthy; `security` pendiente de levantar en este equipo |
+| **F7** | NPC con Ollama | **IA** | Backend (endpoint), Frontend (bocadillo) | ✅ validado contra backend real/Supabase (`F7/16`, `F7/17`) |
 | **F8** | Controles ISO, ataques y evidencias | **Security** | Las cuatro restantes | 🚧 A.8.25 completo; A.8.15/A.8.20/A.8.24 parciales |
 | **F9** | Despliegue final y entrega | *Transversal* | Las cinco | ⬜ pendiente |
 
-**Lectura de la matriz.** F1, F2 y F3 son **Frontend** y están casi cerradas. **F4 (DB) y
-F5 (Backend) ya están cerradas.** Lo que falta de verdad es F1/FE-07 del Frontend, la validación
-de F7 (IA) con Supabase y F8 (Security). F6 no es una fase de una sola división: es la suma de
-los cinco nodos, y cada división cierra el suyo.
+**Lectura de la matriz.** **F2, F3, F4, F5 y F7 están cerradas** (Frontend, DB, Backend e IA,
+validadas contra Supabase DEV). Lo que falta de verdad es el kit de UI de F1 (`FE-05`/`FE-06`),
+el playtest `FE-11`, la publicación pública, F8 (Security) y F9 (entrega). F6 no es una fase de
+una sola división: es la suma de los cinco nodos, y cada división cierra el suyo.
 
 ### 9.1 Reparto de F6 por división
 
 | Nodo | División dueña | Estado | Qué falta |
 | :--- | :--- | :--- | :--- |
-| `Sg-Frontend` | Frontend | ✅ healthy; build WebGL servido | Integrar NPC, cablear arte/UI y FE-10 |
-| `Sg-AI` | IA | ✅ healthy; `qwen2.5:3b`, guardrails y bocadillo WebGL probados | Validar con el backend real y Supabase |
-| `Sg-Backend` | Backend | 🚧 imagen construida; no arranca sin claves de Supabase/JWT | Completar `.env` y healthcheck (BE-08) |
-| `Sg-Security` | Security | 🟡 cerrado operativamente: VM `172.18.18.220`, agente **002** Active, logs Nginx reales y `100250` con 36 alertas; A.8.20/A.8.24/A.8.15 con evidencia parcial | `backend.log`, alerta FIM end-to-end, prueba de aislamiento desde contenedor y tailnet (SEC-08) |
+| `Sg-Frontend` | Frontend | ✅ healthy; build WebGL servido y validado contra el backend real | Publicar en URL pública; `FE-05`/`FE-06` (bloqueados) y `FE-11` (playtest) |
+| `Sg-AI` | IA | ✅ healthy; `qwen2.5:3b`, guardrails y bocadillo WebGL probados; validado con el backend real | — |
+| `Sg-Backend` | Backend | ✅ healthy; imagen `latest` reconstruida y E2E real en verde | — |
+| `Sg-Security` | Security | 🟡 cerrado operativamente: VM `172.18.18.220`, agente **002** Active, logs Nginx reales y `100250` con 36 alertas; A.8.20/A.8.24/A.8.15 con evidencia parcial; **`backend.log` ya disponible** | alerta FIM end-to-end, prueba de aislamiento desde contenedor y tailnet (SEC-08); ataques con backend real |
 | `Sg-DB` | DB | ✅ operativo | Proyecto PROD al desplegar (DB-08) |
 
 ---
@@ -539,16 +544,17 @@ autenticación, evidencias de ataque y corrección.
 
 ## 14. Checklist de entrega
 
-- [ ] Build WebGL Release servido por Nginx en HTTPS, con el arte actual.
-- [ ] Login usuario + PIN con bloqueo por intentos, contra Supabase real.
-- [ ] Leaderboard top 5 + posición propia.
-- [ ] Puntaje firmado con HMAC y validado en servidor.
-- [x] NPC con Ollama + fallback (simulación WebGL).
-- [ ] 5 nodos operativos y aislados (Frontend, Backend, DB, Security, IA).
-- [ ] 10 controles con evidencia de ataque y corrección.
-- [ ] SoA completa.
-- [ ] Gitleaks sin hallazgos; sin secretos en el repo; sin dependencias de agente en Unity.
-- [ ] `pg_dump` reciente y restauración probada.
+- [x] Build WebGL Release servido por Nginx en HTTPS, con el arte actual (local; falta URL pública).
+- [x] Flujo anónimo + reclamo con nombre/PIN y bloqueo por intentos, contra Supabase real.
+- [x] Leaderboard top 5 + posición propia.
+- [x] Puntaje firmado con HMAC y validado en servidor.
+- [x] NPC con Ollama + fallback, validado contra el backend real/Supabase.
+- [ ] 5 nodos operativos y aislados (Frontend, Backend, DB, Security, IA): 3 de 5 activos aquí;
+      el perfil `security` no está levantado en este equipo.
+- [ ] 10 controles con evidencia de ataque y corrección (Security).
+- [x] SoA completa.
+- [x] Gitleaks sin hallazgos; sin secretos en el repo; sin dependencias de agente en Unity.
+- [x] `pg_dump` y restauración probada (backup 2026-11-06).
 - [ ] Demo reproducible + video de respaldo.
 
 ---
@@ -560,6 +566,7 @@ accionable y lo que no debe tocarse:
 
 | División | Documento | Qué incluye |
 | :--- | :--- | :--- |
+| Todas | [`contexto.md`](contexto.md) | **contexto completo**: qué es el proyecto, arquitectura, estado por nodo, evidencias, pendientes y en curso |
 | Todas | [`docs/handoff/README.md`](docs/handoff/README.md) | puesta en marcha desde cero, secretos, qué se versiona, orden de trabajo |
 | Frontend | [`docs/handoff/frontend.md`](docs/handoff/frontend.md) | reparación del arte, integración con la API (firma HMAC en C#), verificación del build |
 | Security | [`docs/handoff/security.md`](docs/handoff/security.md) | recetas de ataque ejecutables, estado por control, plantilla de evidencia |

@@ -1,8 +1,8 @@
 # Arquitectura de infraestructura — CosTamarindo 2D
 
-> **Estado (2026-11-13):** `Sg-Frontend` está *healthy* y escribe logs reales; `Sg-Backend`
-> tiene imagen construida y dependencias actualizadas, pero **no arranca** hasta cargar las
-> claves de Supabase/JWT en `.env`; `Sg-AI` está **healthy** con `qwen2.5:3b` (1,9 GB) y el
+> **Estado (2026-11-25):** `Sg-Frontend` está *healthy* y escribe logs reales; `Sg-Backend` está
+> **healthy** con la imagen `latest` reconstruida desde `main`, las claves de Supabase/JWT en
+> `.env` y `/api/health` con `database: true`; `Sg-AI` está **healthy** con `qwen2.5:3b` (1,9 GB) y
 > endpoint de diálogo ya llama a Ollama. `Sg-Security` es la **VM externa** `sg-security` (`172.18.18.220`, Ubuntu
 > 24.04 + Wazuh 4.14.10), con el agente **002** activo y `100250` con 36 alertas sobre logs
 > reales de Nginx. El FIM guarda estado en `002.db`, pero Wazuh 4.14 no emite la alerta por
@@ -218,7 +218,8 @@ escuchan en localhost. El agente es el **ID 002** (`sg-game-host`, grupo `game`)
 escribe `access.log` real y `100250` ya disparó 36 veces con una ráfaga `429`; el FIM detecta
 el cambio y lo guarda en `002.db`, pero Wazuh 4.14 no emite la alerta por archivo en este
 all-in-one.
-`backend.log` queda pendiente hasta que el backend tenga las claves de Supabase/JWT.
+`backend.log` ya se escribe en el volumen `costamarindo-backend-logs` desde el 2026-11-25; queda
+pendiente la alerta FIM end-to-end, que Wazuh 4.14 no emite en este all-in-one.
 
 Mientras la tailnet del juego no exista, la VM se alcanza por el Default Switch. Cuando estén
 los cinco nodos se crea la tailnet, se saca la VM de la tailnet vieja y se cambia

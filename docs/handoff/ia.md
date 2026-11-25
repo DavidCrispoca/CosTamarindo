@@ -4,9 +4,10 @@
 > **Backlog:** `Plan.md` §8 (`IA-01`…`IA-07`)
 > **Fases:** [`../fases/F7-ia.md`](../fases/F7-ia.md) (F7.0–F7.5)
 > **Contrato:** [`../api.md`](../api.md) §4 · **Código:** `backend/app/ai/`, `backend/app/providers/ollama.py`
-> **Estado 2026-11-24:** ✅ nodo operativo, bocadillo de Unity probado en WebGL con Ollama real y
-> fallback; UI actualizada (globo translúcido y textos sin solape, `F7/14` y `F7/15`). El backend
-> completo sigue bloqueado por las claves de Supabase/JWT.
+> **Estado 2026-11-25:** ✅ nodo operativo y **validado contra el backend real/Supabase**; el
+> bocadillo de Unity se probó en WebGL con Ollama real y fallback; UI actualizada (globo
+> translúcido y textos sin solape, `F7/14` y `F7/15`); `dialog_ok` real registrado en `F7/16` y
+> E2E contra el backend real en `F7/17`.
 
 ---
 
@@ -50,19 +51,20 @@
 
 ## 2. Cómo validar y cerrar
 
-### 2.1 Backend con claves reales
+### 2.1 Backend con claves reales — ✅ hecho (2026-11-25)
 
-El backend completo no arranca sin `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`,
+El backend completo arranca con las variables de `.env` (`SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`,
 `SUPABASE_SECRET_KEY`, `SUPABASE_DB_URL`, `BACKEND_JWT_SECRET`, `PIN_PEPPER` y
-`SESSION_MASTER_KEY`. Cuando estén en `.env`:
+`SESSION_MASTER_KEY`). Verificado el 2026-11-25:
 
 ```powershell
 docker compose --env-file .env -f infra/docker-compose.yml --profile backend up -d backend
 docker compose --env-file .env -f infra/docker-compose.yml ps backend
 ```
 
-El endpoint de diálogo se probó con un backend de prueba (repositorio en memoria + JWT firmado)
-para no depender de Supabase. Ver `evidencias/F7/03-endpoint-real.txt`.
+`sg-backend` quedó `healthy` y `/api/health` devolvió `database: true`. El endpoint de diálogo se
+probó contra el backend real a través del proxy; ver `evidencias/F7/16-backend-real.txt`. La
+simulación con repositorio en memoria (`F7/03-endpoint-real.txt`) queda como evidencia histórica.
 
 ### 2.2 Bocadillo en Unity/WebGL (hecho)
 
@@ -182,5 +184,5 @@ con Ollama apagado el juego responde en **< 1 s** sin dejar de ser jugable.
 `FE-09` está implementado y probado en WebGL: “escribiendo…”, historial de una línea por entrada,
 fallback visible y fondo translúcido (alpha 0,55). Las capturas del estado actual son
 `evidencias/F7/11-webgl-pensamiento.png`, `12-webgl-pensamiento-game-over.png`,
-`14-webgl-bocadillo-translucido.png` y `15-webgl-game-over-legible.png`. Lo único que queda es la
-validación contra el backend real/Supabase.
+`14-webgl-bocadillo-translucido.png` y `15-webgl-game-over-legible.png`. La validación contra el
+backend real/Supabase quedó **cerrada el 2026-11-25** (`F7/16` y `F7/17`).

@@ -1,5 +1,13 @@
 # Solicitud pendiente a Santiago — cierre real de backend, DB y Frontend
 
+> **✅ Cerrado el 2026-11-25.** Todo lo que pedía este documento ya se resolvió: backend real
+> healthy (`costamarindo-backend:latest` reconstruida), Supabase DEV con `004` aplicada y
+> `check_db.py` en verde, nodo Frontend sirviendo y E2E real en verde. El cierre verificado está en
+> [`solicitud-datos-santiago.md`](solicitud-datos-santiago.md) §8 y las evidencias en
+> [`evidencias/F7/16-backend-real.txt`](../../evidencias/F7/16-backend-real.txt) y
+> [`17-e2e-real.md`](../../evidencias/F7/17-e2e-real.md). El cuerpo de abajo queda como registro
+> histórico del 2026-11-24.
+>
 > **Para:** Santiago y su agente.
 > **Fecha:** 2026-11-24.
 > **Base verificada:** `main` en `a18d7ab`; `Yoann` ya quedó alineada con `main`.
