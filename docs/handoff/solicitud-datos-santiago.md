@@ -10,6 +10,9 @@
 > **Regla de oro:** no enviar claves, tokens, contraseñas, cadenas de conexión ni archivos `.env`
 > por Git, chat, capturas o documentos. Usar un gestor de secretos o configurarlos directamente en
 > el nodo. En este documento solo se piden **nombres, estados y salidas sin secretos**.
+>
+> **2026-11-24:** la respuesta de §7 es **parcial**. Lo que sigue faltando para cerrar F7 está en
+> [`solicitud-datos-santiago-pendientes.md`](solicitud-datos-santiago-pendientes.md).
 
 ---
 

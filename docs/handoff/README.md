@@ -1,7 +1,7 @@
 # Handoff · CosTamarindo 2D
 
 > **Para quién:** las personas que toman Frontend, Security e IA.
-> **Estado del proyecto:** 2026-11-24 (`main` en `efe5d0a`, alineada con `origin/main`).
+> **Estado del proyecto:** 2026-11-24 (`main` en `a18d7ab`, alineada con `origin/main`).
 > **Fuente de verdad del avance:** [`../../Plan.md`](../../Plan.md) §3 (verificación del 2026-11-24).
 > **Contratos de la API:** [`../api.md`](../api.md).
 
@@ -14,6 +14,7 @@ división por división. No reemplaza a `Plan.md`: lo hace accionable.
 | [`security.md`](security.md) | atacar y evidenciar los 10 controles (`SEC-01`…`SEC-14`) |
 | [`ia.md`](ia.md) | conectar Ollama al NPC sin romper el puntaje (`IA-01`…`IA-07`) |
 | [`solicitud-datos-santiago.md`](solicitud-datos-santiago.md) | **pedir a Santiago** claves, migraciones y acceso al nodo; §7 registra lo ya entregado en local |
+| [`solicitud-datos-santiago-pendientes.md`](solicitud-datos-santiago-pendientes.md) | **seguimiento 2026-11-24:** solo lo que falta tras la respuesta parcial (backend/DB y nodo Frontend) |
 | [`handoff-santiago-backend.md`](handoff-santiago-backend.md) | contexto histórico de F7/backend; el contrato vigente es anónimo + claim |
 | [`handoff-alejandra-frontend.md`](handoff-alejandra-frontend.md) | contexto histórico de integración del NPC; el estado vigente está en `frontend.md` |
 | [`evidencias/_plantilla/README.md`](../../evidencias/_plantilla/README.md) | formato obligatorio de una carpeta de evidencia |
@@ -36,10 +37,10 @@ Todo lo que sigue está **documentado y abierto**; no se inventó estado ni se s
 
 | Pendiente | Responsable / bloqueo | Seguir en |
 | :--- | :--- | :--- |
-| Publicar el WebGL en URL pública (dominio/VPS o demo estática) | nodo de Santiago: dominio, acceso y procedimiento | [`solicitud-datos-santiago.md`](solicitud-datos-santiago.md) §2, §7.3 |
-| Claves Supabase/JWT y proyecto DEV confirmado | Santiago, por canal seguro | ídem §1.1 |
-| Migración `004_anonymous_claim.sql` + `check_db.py` en verde | Santiago / DB | ídem §1.2 |
-| Imagen `costamarindo-backend:latest` y despliegue del backend | Santiago / Backend | ídem §1.3 |
+| Publicar el WebGL en URL pública (dominio/VPS o demo estática) | nodo de Santiago: dominio, acceso y procedimiento | [`solicitud-datos-santiago-pendientes.md`](solicitud-datos-santiago-pendientes.md) §2.4 |
+| Claves Supabase/JWT y proyecto DEV confirmado | Santiago, por canal seguro | ídem §2.1 |
+| Migración `004_anonymous_claim.sql` + `check_db.py` en verde | Santiago / DB | ídem §2.2 |
+| Imagen `costamarindo-backend:latest` y despliegue del backend | Santiago / Backend | ídem §2.3 |
 | `FE-05`/`FE-06`: 10 prefabs y kit de Figma | `FIGMA_TOKEN` (0/~30 componentes) | [`frontend.md`](frontend.md) §2.4 |
 | `FE-11`: playtest humano de 10–15 min | una persona real | [`frontend.md`](frontend.md) §2.4 |
 | Ataques ISO reales y evidencias (A.8.5, A.8.9, A.8.12, A.8.19, A.8.24, A.8.28, A.8.31) | backend desplegado + PROD para A.8.31 | [`security.md`](security.md) §5 |
