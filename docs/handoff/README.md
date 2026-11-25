@@ -17,6 +17,7 @@ división por división. No reemplaza a `Plan.md`: lo hace accionable.
 | [`ia.md`](ia.md) | conectar Ollama al NPC sin romper el puntaje (`IA-01`…`IA-07`) |
 | [`solicitud-datos-santiago.md`](solicitud-datos-santiago.md) | **pedir a Santiago** claves, migraciones y acceso al nodo; §7 registra lo ya entregado en local |
 | [`solicitud-datos-santiago-pendientes.md`](solicitud-datos-santiago-pendientes.md) | **seguimiento 2026-11-24:** solo lo que falta tras la respuesta parcial (backend/DB y nodo Frontend) |
+| [`solicitud-aprobacion-backend-local.md`](solicitud-aprobacion-backend-local.md) | **aprobación 2026-11-25:** levantar backend local contra DEV y entregar secretos por canal seguro |
 | [`handoff-santiago-backend.md`](handoff-santiago-backend.md) | contexto histórico de F7/backend; el contrato vigente es anónimo + claim |
 | [`handoff-alejandra-frontend.md`](handoff-alejandra-frontend.md) | contexto histórico de integración del NPC; el estado vigente está en `frontend.md` |
 | [`evidencias/_plantilla/README.md`](../../evidencias/_plantilla/README.md) | formato obligatorio de una carpeta de evidencia |

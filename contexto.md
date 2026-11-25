@@ -291,6 +291,7 @@ Si Docker falla al arrancar con redes huérfanas, ver `README.md` §2.4 y limpia
 | [`docs/handoff/security.md`](docs/handoff/security.md) | recetas de ataque y estado por control ISO |
 | [`docs/handoff/security-node.md`](docs/handoff/security-node.md) | provisión y operación de la VM Wazuh |
 | [`docs/handoff/solicitud-datos-santiago.md`](docs/handoff/solicitud-datos-santiago.md) | solicitud a Santiago y cierre verificado (§8) |
+| [`docs/handoff/solicitud-aprobacion-backend-local.md`](docs/handoff/solicitud-aprobacion-backend-local.md) | aprobación para backend local contra DEV y entrega segura de secretos |
 | [`docs/handoff/handoff-santiago-backend.md`](docs/handoff/handoff-santiago-backend.md) | contexto histórico de backend/F7 |
 | [`docs/handoff/handoff-alejandra-frontend.md`](docs/handoff/handoff-alejandra-frontend.md) | contexto histórico de integración del NPC |
 | [`Plan.md`](Plan.md) | plan maestro, fases, backlog y decisiones |
