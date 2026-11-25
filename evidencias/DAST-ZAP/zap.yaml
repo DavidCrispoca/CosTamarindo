@@ -1,0 +1,54 @@
+env:
+  contexts:
+  - excludePaths: []
+    name: baseline
+    urls:
+    - https://costamarindo.onrender.com/
+  parameters:
+    failOnError: true
+    progressToStdout: false
+jobs:
+- parameters:
+    enableTags: false
+    maxAlertsPerRule: 10
+  type: passiveScan-config
+- parameters:
+    maxDuration: 2
+    url: https://costamarindo.onrender.com/
+  type: spider
+- parameters:
+    maxDuration: 0
+  type: passiveScan-wait
+- parameters:
+    format: Long
+    summaryFile: /home/zap/zap_out.json
+  rules: []
+  type: outputSummary
+- parameters:
+    reportDescription: ''
+    reportDir: /zap/wrk/
+    reportFile: zap-baseline-despues.html
+    reportTitle: ZAP Scanning Report
+    template: traditional-html
+  type: report
+- parameters:
+    reportDescription: ''
+    reportDir: /zap/wrk/
+    reportFile: zap-baseline-despues.md
+    reportTitle: ZAP Scanning Report
+    template: traditional-md
+  type: report
+- parameters:
+    reportDescription: ''
+    reportDir: /zap/wrk/
+    reportFile: zap-baseline-despues.xml
+    reportTitle: ZAP Scanning Report
+    template: traditional-xml
+  type: report
+- parameters:
+    reportDescription: ''
+    reportDir: /zap/wrk/
+    reportFile: zap-baseline-despues.json
+    reportTitle: ZAP Scanning Report
+    template: traditional-json
+  type: report

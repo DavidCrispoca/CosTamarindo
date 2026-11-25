@@ -1,0 +1,23 @@
+﻿
+
+Security Report
+
+=====================================
+
+Rules: 
+https://docs.bearer.com/reference/rules [v0.48.4]
+
+Language  Default Rules  Custom Rules  Files  
+Python    88             0             37     
+
+Need to add your own custom rule? Check out the guide: https://docs.bearer.com/guides/custom-rule
+
+=====================================
+
+SUCCESS
+
+88 checks were run and no failures were detected. Great job! ­ƒæÅ
+
+Bearer found:
+- 3 unique data type(s), representing 33 occurrences, including PII, Personal Data.
+

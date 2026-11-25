@@ -1,0 +1,1278 @@
+<?xml version="1.0"?>
+<OWASPZAPReport programName="ZAP" version="2.17.0" generated="Wed, 25 Nov 2026 12:03:54" created="2026-11-25T12:03:54.968062010Z">
+	
+		<site name="http://costamarindo.onrender.com" host="costamarindo.onrender.com" port="80" ssl="false">
+			<alerts>
+				
+					<alertitem>
+						<pluginid>100001</pluginid>
+						<alertRef>100001</alertRef>
+						<alert>Unexpected Content-Type was returned</alert>
+						<name>Unexpected Content-Type was returned</name>
+						<riskcode>1</riskcode>
+						<confidence>3</confidence>
+						<riskdesc>Low (High)</riskdesc>
+						<confidencedesc>High</confidencedesc>
+						<desc>&lt;p&gt;A Content-Type of text/html was returned by the server.&lt;/p&gt;&lt;p&gt;This is not one of the types expected to be returned by an API.&lt;/p&gt;&lt;p&gt;Raised by the &apos;Alert on Unexpected Content Types&apos; script&lt;/p&gt;</desc>
+						<instances>
+							
+								<instance>
+									<uri>http://costamarindo.onrender.com/api/health</uri>
+									<nodeName>http://costamarindo.onrender.com/api/health</nodeName>
+									<method>GET</method>
+									<param></param>
+									<attack></attack>
+									<evidence>text/html</evidence>
+									<otherinfo></otherinfo>
+								</instance>
+							
+							
+								<instance>
+									<uri>http://costamarindo.onrender.com/api/leaderboard</uri>
+									<nodeName>http://costamarindo.onrender.com/api/leaderboard</nodeName>
+									<method>GET</method>
+									<param></param>
+									<attack></attack>
+									<evidence>text/html</evidence>
+									<otherinfo></otherinfo>
+								</instance>
+							
+						</instances>
+						<count>2</count>
+						<systemic>false</systemic>
+						<solution></solution>
+						<otherinfo></otherinfo>
+						<reference></reference>
+						<cweid>-1</cweid>
+						<wascid>-1</wascid>
+						<sourceid>2051</sourceid>
+					</alertitem>
+				
+			</alerts>
+		</site>
+	
+	
+		<site name="https://costamarindo.onrender.com" host="costamarindo.onrender.com" port="443" ssl="true">
+			<alerts>
+				
+					<alertitem>
+						<pluginid>20020</pluginid>
+						<alertRef>20020-5</alertRef>
+						<alert>nginx Version with Known Vulnerabilities</alert>
+						<name>nginx Version with Known Vulnerabilities</name>
+						<riskcode>3</riskcode>
+						<confidence>2</confidence>
+						<riskdesc>High (Medium)</riskdesc>
+						<confidencedesc>Medium</confidencedesc>
+						<desc>&lt;p&gt;The server disclosed the version of a server side technology it is running via an HTTP response header, and that version is affected by known vulnerabilities. The version, header and vulnerabilities, listed by severity, are given in the other info. See the references for the details of each.&lt;/p&gt;&lt;p&gt;Note that some distributions backport security fixes without changing the version number, so check whether the fixes have actually been applied before reporting these as confirmed.&lt;/p&gt;</desc>
+						<instances>
+							
+								<instance>
+									<uri>https://costamarindo.onrender.com/api/auth/refresh</uri>
+									<nodeName>https://costamarindo.onrender.com/api/auth/refresh ()({refresh_token})</nodeName>
+									<method>POST</method>
+									<param></param>
+									<attack></attack>
+									<evidence>nginx/1.26.3</evidence>
+									<otherinfo>The server disclosed that it is running nginx version 1.26.3 via the &quot;x-render-origin-server&quot; HTTP response header.
+
+31 known vulnerabilities: 0 critical, 4 high, 21 medium, 6 low.
+
+High: CVE-2026-113425, CVE-2026-118899, CVE-2026-123007, CVE-2026-42533
+
+Medium: CVE-2026-120967, CVE-2026-121810, CVE-2026-123633, CVE-2026-123634, CVE-2026-15176, CVE-2026-1642, CVE-2026-27654, CVE-2026-27784, CVE-2026-28753, CVE-2026-32647, CVE-2026-40460, CVE-2026-40701, CVE-2026-42055, CVE-2026-42945, CVE-2026-42946, CVE-2026-56434, CVE-2026-60005, CVE-2026-9256, CVE-2026-95101, CVE-2026-97205, CVE-2026-97629
+
+Low: CVE-2025-53859, CVE-2026-123640, CVE-2026-125283, CVE-2026-27651, CVE-2026-42934, CVE-2026-48142</otherinfo>
+								</instance>
+							
+						</instances>
+						<count>1</count>
+						<systemic>false</systemic>
+						<solution>&lt;p&gt;Upgrade nginx to a supported version which includes fixes for the listed vulnerabilities. Also configure the server not to disclose its version, e.g. by setting &quot;server_tokens off;&quot;.&lt;/p&gt;</solution>
+						<otherinfo>&lt;p&gt;The server disclosed that it is running nginx version 1.26.3 via the &quot;x-render-origin-server&quot; HTTP response header.&lt;/p&gt;&lt;p&gt;&lt;/p&gt;&lt;p&gt;31 known vulnerabilities: 0 critical, 4 high, 21 medium, 6 low.&lt;/p&gt;&lt;p&gt;&lt;/p&gt;&lt;p&gt;High: CVE-2026-113425, CVE-2026-118899, CVE-2026-123007, CVE-2026-42533&lt;/p&gt;&lt;p&gt;&lt;/p&gt;&lt;p&gt;Medium: CVE-2026-120967, CVE-2026-121810, CVE-2026-123633, CVE-2026-123634, CVE-2026-15176, CVE-2026-1642, CVE-2026-27654, CVE-2026-27784, CVE-2026-28753, CVE-2026-32647, CVE-2026-40460, CVE-2026-40701, CVE-2026-42055, CVE-2026-42945, CVE-2026-42946, CVE-2026-56434, CVE-2026-60005, CVE-2026-9256, CVE-2026-95101, CVE-2026-97205, CVE-2026-97629&lt;/p&gt;&lt;p&gt;&lt;/p&gt;&lt;p&gt;Low: CVE-2025-53859, CVE-2026-123640, CVE-2026-125283, CVE-2026-27651, CVE-2026-42934, CVE-2026-48142&lt;/p&gt;</otherinfo>
+						<reference>&lt;p&gt;https://nginx.org/en/security_advisories.html&lt;/p&gt;&lt;p&gt;https://nginx.org/en/CHANGES&lt;/p&gt;&lt;p&gt;https://www.zaproxy.org/docs/desktop/addons/passive-scan-rules/nginx-known-vulnerabilities/#cve-2026-113425&lt;/p&gt;&lt;p&gt;https://www.zaproxy.org/docs/desktop/addons/passive-scan-rules/nginx-known-vulnerabilities/#cve-2026-118899&lt;/p&gt;&lt;p&gt;https://www.zaproxy.org/docs/desktop/addons/passive-scan-rules/nginx-known-vulnerabilities/#cve-2026-123007&lt;/p&gt;&lt;p&gt;https://www.zaproxy.org/docs/desktop/addons/passive-scan-rules/nginx-known-vulnerabilities/#cve-2026-42533&lt;/p&gt;&lt;p&gt;https://www.zaproxy.org/docs/desktop/addons/passive-scan-rules/nginx-known-vulnerabilities/#cve-2026-120967&lt;/p&gt;&lt;p&gt;https://www.zaproxy.org/docs/desktop/addons/passive-scan-rules/nginx-known-vulnerabilities/#cve-2026-121810&lt;/p&gt;&lt;p&gt;https://www.zaproxy.org/docs/desktop/addons/passive-scan-rules/nginx-known-vulnerabilities/#cve-2026-123633&lt;/p&gt;&lt;p&gt;https://www.zaproxy.org/docs/desktop/addons/passive-scan-rules/nginx-known-vulnerabilities/#cve-2026-123634&lt;/p&gt;&lt;p&gt;https://www.zaproxy.org/docs/desktop/addons/passive-scan-rules/nginx-known-vulnerabilities/#cve-2026-15176&lt;/p&gt;&lt;p&gt;https://www.zaproxy.org/docs/desktop/addons/passive-scan-rules/nginx-known-vulnerabilities/#cve-2026-1642&lt;/p&gt;&lt;p&gt;https://www.zaproxy.org/docs/desktop/addons/passive-scan-rules/nginx-known-vulnerabilities/#cve-2026-27654&lt;/p&gt;&lt;p&gt;https://www.zaproxy.org/docs/desktop/addons/passive-scan-rules/nginx-known-vulnerabilities/#cve-2026-27784&lt;/p&gt;&lt;p&gt;https://www.zaproxy.org/docs/desktop/addons/passive-scan-rules/nginx-known-vulnerabilities/#cve-2026-28753&lt;/p&gt;&lt;p&gt;https://www.zaproxy.org/docs/desktop/addons/passive-scan-rules/nginx-known-vulnerabilities/#cve-2026-32647&lt;/p&gt;&lt;p&gt;https://www.zaproxy.org/docs/desktop/addons/passive-scan-rules/nginx-known-vulnerabilities/#cve-2026-40460&lt;/p&gt;&lt;p&gt;https://www.zaproxy.org/docs/desktop/addons/passive-scan-rules/nginx-known-vulnerabilities/#cve-2026-40701&lt;/p&gt;&lt;p&gt;https://www.zaproxy.org/docs/desktop/addons/passive-scan-rules/nginx-known-vulnerabilities/#cve-2026-42055&lt;/p&gt;&lt;p&gt;https://www.zaproxy.org/docs/desktop/addons/passive-scan-rules/nginx-known-vulnerabilities/#cve-2026-42945&lt;/p&gt;&lt;p&gt;https://www.zaproxy.org/docs/desktop/addons/passive-scan-rules/nginx-known-vulnerabilities/#cve-2026-42946&lt;/p&gt;&lt;p&gt;https://www.zaproxy.org/docs/desktop/addons/passive-scan-rules/nginx-known-vulnerabilities/#cve-2026-56434&lt;/p&gt;&lt;p&gt;https://www.zaproxy.org/docs/desktop/addons/passive-scan-rules/nginx-known-vulnerabilities/#cve-2026-60005&lt;/p&gt;&lt;p&gt;https://www.zaproxy.org/docs/desktop/addons/passive-scan-rules/nginx-known-vulnerabilities/#cve-2026-9256&lt;/p&gt;&lt;p&gt;https://www.zaproxy.org/docs/desktop/addons/passive-scan-rules/nginx-known-vulnerabilities/#cve-2026-95101&lt;/p&gt;&lt;p&gt;https://www.zaproxy.org/docs/desktop/addons/passive-scan-rules/nginx-known-vulnerabilities/#cve-2026-97205&lt;/p&gt;&lt;p&gt;https://www.zaproxy.org/docs/desktop/addons/passive-scan-rules/nginx-known-vulnerabilities/#cve-2026-97629&lt;/p&gt;&lt;p&gt;https://www.zaproxy.org/docs/desktop/addons/passive-scan-rules/nginx-known-vulnerabilities/#cve-2025-53859&lt;/p&gt;&lt;p&gt;https://www.zaproxy.org/docs/desktop/addons/passive-scan-rules/nginx-known-vulnerabilities/#cve-2026-123640&lt;/p&gt;&lt;p&gt;https://www.zaproxy.org/docs/desktop/addons/passive-scan-rules/nginx-known-vulnerabilities/#cve-2026-125283&lt;/p&gt;&lt;p&gt;https://www.zaproxy.org/docs/desktop/addons/passive-scan-rules/nginx-known-vulnerabilities/#cve-2026-27651&lt;/p&gt;&lt;p&gt;https://www.zaproxy.org/docs/desktop/addons/passive-scan-rules/nginx-known-vulnerabilities/#cve-2026-42934&lt;/p&gt;&lt;p&gt;https://www.zaproxy.org/docs/desktop/addons/passive-scan-rules/nginx-known-vulnerabilities/#cve-2026-48142&lt;/p&gt;</reference>
+						<cweid>1395</cweid>
+						<wascid>13</wascid>
+						<sourceid>7</sourceid>
+					</alertitem>
+				
+				
+					<alertitem>
+						<pluginid>90004</pluginid>
+						<alertRef>90004-1</alertRef>
+						<alert>Cross-Origin-Resource-Policy Header Missing or Invalid</alert>
+						<name>Cross-Origin-Resource-Policy Header Missing or Invalid</name>
+						<riskcode>1</riskcode>
+						<confidence>2</confidence>
+						<riskdesc>Low (Medium)</riskdesc>
+						<confidencedesc>Medium</confidencedesc>
+						<desc>&lt;p&gt;Cross-Origin-Resource-Policy header is an opt-in header designed to counter side-channels attacks like Spectre. Resource should be specifically set as shareable amongst different origins.&lt;/p&gt;</desc>
+						<instances>
+							
+								<instance>
+									<uri>https://costamarindo.onrender.com/api/health</uri>
+									<nodeName>https://costamarindo.onrender.com/api/health</nodeName>
+									<method>GET</method>
+									<param>Cross-Origin-Resource-Policy</param>
+									<attack></attack>
+									<evidence></evidence>
+									<otherinfo></otherinfo>
+								</instance>
+							
+							
+								<instance>
+									<uri>https://costamarindo.onrender.com/api/leaderboard?limit=5</uri>
+									<nodeName>https://costamarindo.onrender.com/api/leaderboard (limit)</nodeName>
+									<method>GET</method>
+									<param>Cross-Origin-Resource-Policy</param>
+									<attack></attack>
+									<evidence></evidence>
+									<otherinfo></otherinfo>
+								</instance>
+							
+							
+								<instance>
+									<uri>https://costamarindo.onrender.com/api/dialog</uri>
+									<nodeName>https://costamarindo.onrender.com/api/dialog ()({text,context,item,kind})</nodeName>
+									<method>POST</method>
+									<param>Cross-Origin-Resource-Policy</param>
+									<attack></attack>
+									<evidence></evidence>
+									<otherinfo></otherinfo>
+								</instance>
+							
+							
+								<instance>
+									<uri>https://costamarindo.onrender.com/api/session/start</uri>
+									<nodeName>https://costamarindo.onrender.com/api/session/start</nodeName>
+									<method>POST</method>
+									<param>Cross-Origin-Resource-Policy</param>
+									<attack></attack>
+									<evidence></evidence>
+									<otherinfo></otherinfo>
+								</instance>
+							
+						</instances>
+						<count>4</count>
+						<systemic>false</systemic>
+						<solution>&lt;p&gt;Ensure that the application/web server sets the Cross-Origin-Resource-Policy header appropriately, and that it sets the Cross-Origin-Resource-Policy header to &apos;same-origin&apos; for all web pages.&lt;/p&gt;&lt;p&gt;&apos;same-site&apos; is considered as less secured and should be avoided.&lt;/p&gt;&lt;p&gt;If resources must be shared, set the header to &apos;cross-origin&apos;.&lt;/p&gt;&lt;p&gt;If possible, ensure that the end user uses a standards-compliant and modern web browser that supports the Cross-Origin-Resource-Policy header (https://caniuse.com/mdn-http_headers_cross-origin-resource-policy).&lt;/p&gt;</solution>
+						<otherinfo></otherinfo>
+						<reference>&lt;p&gt;https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Cross-Origin-Embedder-Policy&lt;/p&gt;</reference>
+						<cweid>693</cweid>
+						<wascid>14</wascid>
+						<sourceid>1</sourceid>
+					</alertitem>
+				
+				
+					<alertitem>
+						<pluginid>10035</pluginid>
+						<alertRef>10035-1</alertRef>
+						<alert>Strict-Transport-Security Header Not Set</alert>
+						<name>Strict-Transport-Security Header Not Set</name>
+						<riskcode>1</riskcode>
+						<confidence>3</confidence>
+						<riskdesc>Low (High)</riskdesc>
+						<confidencedesc>High</confidencedesc>
+						<desc>&lt;p&gt;HTTP Strict Transport Security (HSTS) is a web security policy mechanism whereby a web server declares that complying user agents (such as a web browser) are to interact with it using only secure HTTPS connections (i.e. HTTP layered over TLS/SSL). HSTS is an IETF standards track protocol and is specified in RFC 6797.&lt;/p&gt;</desc>
+						<instances>
+							
+								<instance>
+									<uri>https://costamarindo.onrender.com/api/health</uri>
+									<nodeName>https://costamarindo.onrender.com/api/health</nodeName>
+									<method>GET</method>
+									<param></param>
+									<attack></attack>
+									<evidence></evidence>
+									<otherinfo></otherinfo>
+								</instance>
+							
+							
+								<instance>
+									<uri>https://costamarindo.onrender.com/api/auth/login</uri>
+									<nodeName>https://costamarindo.onrender.com/api/auth/login ()({username,pin})</nodeName>
+									<method>POST</method>
+									<param></param>
+									<attack></attack>
+									<evidence></evidence>
+									<otherinfo></otherinfo>
+								</instance>
+							
+							
+								<instance>
+									<uri>https://costamarindo.onrender.com/api/auth/logout</uri>
+									<nodeName>https://costamarindo.onrender.com/api/auth/logout</nodeName>
+									<method>POST</method>
+									<param></param>
+									<attack></attack>
+									<evidence></evidence>
+									<otherinfo></otherinfo>
+								</instance>
+							
+							
+								<instance>
+									<uri>https://costamarindo.onrender.com/api/auth/refresh</uri>
+									<nodeName>https://costamarindo.onrender.com/api/auth/refresh ()({refresh_token})</nodeName>
+									<method>POST</method>
+									<param></param>
+									<attack></attack>
+									<evidence></evidence>
+									<otherinfo></otherinfo>
+								</instance>
+							
+							
+								<instance>
+									<uri>https://costamarindo.onrender.com/api/auth/register</uri>
+									<nodeName>https://costamarindo.onrender.com/api/auth/register ()({username,pin})</nodeName>
+									<method>POST</method>
+									<param></param>
+									<attack></attack>
+									<evidence></evidence>
+									<otherinfo></otherinfo>
+								</instance>
+							
+						</instances>
+						<count>5</count>
+						<systemic>true</systemic>
+						<solution>&lt;p&gt;Ensure that your web server, application server, load balancer, etc. is configured to enforce Strict-Transport-Security.&lt;/p&gt;</solution>
+						<otherinfo></otherinfo>
+						<reference>&lt;p&gt;https://cheatsheetseries.owasp.org/cheatsheets/HTTP_Strict_Transport_Security_Cheat_Sheet.html&lt;/p&gt;&lt;p&gt;https://owasp.org/www-community/Security_Headers&lt;/p&gt;&lt;p&gt;https://en.wikipedia.org/wiki/HTTP_Strict_Transport_Security&lt;/p&gt;&lt;p&gt;https://caniuse.com/stricttransportsecurity&lt;/p&gt;&lt;p&gt;https://datatracker.ietf.org/doc/html/rfc6797&lt;/p&gt;</reference>
+						<cweid>319</cweid>
+						<wascid>15</wascid>
+						<sourceid>1</sourceid>
+					</alertitem>
+				
+				
+					<alertitem>
+						<pluginid>100001</pluginid>
+						<alertRef>100001</alertRef>
+						<alert>Unexpected Content-Type was returned</alert>
+						<name>Unexpected Content-Type was returned</name>
+						<riskcode>1</riskcode>
+						<confidence>3</confidence>
+						<riskdesc>Low (High)</riskdesc>
+						<confidencedesc>High</confidencedesc>
+						<desc>&lt;p&gt;A Content-Type of text/html was returned by the server.&lt;/p&gt;&lt;p&gt;This is not one of the types expected to be returned by an API.&lt;/p&gt;&lt;p&gt;Raised by the &apos;Alert on Unexpected Content Types&apos; script&lt;/p&gt;</desc>
+						<instances>
+							
+								<instance>
+									<uri>https://costamarindo.onrender.com</uri>
+									<nodeName>https://costamarindo.onrender.com</nodeName>
+									<method>GET</method>
+									<param></param>
+									<attack></attack>
+									<evidence>text/html</evidence>
+									<otherinfo></otherinfo>
+								</instance>
+							
+							
+								<instance>
+									<uri>https://costamarindo.onrender.com/</uri>
+									<nodeName>https://costamarindo.onrender.com/</nodeName>
+									<method>GET</method>
+									<param></param>
+									<attack></attack>
+									<evidence>text/html</evidence>
+									<otherinfo></otherinfo>
+								</instance>
+							
+							
+								<instance>
+									<uri>https://costamarindo.onrender.com/120008811532726607</uri>
+									<nodeName>https://costamarindo.onrender.com/120008811532726607</nodeName>
+									<method>GET</method>
+									<param></param>
+									<attack></attack>
+									<evidence>text/html</evidence>
+									<otherinfo></otherinfo>
+								</instance>
+							
+							
+								<instance>
+									<uri>https://costamarindo.onrender.com/8470726940219122122</uri>
+									<nodeName>https://costamarindo.onrender.com/8470726940219122122</nodeName>
+									<method>GET</method>
+									<param></param>
+									<attack></attack>
+									<evidence>text/html</evidence>
+									<otherinfo></otherinfo>
+								</instance>
+							
+							
+								<instance>
+									<uri>https://costamarindo.onrender.com/api</uri>
+									<nodeName>https://costamarindo.onrender.com/api</nodeName>
+									<method>GET</method>
+									<param></param>
+									<attack></attack>
+									<evidence>text/html</evidence>
+									<otherinfo></otherinfo>
+								</instance>
+							
+							
+								<instance>
+									<uri>https://costamarindo.onrender.com/api/leaderboard?limit=5+AND+1%3D1+--+</uri>
+									<nodeName>https://costamarindo.onrender.com/api/leaderboard (limit)</nodeName>
+									<method>GET</method>
+									<param></param>
+									<attack></attack>
+									<evidence>text/html</evidence>
+									<otherinfo></otherinfo>
+								</instance>
+							
+							
+								<instance>
+									<uri>https://costamarindo.onrender.com/api/auth/login</uri>
+									<nodeName>https://costamarindo.onrender.com/api/auth/login ()({username,pin})</nodeName>
+									<method>POST</method>
+									<param></param>
+									<attack></attack>
+									<evidence>text/html</evidence>
+									<otherinfo></otherinfo>
+								</instance>
+							
+							
+								<instance>
+									<uri>https://costamarindo.onrender.com/api/auth/refresh</uri>
+									<nodeName>https://costamarindo.onrender.com/api/auth/refresh ()({refresh_token})</nodeName>
+									<method>POST</method>
+									<param></param>
+									<attack></attack>
+									<evidence>text/html</evidence>
+									<otherinfo></otherinfo>
+								</instance>
+							
+							
+								<instance>
+									<uri>https://costamarindo.onrender.com/api/auth/register</uri>
+									<nodeName>https://costamarindo.onrender.com/api/auth/register ()({username,pin})</nodeName>
+									<method>POST</method>
+									<param></param>
+									<attack></attack>
+									<evidence>text/html</evidence>
+									<otherinfo></otherinfo>
+								</instance>
+							
+							
+								<instance>
+									<uri>https://costamarindo.onrender.com/api/claim</uri>
+									<nodeName>https://costamarindo.onrender.com/api/claim ()({session_id,username,pin})</nodeName>
+									<method>POST</method>
+									<param></param>
+									<attack></attack>
+									<evidence>text/html</evidence>
+									<otherinfo></otherinfo>
+								</instance>
+							
+							
+								<instance>
+									<uri>https://costamarindo.onrender.com/api/dialog</uri>
+									<nodeName>https://costamarindo.onrender.com/api/dialog ()({text,context,item,kind})</nodeName>
+									<method>POST</method>
+									<param></param>
+									<attack></attack>
+									<evidence>text/html</evidence>
+									<otherinfo></otherinfo>
+								</instance>
+							
+							
+								<instance>
+									<uri>https://costamarindo.onrender.com/api/score</uri>
+									<nodeName>https://costamarindo.onrender.com/api/score ()({session_id,score,duration_ms,catches,nonce,signature})</nodeName>
+									<method>POST</method>
+									<param></param>
+									<attack></attack>
+									<evidence>text/html</evidence>
+									<otherinfo></otherinfo>
+								</instance>
+							
+							
+								<instance>
+									<uri>https://costamarindo.onrender.com/computeMetadata/v1/</uri>
+									<nodeName>https://costamarindo.onrender.com/computeMetadata/v1/ ()({username,pin})</nodeName>
+									<method>POST</method>
+									<param></param>
+									<attack></attack>
+									<evidence>text/html</evidence>
+									<otherinfo></otherinfo>
+								</instance>
+							
+							
+								<instance>
+									<uri>https://costamarindo.onrender.com/latest/meta-data/</uri>
+									<nodeName>https://costamarindo.onrender.com/latest/meta-data/ ()({username,pin})</nodeName>
+									<method>POST</method>
+									<param></param>
+									<attack></attack>
+									<evidence>text/html</evidence>
+									<otherinfo></otherinfo>
+								</instance>
+							
+							
+								<instance>
+									<uri>https://costamarindo.onrender.com/metadata/instance</uri>
+									<nodeName>https://costamarindo.onrender.com/metadata/instance ()({username,pin})</nodeName>
+									<method>POST</method>
+									<param></param>
+									<attack></attack>
+									<evidence>text/html</evidence>
+									<otherinfo></otherinfo>
+								</instance>
+							
+							
+								<instance>
+									<uri>https://costamarindo.onrender.com/metadata/v1</uri>
+									<nodeName>https://costamarindo.onrender.com/metadata/v1 ()({username,pin})</nodeName>
+									<method>POST</method>
+									<param></param>
+									<attack></attack>
+									<evidence>text/html</evidence>
+									<otherinfo></otherinfo>
+								</instance>
+							
+							
+								<instance>
+									<uri>https://costamarindo.onrender.com/opc/v1/instance/</uri>
+									<nodeName>https://costamarindo.onrender.com/opc/v1/instance/ ()({username,pin})</nodeName>
+									<method>POST</method>
+									<param></param>
+									<attack></attack>
+									<evidence>text/html</evidence>
+									<otherinfo></otherinfo>
+								</instance>
+							
+							
+								<instance>
+									<uri>https://costamarindo.onrender.com/opc/v2/instance/</uri>
+									<nodeName>https://costamarindo.onrender.com/opc/v2/instance/ ()({username,pin})</nodeName>
+									<method>POST</method>
+									<param></param>
+									<attack></attack>
+									<evidence>text/html</evidence>
+									<otherinfo></otherinfo>
+								</instance>
+							
+							
+								<instance>
+									<uri>https://costamarindo.onrender.com/openstack/latest/meta_data.json</uri>
+									<nodeName>https://costamarindo.onrender.com/openstack/latest/meta_data.json ()({username,pin})</nodeName>
+									<method>POST</method>
+									<param></param>
+									<attack></attack>
+									<evidence>text/html</evidence>
+									<otherinfo></otherinfo>
+								</instance>
+							
+						</instances>
+						<count>19</count>
+						<systemic>false</systemic>
+						<solution></solution>
+						<otherinfo></otherinfo>
+						<reference></reference>
+						<cweid>-1</cweid>
+						<wascid>-1</wascid>
+						<sourceid>29</sourceid>
+					</alertitem>
+				
+				
+					<alertitem>
+						<pluginid>100000</pluginid>
+						<alertRef>100000-1</alertRef>
+						<alert>A Client Error response code was returned by the server</alert>
+						<name>A Client Error response code was returned by the server</name>
+						<riskcode>0</riskcode>
+						<confidence>3</confidence>
+						<riskdesc>Informational (High)</riskdesc>
+						<confidencedesc>High</confidencedesc>
+						<desc>&lt;p&gt;A response code of 404 was returned by the server.&lt;/p&gt;&lt;p&gt;This may indicate that the application is failing to handle unexpected input correctly.&lt;/p&gt;&lt;p&gt;Raised by the &apos;Alert on HTTP Response Code Error&apos; script&lt;/p&gt;</desc>
+						<instances>
+							
+								<instance>
+									<uri>https://costamarindo.onrender.com/api/</uri>
+									<nodeName>https://costamarindo.onrender.com/api/</nodeName>
+									<method>GET</method>
+									<param></param>
+									<attack></attack>
+									<evidence>404</evidence>
+									<otherinfo></otherinfo>
+								</instance>
+							
+							
+								<instance>
+									<uri>https://costamarindo.onrender.com/api/3717010989569159878</uri>
+									<nodeName>https://costamarindo.onrender.com/api/3717010989569159878</nodeName>
+									<method>GET</method>
+									<param></param>
+									<attack></attack>
+									<evidence>404</evidence>
+									<otherinfo></otherinfo>
+								</instance>
+							
+							
+								<instance>
+									<uri>https://costamarindo.onrender.com/api/auth</uri>
+									<nodeName>https://costamarindo.onrender.com/api/auth</nodeName>
+									<method>GET</method>
+									<param></param>
+									<attack></attack>
+									<evidence>404</evidence>
+									<otherinfo></otherinfo>
+								</instance>
+							
+							
+								<instance>
+									<uri>https://costamarindo.onrender.com/api/auth/</uri>
+									<nodeName>https://costamarindo.onrender.com/api/auth/</nodeName>
+									<method>GET</method>
+									<param></param>
+									<attack></attack>
+									<evidence>404</evidence>
+									<otherinfo></otherinfo>
+								</instance>
+							
+							
+								<instance>
+									<uri>https://costamarindo.onrender.com/api/auth/1378695821516037239</uri>
+									<nodeName>https://costamarindo.onrender.com/api/auth/1378695821516037239</nodeName>
+									<method>GET</method>
+									<param></param>
+									<attack></attack>
+									<evidence>404</evidence>
+									<otherinfo></otherinfo>
+								</instance>
+							
+							
+								<instance>
+									<uri>https://costamarindo.onrender.com/api/auth/actuator/health</uri>
+									<nodeName>https://costamarindo.onrender.com/api/auth/actuator/health</nodeName>
+									<method>GET</method>
+									<param></param>
+									<attack></attack>
+									<evidence>404</evidence>
+									<otherinfo></otherinfo>
+								</instance>
+							
+							
+								<instance>
+									<uri>https://costamarindo.onrender.com/api/leaderboard?limit=5+AND+1%3D1+--+</uri>
+									<nodeName>https://costamarindo.onrender.com/api/leaderboard (limit)</nodeName>
+									<method>GET</method>
+									<param></param>
+									<attack></attack>
+									<evidence>403</evidence>
+									<otherinfo></otherinfo>
+								</instance>
+							
+							
+								<instance>
+									<uri>https://costamarindo.onrender.com/api/leaderboard?limit=http%3A%2F%2Fwww.google.com%2F</uri>
+									<nodeName>https://costamarindo.onrender.com/api/leaderboard (limit)</nodeName>
+									<method>GET</method>
+									<param></param>
+									<attack></attack>
+									<evidence>422</evidence>
+									<otherinfo></otherinfo>
+								</instance>
+							
+							
+								<instance>
+									<uri>https://costamarindo.onrender.com/api/session</uri>
+									<nodeName>https://costamarindo.onrender.com/api/session</nodeName>
+									<method>GET</method>
+									<param></param>
+									<attack></attack>
+									<evidence>404</evidence>
+									<otherinfo></otherinfo>
+								</instance>
+							
+							
+								<instance>
+									<uri>https://costamarindo.onrender.com/api/session/</uri>
+									<nodeName>https://costamarindo.onrender.com/api/session/</nodeName>
+									<method>GET</method>
+									<param></param>
+									<attack></attack>
+									<evidence>404</evidence>
+									<otherinfo></otherinfo>
+								</instance>
+							
+							
+								<instance>
+									<uri>https://costamarindo.onrender.com/api/session/4693682251472236421</uri>
+									<nodeName>https://costamarindo.onrender.com/api/session/4693682251472236421</nodeName>
+									<method>GET</method>
+									<param></param>
+									<attack></attack>
+									<evidence>404</evidence>
+									<otherinfo></otherinfo>
+								</instance>
+							
+							
+								<instance>
+									<uri>https://costamarindo.onrender.com/api/auth/login</uri>
+									<nodeName>https://costamarindo.onrender.com/api/auth/login ()({username,pin})</nodeName>
+									<method>POST</method>
+									<param></param>
+									<attack></attack>
+									<evidence>403</evidence>
+									<otherinfo></otherinfo>
+								</instance>
+							
+							
+								<instance>
+									<uri>https://costamarindo.onrender.com/api/auth/login</uri>
+									<nodeName>https://costamarindo.onrender.com/api/auth/login ()({username,pin})</nodeName>
+									<method>POST</method>
+									<param></param>
+									<attack></attack>
+									<evidence>422</evidence>
+									<otherinfo></otherinfo>
+								</instance>
+							
+							
+								<instance>
+									<uri>https://costamarindo.onrender.com/api/auth/login/</uri>
+									<nodeName>https://costamarindo.onrender.com/api/auth/login/ ()({username,pin})</nodeName>
+									<method>POST</method>
+									<param></param>
+									<attack></attack>
+									<evidence>422</evidence>
+									<otherinfo></otherinfo>
+								</instance>
+							
+							
+								<instance>
+									<uri>https://costamarindo.onrender.com/api/auth/logout</uri>
+									<nodeName>https://costamarindo.onrender.com/api/auth/logout</nodeName>
+									<method>POST</method>
+									<param></param>
+									<attack></attack>
+									<evidence>401</evidence>
+									<otherinfo></otherinfo>
+								</instance>
+							
+							
+								<instance>
+									<uri>https://costamarindo.onrender.com/api/auth/logout/</uri>
+									<nodeName>https://costamarindo.onrender.com/api/auth/logout/</nodeName>
+									<method>POST</method>
+									<param></param>
+									<attack></attack>
+									<evidence>401</evidence>
+									<otherinfo></otherinfo>
+								</instance>
+							
+							
+								<instance>
+									<uri>https://costamarindo.onrender.com/api/auth/refresh</uri>
+									<nodeName>https://costamarindo.onrender.com/api/auth/refresh ()({refresh_token})</nodeName>
+									<method>POST</method>
+									<param></param>
+									<attack></attack>
+									<evidence>401</evidence>
+									<otherinfo></otherinfo>
+								</instance>
+							
+							
+								<instance>
+									<uri>https://costamarindo.onrender.com/api/auth/refresh</uri>
+									<nodeName>https://costamarindo.onrender.com/api/auth/refresh ()({refresh_token})</nodeName>
+									<method>POST</method>
+									<param></param>
+									<attack></attack>
+									<evidence>403</evidence>
+									<otherinfo></otherinfo>
+								</instance>
+							
+							
+								<instance>
+									<uri>https://costamarindo.onrender.com/api/auth/refresh</uri>
+									<nodeName>https://costamarindo.onrender.com/api/auth/refresh ()({refresh_token})</nodeName>
+									<method>POST</method>
+									<param></param>
+									<attack></attack>
+									<evidence>422</evidence>
+									<otherinfo></otherinfo>
+								</instance>
+							
+							
+								<instance>
+									<uri>https://costamarindo.onrender.com/api/auth/refresh/</uri>
+									<nodeName>https://costamarindo.onrender.com/api/auth/refresh/ ()({refresh_token})</nodeName>
+									<method>POST</method>
+									<param></param>
+									<attack></attack>
+									<evidence>422</evidence>
+									<otherinfo></otherinfo>
+								</instance>
+							
+							
+								<instance>
+									<uri>https://costamarindo.onrender.com/api/auth/register</uri>
+									<nodeName>https://costamarindo.onrender.com/api/auth/register ()({username,pin})</nodeName>
+									<method>POST</method>
+									<param></param>
+									<attack></attack>
+									<evidence>403</evidence>
+									<otherinfo></otherinfo>
+								</instance>
+							
+							
+								<instance>
+									<uri>https://costamarindo.onrender.com/api/auth/register</uri>
+									<nodeName>https://costamarindo.onrender.com/api/auth/register ()({username,pin})</nodeName>
+									<method>POST</method>
+									<param></param>
+									<attack></attack>
+									<evidence>422</evidence>
+									<otherinfo></otherinfo>
+								</instance>
+							
+							
+								<instance>
+									<uri>https://costamarindo.onrender.com/api/auth/register/</uri>
+									<nodeName>https://costamarindo.onrender.com/api/auth/register/ ()({username,pin})</nodeName>
+									<method>POST</method>
+									<param></param>
+									<attack></attack>
+									<evidence>422</evidence>
+									<otherinfo></otherinfo>
+								</instance>
+							
+							
+								<instance>
+									<uri>https://costamarindo.onrender.com/api/claim</uri>
+									<nodeName>https://costamarindo.onrender.com/api/claim ()({session_id,username,pin})</nodeName>
+									<method>POST</method>
+									<param></param>
+									<attack></attack>
+									<evidence>403</evidence>
+									<otherinfo></otherinfo>
+								</instance>
+							
+							
+								<instance>
+									<uri>https://costamarindo.onrender.com/api/claim</uri>
+									<nodeName>https://costamarindo.onrender.com/api/claim ()({session_id,username,pin})</nodeName>
+									<method>POST</method>
+									<param></param>
+									<attack></attack>
+									<evidence>422</evidence>
+									<otherinfo></otherinfo>
+								</instance>
+							
+							
+								<instance>
+									<uri>https://costamarindo.onrender.com/api/claim/</uri>
+									<nodeName>https://costamarindo.onrender.com/api/claim/ ()({session_id,username,pin})</nodeName>
+									<method>POST</method>
+									<param></param>
+									<attack></attack>
+									<evidence>422</evidence>
+									<otherinfo></otherinfo>
+								</instance>
+							
+							
+								<instance>
+									<uri>https://costamarindo.onrender.com/api/dialog</uri>
+									<nodeName>https://costamarindo.onrender.com/api/dialog ()({text,context,item,kind})</nodeName>
+									<method>POST</method>
+									<param></param>
+									<attack></attack>
+									<evidence>403</evidence>
+									<otherinfo></otherinfo>
+								</instance>
+							
+							
+								<instance>
+									<uri>https://costamarindo.onrender.com/api/dialog</uri>
+									<nodeName>https://costamarindo.onrender.com/api/dialog ()({text,context,item,kind})</nodeName>
+									<method>POST</method>
+									<param></param>
+									<attack></attack>
+									<evidence>422</evidence>
+									<otherinfo></otherinfo>
+								</instance>
+							
+							
+								<instance>
+									<uri>https://costamarindo.onrender.com/api/dialog</uri>
+									<nodeName>https://costamarindo.onrender.com/api/dialog ()({text,context,item,kind})</nodeName>
+									<method>POST</method>
+									<param></param>
+									<attack></attack>
+									<evidence>429</evidence>
+									<otherinfo></otherinfo>
+								</instance>
+							
+							
+								<instance>
+									<uri>https://costamarindo.onrender.com/api/dialog/</uri>
+									<nodeName>https://costamarindo.onrender.com/api/dialog/ ()({text,context,item,kind})</nodeName>
+									<method>POST</method>
+									<param></param>
+									<attack></attack>
+									<evidence>429</evidence>
+									<otherinfo></otherinfo>
+								</instance>
+							
+							
+								<instance>
+									<uri>https://costamarindo.onrender.com/api/score</uri>
+									<nodeName>https://costamarindo.onrender.com/api/score ()({session_id,score,duration_ms,catches,nonce,signature})</nodeName>
+									<method>POST</method>
+									<param></param>
+									<attack></attack>
+									<evidence>403</evidence>
+									<otherinfo></otherinfo>
+								</instance>
+							
+							
+								<instance>
+									<uri>https://costamarindo.onrender.com/api/score</uri>
+									<nodeName>https://costamarindo.onrender.com/api/score ()({session_id,score,duration_ms,catches,nonce,signature})</nodeName>
+									<method>POST</method>
+									<param></param>
+									<attack></attack>
+									<evidence>422</evidence>
+									<otherinfo></otherinfo>
+								</instance>
+							
+							
+								<instance>
+									<uri>https://costamarindo.onrender.com/api/score/</uri>
+									<nodeName>https://costamarindo.onrender.com/api/score/ ()({session_id,score,duration_ms,catches,nonce,signature})</nodeName>
+									<method>POST</method>
+									<param></param>
+									<attack></attack>
+									<evidence>422</evidence>
+									<otherinfo></otherinfo>
+								</instance>
+							
+							
+								<instance>
+									<uri>https://costamarindo.onrender.com/computeMetadata/v1/</uri>
+									<nodeName>https://costamarindo.onrender.com/computeMetadata/v1/ ()({username,pin})</nodeName>
+									<method>POST</method>
+									<param></param>
+									<attack></attack>
+									<evidence>421</evidence>
+									<otherinfo></otherinfo>
+								</instance>
+							
+							
+								<instance>
+									<uri>https://costamarindo.onrender.com/latest/meta-data/</uri>
+									<nodeName>https://costamarindo.onrender.com/latest/meta-data/ ()({username,pin})</nodeName>
+									<method>POST</method>
+									<param></param>
+									<attack></attack>
+									<evidence>421</evidence>
+									<otherinfo></otherinfo>
+								</instance>
+							
+							
+								<instance>
+									<uri>https://costamarindo.onrender.com/metadata/instance</uri>
+									<nodeName>https://costamarindo.onrender.com/metadata/instance ()({username,pin})</nodeName>
+									<method>POST</method>
+									<param></param>
+									<attack></attack>
+									<evidence>421</evidence>
+									<otherinfo></otherinfo>
+								</instance>
+							
+							
+								<instance>
+									<uri>https://costamarindo.onrender.com/metadata/v1</uri>
+									<nodeName>https://costamarindo.onrender.com/metadata/v1 ()({username,pin})</nodeName>
+									<method>POST</method>
+									<param></param>
+									<attack></attack>
+									<evidence>421</evidence>
+									<otherinfo></otherinfo>
+								</instance>
+							
+							
+								<instance>
+									<uri>https://costamarindo.onrender.com/opc/v1/instance/</uri>
+									<nodeName>https://costamarindo.onrender.com/opc/v1/instance/ ()({username,pin})</nodeName>
+									<method>POST</method>
+									<param></param>
+									<attack></attack>
+									<evidence>421</evidence>
+									<otherinfo></otherinfo>
+								</instance>
+							
+							
+								<instance>
+									<uri>https://costamarindo.onrender.com/opc/v2/instance/</uri>
+									<nodeName>https://costamarindo.onrender.com/opc/v2/instance/ ()({username,pin})</nodeName>
+									<method>POST</method>
+									<param></param>
+									<attack></attack>
+									<evidence>421</evidence>
+									<otherinfo></otherinfo>
+								</instance>
+							
+							
+								<instance>
+									<uri>https://costamarindo.onrender.com/openstack/latest/meta_data.json</uri>
+									<nodeName>https://costamarindo.onrender.com/openstack/latest/meta_data.json ()({username,pin})</nodeName>
+									<method>POST</method>
+									<param></param>
+									<attack></attack>
+									<evidence>421</evidence>
+									<otherinfo></otherinfo>
+								</instance>
+							
+						</instances>
+						<count>40</count>
+						<systemic>false</systemic>
+						<solution></solution>
+						<otherinfo></otherinfo>
+						<reference></reference>
+						<cweid>388</cweid>
+						<wascid>20</wascid>
+						<sourceid>2026</sourceid>
+					</alertitem>
+				
+				
+					<alertitem>
+						<pluginid>10049</pluginid>
+						<alertRef>10049-1</alertRef>
+						<alert>Non-Storable Content</alert>
+						<name>Non-Storable Content</name>
+						<riskcode>0</riskcode>
+						<confidence>2</confidence>
+						<riskdesc>Informational (Medium)</riskdesc>
+						<confidencedesc>Medium</confidencedesc>
+						<desc>&lt;p&gt;The response contents are not storable by caching components such as proxy servers. If the response does not contain sensitive, personal or user-specific information, it may benefit from being stored and cached, to improve performance.&lt;/p&gt;</desc>
+						<instances>
+							
+								<instance>
+									<uri>https://costamarindo.onrender.com/api/auth/login</uri>
+									<nodeName>https://costamarindo.onrender.com/api/auth/login ()({username,pin})</nodeName>
+									<method>POST</method>
+									<param></param>
+									<attack></attack>
+									<evidence>422</evidence>
+									<otherinfo></otherinfo>
+								</instance>
+							
+							
+								<instance>
+									<uri>https://costamarindo.onrender.com/api/auth/logout</uri>
+									<nodeName>https://costamarindo.onrender.com/api/auth/logout</nodeName>
+									<method>POST</method>
+									<param></param>
+									<attack></attack>
+									<evidence>401</evidence>
+									<otherinfo></otherinfo>
+								</instance>
+							
+							
+								<instance>
+									<uri>https://costamarindo.onrender.com/api/auth/refresh</uri>
+									<nodeName>https://costamarindo.onrender.com/api/auth/refresh ()({refresh_token})</nodeName>
+									<method>POST</method>
+									<param></param>
+									<attack></attack>
+									<evidence>422</evidence>
+									<otherinfo></otherinfo>
+								</instance>
+							
+							
+								<instance>
+									<uri>https://costamarindo.onrender.com/api/auth/register</uri>
+									<nodeName>https://costamarindo.onrender.com/api/auth/register ()({username,pin})</nodeName>
+									<method>POST</method>
+									<param></param>
+									<attack></attack>
+									<evidence>422</evidence>
+									<otherinfo></otherinfo>
+								</instance>
+							
+							
+								<instance>
+									<uri>https://costamarindo.onrender.com/api/claim</uri>
+									<nodeName>https://costamarindo.onrender.com/api/claim ()({session_id,username,pin})</nodeName>
+									<method>POST</method>
+									<param></param>
+									<attack></attack>
+									<evidence>422</evidence>
+									<otherinfo></otherinfo>
+								</instance>
+							
+						</instances>
+						<count>5</count>
+						<systemic>true</systemic>
+						<solution>&lt;p&gt;The content may be marked as storable by ensuring that the following conditions are satisfied:&lt;/p&gt;&lt;p&gt;The request method must be understood by the cache and defined as being cacheable (&quot;GET&quot;, &quot;HEAD&quot;, and &quot;POST&quot; are currently defined as cacheable)&lt;/p&gt;&lt;p&gt;The response status code must be understood by the cache (one of the 1XX, 2XX, 3XX, 4XX, or 5XX response classes are generally understood)&lt;/p&gt;&lt;p&gt;The &quot;no-store&quot; cache directive must not appear in the request or response header fields&lt;/p&gt;&lt;p&gt;For caching by &quot;shared&quot; caches such as &quot;proxy&quot; caches, the &quot;private&quot; response directive must not appear in the response&lt;/p&gt;&lt;p&gt;For caching by &quot;shared&quot; caches such as &quot;proxy&quot; caches, the &quot;Authorization&quot; header field must not appear in the request, unless the response explicitly allows it (using one of the &quot;must-revalidate&quot;, &quot;public&quot;, or &quot;s-maxage&quot; Cache-Control response directives)&lt;/p&gt;&lt;p&gt;In addition to the conditions above, at least one of the following conditions must also be satisfied by the response:&lt;/p&gt;&lt;p&gt;It must contain an &quot;Expires&quot; header field&lt;/p&gt;&lt;p&gt;It must contain a &quot;max-age&quot; response directive&lt;/p&gt;&lt;p&gt;For &quot;shared&quot; caches such as &quot;proxy&quot; caches, it must contain a &quot;s-maxage&quot; response directive&lt;/p&gt;&lt;p&gt;It must contain a &quot;Cache Control Extension&quot; that allows it to be cached&lt;/p&gt;&lt;p&gt;It must have a status code that is defined as cacheable by default (200, 203, 204, 206, 300, 301, 404, 405, 410, 414, 501).&lt;/p&gt;</solution>
+						<otherinfo></otherinfo>
+						<reference>&lt;p&gt;https://datatracker.ietf.org/doc/html/rfc7234&lt;/p&gt;&lt;p&gt;https://datatracker.ietf.org/doc/html/rfc7231&lt;/p&gt;&lt;p&gt;https://www.w3.org/Protocols/rfc2616/rfc2616-sec13.html&lt;/p&gt;</reference>
+						<cweid>524</cweid>
+						<wascid>13</wascid>
+						<sourceid>6</sourceid>
+					</alertitem>
+				
+				
+					<alertitem>
+						<pluginid>10015</pluginid>
+						<alertRef>10015</alertRef>
+						<alert>Re-examine Cache-control Directives</alert>
+						<name>Re-examine Cache-control Directives</name>
+						<riskcode>0</riskcode>
+						<confidence>1</confidence>
+						<riskdesc>Informational (Low)</riskdesc>
+						<confidencedesc>Low</confidencedesc>
+						<desc>&lt;p&gt;The cache-control header has not been set properly or is missing, allowing the browser and proxies to cache content. For static assets like css, js, or image files this might be intended, however, the resources should be reviewed to ensure that no sensitive content will be cached.&lt;/p&gt;</desc>
+						<instances>
+							
+								<instance>
+									<uri>https://costamarindo.onrender.com/api/health</uri>
+									<nodeName>https://costamarindo.onrender.com/api/health</nodeName>
+									<method>GET</method>
+									<param>cache-control</param>
+									<attack></attack>
+									<evidence></evidence>
+									<otherinfo></otherinfo>
+								</instance>
+							
+							
+								<instance>
+									<uri>https://costamarindo.onrender.com/api/leaderboard?limit=5</uri>
+									<nodeName>https://costamarindo.onrender.com/api/leaderboard (limit)</nodeName>
+									<method>GET</method>
+									<param>cache-control</param>
+									<attack></attack>
+									<evidence></evidence>
+									<otherinfo></otherinfo>
+								</instance>
+							
+						</instances>
+						<count>2</count>
+						<systemic>false</systemic>
+						<solution>&lt;p&gt;For secure content, ensure the cache-control HTTP header is set with &quot;no-cache, no-store, must-revalidate&quot;. If an asset should be cached consider setting the directives &quot;public, max-age, immutable&quot;.&lt;/p&gt;</solution>
+						<otherinfo></otherinfo>
+						<reference>&lt;p&gt;https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html#web-content-caching&lt;/p&gt;&lt;p&gt;https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Cache-Control&lt;/p&gt;&lt;p&gt;https://grayduck.mn/2021/09/13/cache-control-recommendations/&lt;/p&gt;</reference>
+						<cweid>525</cweid>
+						<wascid>13</wascid>
+						<sourceid>1</sourceid>
+					</alertitem>
+				
+				
+					<alertitem>
+						<pluginid>10049</pluginid>
+						<alertRef>10049-3</alertRef>
+						<alert>Storable and Cacheable Content</alert>
+						<name>Storable and Cacheable Content</name>
+						<riskcode>0</riskcode>
+						<confidence>2</confidence>
+						<riskdesc>Informational (Medium)</riskdesc>
+						<confidencedesc>Medium</confidencedesc>
+						<desc>&lt;p&gt;The response contents are storable by caching components such as proxy servers, and may be retrieved directly from the cache, rather than from the origin server by the caching servers, in response to similar requests from other users. If the response data is sensitive, personal or user-specific, this may result in sensitive information being leaked. In some cases, this may even result in a user gaining complete control of the session of another user, depending on the configuration of the caching components in use in their environment. This is primarily an issue where &quot;shared&quot; caching servers such as &quot;proxy&quot; caches are configured on the local network. This configuration is typically found in corporate or educational environments, for instance.&lt;/p&gt;</desc>
+						<instances>
+							
+								<instance>
+									<uri>https://costamarindo.onrender.com/api/health</uri>
+									<nodeName>https://costamarindo.onrender.com/api/health</nodeName>
+									<method>GET</method>
+									<param></param>
+									<attack></attack>
+									<evidence></evidence>
+									<otherinfo>In the absence of an explicitly specified caching lifetime directive in the response, a liberal lifetime heuristic of 1 year was assumed. This is permitted by rfc7234.</otherinfo>
+								</instance>
+							
+							
+								<instance>
+									<uri>https://costamarindo.onrender.com/api/leaderboard?limit=5</uri>
+									<nodeName>https://costamarindo.onrender.com/api/leaderboard (limit)</nodeName>
+									<method>GET</method>
+									<param></param>
+									<attack></attack>
+									<evidence></evidence>
+									<otherinfo>In the absence of an explicitly specified caching lifetime directive in the response, a liberal lifetime heuristic of 1 year was assumed. This is permitted by rfc7234.</otherinfo>
+								</instance>
+							
+							
+								<instance>
+									<uri>https://costamarindo.onrender.com/api/dialog</uri>
+									<nodeName>https://costamarindo.onrender.com/api/dialog ()({text,context,item,kind})</nodeName>
+									<method>POST</method>
+									<param></param>
+									<attack></attack>
+									<evidence></evidence>
+									<otherinfo>In the absence of an explicitly specified caching lifetime directive in the response, a liberal lifetime heuristic of 1 year was assumed. This is permitted by rfc7234.</otherinfo>
+								</instance>
+							
+							
+								<instance>
+									<uri>https://costamarindo.onrender.com/api/session/start</uri>
+									<nodeName>https://costamarindo.onrender.com/api/session/start</nodeName>
+									<method>POST</method>
+									<param></param>
+									<attack></attack>
+									<evidence></evidence>
+									<otherinfo>In the absence of an explicitly specified caching lifetime directive in the response, a liberal lifetime heuristic of 1 year was assumed. This is permitted by rfc7234.</otherinfo>
+								</instance>
+							
+						</instances>
+						<count>4</count>
+						<systemic>false</systemic>
+						<solution>&lt;p&gt;Validate that the response does not contain sensitive, personal or user-specific information. If it does, consider the use of the following HTTP response headers, to limit, or prevent the content being stored and retrieved from the cache by another user:&lt;/p&gt;&lt;p&gt;Cache-Control: no-cache, no-store, must-revalidate, private&lt;/p&gt;&lt;p&gt;Pragma: no-cache&lt;/p&gt;&lt;p&gt;Expires: 0&lt;/p&gt;&lt;p&gt;This configuration directs both HTTP 1.0 and HTTP 1.1 compliant caching servers to not store the response, and to not retrieve the response (without validation) from the cache, in response to a similar request.&lt;/p&gt;</solution>
+						<otherinfo>&lt;p&gt;In the absence of an explicitly specified caching lifetime directive in the response, a liberal lifetime heuristic of 1 year was assumed. This is permitted by rfc7234.&lt;/p&gt;</otherinfo>
+						<reference>&lt;p&gt;https://datatracker.ietf.org/doc/html/rfc7234&lt;/p&gt;&lt;p&gt;https://datatracker.ietf.org/doc/html/rfc7231&lt;/p&gt;&lt;p&gt;https://www.w3.org/Protocols/rfc2616/rfc2616-sec13.html&lt;/p&gt;</reference>
+						<cweid>524</cweid>
+						<wascid>13</wascid>
+						<sourceid>1</sourceid>
+					</alertitem>
+				
+			</alerts>
+		</site>
+	
+	
+		<insights>
+			
+				<insight>
+					<level>Medium</level>
+					<reason>Exceeded High</reason>
+					<site>https://costamarindo.onrender.com</site>
+					<key>insight.code.4xx</key>
+					<description>Percentage of responses with status code 4xx</description>
+					<statistic>95</statistic>
+				</insight>
+			
+			
+				<insight>
+					<level>Low</level>
+					<reason>Exceeded High</reason>
+					<site>https://costamarindo.onrender.com</site>
+					<key>insight.response.slow</key>
+					<description>Percentage of slow responses</description>
+					<statistic>98</statistic>
+				</insight>
+			
+			
+				<insight>
+					<level>Info</level>
+					<reason>Informational</reason>
+					<site>http://costamarindo.onrender.com</site>
+					<key>insight.code.3xx</key>
+					<description>Percentage of responses with status code 3xx</description>
+					<statistic>100</statistic>
+				</insight>
+			
+			
+				<insight>
+					<level>Info</level>
+					<reason>Informational</reason>
+					<site>http://costamarindo.onrender.com</site>
+					<key>insight.endpoint.ctype.text/html</key>
+					<description>Percentage of endpoints with content type text/html</description>
+					<statistic>100</statistic>
+				</insight>
+			
+			
+				<insight>
+					<level>Info</level>
+					<reason>Informational</reason>
+					<site>http://costamarindo.onrender.com</site>
+					<key>insight.endpoint.method.GET</key>
+					<description>Percentage of endpoints with method GET</description>
+					<statistic>100</statistic>
+				</insight>
+			
+			
+				<insight>
+					<level>Info</level>
+					<reason>Informational</reason>
+					<site>http://costamarindo.onrender.com</site>
+					<key>insight.endpoint.total</key>
+					<description>Count of total endpoints</description>
+					<statistic>2</statistic>
+				</insight>
+			
+			
+				<insight>
+					<level>Info</level>
+					<reason>Informational</reason>
+					<site>http://costamarindo.onrender.com</site>
+					<key>insight.response.slow</key>
+					<description>Percentage of slow responses</description>
+					<statistic>100</statistic>
+				</insight>
+			
+			
+				<insight>
+					<level>Info</level>
+					<reason>Informational</reason>
+					<site>https://costamarindo.onrender.com</site>
+					<key>insight.code.2xx</key>
+					<description>Percentage of responses with status code 2xx</description>
+					<statistic>3</statistic>
+				</insight>
+			
+			
+				<insight>
+					<level>Info</level>
+					<reason>Informational</reason>
+					<site>https://costamarindo.onrender.com</site>
+					<key>insight.code.3xx</key>
+					<description>Percentage of responses with status code 3xx</description>
+					<statistic>1</statistic>
+				</insight>
+			
+			
+				<insight>
+					<level>Info</level>
+					<reason>Informational</reason>
+					<site>https://costamarindo.onrender.com</site>
+					<key>insight.endpoint.ctype.application/json</key>
+					<description>Percentage of endpoints with content type application/json</description>
+					<statistic>70</statistic>
+				</insight>
+			
+			
+				<insight>
+					<level>Info</level>
+					<reason>Informational</reason>
+					<site>https://costamarindo.onrender.com</site>
+					<key>insight.endpoint.ctype.text/html</key>
+					<description>Percentage of endpoints with content type text/html</description>
+					<statistic>29</statistic>
+				</insight>
+			
+			
+				<insight>
+					<level>Info</level>
+					<reason>Informational</reason>
+					<site>https://costamarindo.onrender.com</site>
+					<key>insight.endpoint.method.GET</key>
+					<description>Percentage of endpoints with method GET</description>
+					<statistic>40</statistic>
+				</insight>
+			
+			
+				<insight>
+					<level>Info</level>
+					<reason>Informational</reason>
+					<site>https://costamarindo.onrender.com</site>
+					<key>insight.endpoint.method.POST</key>
+					<description>Percentage of endpoints with method POST</description>
+					<statistic>59</statistic>
+				</insight>
+			
+			
+				<insight>
+					<level>Info</level>
+					<reason>Informational</reason>
+					<site>https://costamarindo.onrender.com</site>
+					<key>insight.endpoint.total</key>
+					<description>Count of total endpoints</description>
+					<statistic>37</statistic>
+				</insight>
+			
+		</insights>
+	
+	
+	
+</OWASPZAPReport>

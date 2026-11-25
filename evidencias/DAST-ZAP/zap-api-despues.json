@@ -1,0 +1,981 @@
+{
+	"@programName": "ZAP",
+	"@version": "2.17.0",
+	"@generated": "Wed, 25 Nov 2026 12:18:25",
+	"created": "2026-11-25T12:18:25.527152378Z",
+	"insights":[
+		{
+			"level": "Medium",
+			"reason": "Exceeded High",
+			"site": "https://costamarindo.onrender.com",
+			"key": "insight.code.4xx",
+			"description": "Percentage of responses with status code 4xx",
+			"statistic": "95"
+		},
+		{
+			"level": "Low",
+			"reason": "Exceeded High",
+			"site": "https://costamarindo.onrender.com",
+			"key": "insight.response.slow",
+			"description": "Percentage of slow responses",
+			"statistic": "98"
+		},
+		{
+			"level": "Info",
+			"reason": "Informational",
+			"site": "http://costamarindo.onrender.com",
+			"key": "insight.code.3xx",
+			"description": "Percentage of responses with status code 3xx",
+			"statistic": "100"
+		},
+		{
+			"level": "Info",
+			"reason": "Informational",
+			"site": "http://costamarindo.onrender.com",
+			"key": "insight.endpoint.ctype.text/html",
+			"description": "Percentage of endpoints with content type text/html",
+			"statistic": "100"
+		},
+		{
+			"level": "Info",
+			"reason": "Informational",
+			"site": "http://costamarindo.onrender.com",
+			"key": "insight.endpoint.method.GET",
+			"description": "Percentage of endpoints with method GET",
+			"statistic": "100"
+		},
+		{
+			"level": "Info",
+			"reason": "Informational",
+			"site": "http://costamarindo.onrender.com",
+			"key": "insight.endpoint.total",
+			"description": "Count of total endpoints",
+			"statistic": "2"
+		},
+		{
+			"level": "Info",
+			"reason": "Informational",
+			"site": "http://costamarindo.onrender.com",
+			"key": "insight.response.slow",
+			"description": "Percentage of slow responses",
+			"statistic": "100"
+		},
+		{
+			"level": "Info",
+			"reason": "Informational",
+			"site": "https://costamarindo.onrender.com",
+			"key": "insight.code.2xx",
+			"description": "Percentage of responses with status code 2xx",
+			"statistic": "3"
+		},
+		{
+			"level": "Info",
+			"reason": "Informational",
+			"site": "https://costamarindo.onrender.com",
+			"key": "insight.code.3xx",
+			"description": "Percentage of responses with status code 3xx",
+			"statistic": "2"
+		},
+		{
+			"level": "Info",
+			"reason": "Informational",
+			"site": "https://costamarindo.onrender.com",
+			"key": "insight.endpoint.ctype.application/json",
+			"description": "Percentage of endpoints with content type application/json",
+			"statistic": "72"
+		},
+		{
+			"level": "Info",
+			"reason": "Informational",
+			"site": "https://costamarindo.onrender.com",
+			"key": "insight.endpoint.ctype.text/html",
+			"description": "Percentage of endpoints with content type text/html",
+			"statistic": "27"
+		},
+		{
+			"level": "Info",
+			"reason": "Informational",
+			"site": "https://costamarindo.onrender.com",
+			"key": "insight.endpoint.method.GET",
+			"description": "Percentage of endpoints with method GET",
+			"statistic": "38"
+		},
+		{
+			"level": "Info",
+			"reason": "Informational",
+			"site": "https://costamarindo.onrender.com",
+			"key": "insight.endpoint.method.POST",
+			"description": "Percentage of endpoints with method POST",
+			"statistic": "61"
+		},
+		{
+			"level": "Info",
+			"reason": "Informational",
+			"site": "https://costamarindo.onrender.com",
+			"key": "insight.endpoint.total",
+			"description": "Count of total endpoints",
+			"statistic": "36"
+		}
+	],
+	"site":[ 
+		{
+			"@name": "http://costamarindo.onrender.com",
+			"@host": "costamarindo.onrender.com",
+			"@port": "80",
+			"@ssl": "false",
+			"alerts": [ 
+				{
+					"pluginid": "100001",
+					"alertRef": "100001",
+					"alert": "Unexpected Content-Type was returned",
+					"name": "Unexpected Content-Type was returned",
+					"riskcode": "1",
+					"confidence": "3",
+					"riskdesc": "Low (High)",
+					"desc": "<p>A Content-Type of text/html was returned by the server.</p><p>This is not one of the types expected to be returned by an API.</p><p>Raised by the 'Alert on Unexpected Content Types' script</p>",
+					"instances":[ 
+						{
+							"id": "2102",
+							"uri": "http://costamarindo.onrender.com/api/health",
+							"nodeName": "http:\/\/costamarindo.onrender.com\/api\/health",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "text/html",
+							"otherinfo": ""
+						},
+						{
+							"id": "2103",
+							"uri": "http://costamarindo.onrender.com/api/leaderboard",
+							"nodeName": "http:\/\/costamarindo.onrender.com\/api\/leaderboard",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "text/html",
+							"otherinfo": ""
+						}
+					],
+					"count": "2",
+					"systemic": false,
+					"solution": "",
+					"otherinfo": "",
+					"reference": "",
+					"cweid": "-1",
+					"wascid": "-1",
+					"sourceid": "2050"
+				}
+			]
+		},
+		{
+			"@name": "https://costamarindo.onrender.com",
+			"@host": "costamarindo.onrender.com",
+			"@port": "443",
+			"@ssl": "true",
+			"alerts": [ 
+				{
+					"pluginid": "100001",
+					"alertRef": "100001",
+					"alert": "Unexpected Content-Type was returned",
+					"name": "Unexpected Content-Type was returned",
+					"riskcode": "1",
+					"confidence": "3",
+					"riskdesc": "Low (High)",
+					"desc": "<p>A Content-Type of text/html was returned by the server.</p><p>This is not one of the types expected to be returned by an API.</p><p>Raised by the 'Alert on Unexpected Content Types' script</p>",
+					"instances":[ 
+						{
+							"id": "23",
+							"uri": "https://costamarindo.onrender.com",
+							"nodeName": "https:\/\/costamarindo.onrender.com",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "text/html",
+							"otherinfo": ""
+						},
+						{
+							"id": "2082",
+							"uri": "https://costamarindo.onrender.com/",
+							"nodeName": "https:\/\/costamarindo.onrender.com\/",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "text/html",
+							"otherinfo": ""
+						},
+						{
+							"id": "18",
+							"uri": "https://costamarindo.onrender.com/5424292872359130505",
+							"nodeName": "https:\/\/costamarindo.onrender.com\/5424292872359130505",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "text/html",
+							"otherinfo": ""
+						},
+						{
+							"id": "28",
+							"uri": "https://costamarindo.onrender.com/api",
+							"nodeName": "https:\/\/costamarindo.onrender.com\/api",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "text/html",
+							"otherinfo": ""
+						},
+						{
+							"id": "567",
+							"uri": "https://costamarindo.onrender.com/api/leaderboard?limit=5+AND+1%3D1+--+",
+							"nodeName": "https:\/\/costamarindo.onrender.com\/api\/leaderboard (limit)",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "text/html",
+							"otherinfo": ""
+						},
+						{
+							"id": "1771",
+							"uri": "https://costamarindo.onrender.com/api/auth/login",
+							"nodeName": "https:\/\/costamarindo.onrender.com\/api\/auth\/login ()({username,pin})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "text/html",
+							"otherinfo": ""
+						},
+						{
+							"id": "1779",
+							"uri": "https://costamarindo.onrender.com/api/auth/refresh",
+							"nodeName": "https:\/\/costamarindo.onrender.com\/api\/auth\/refresh ()({refresh_token})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "text/html",
+							"otherinfo": ""
+						},
+						{
+							"id": "1777",
+							"uri": "https://costamarindo.onrender.com/api/auth/register",
+							"nodeName": "https:\/\/costamarindo.onrender.com\/api\/auth\/register ()({username,pin})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "text/html",
+							"otherinfo": ""
+						},
+						{
+							"id": "1769",
+							"uri": "https://costamarindo.onrender.com/api/claim",
+							"nodeName": "https:\/\/costamarindo.onrender.com\/api\/claim ()({session_id,username,pin})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "text/html",
+							"otherinfo": ""
+						},
+						{
+							"id": "1775",
+							"uri": "https://costamarindo.onrender.com/api/dialog",
+							"nodeName": "https:\/\/costamarindo.onrender.com\/api\/dialog ()({text,context,item,kind})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "text/html",
+							"otherinfo": ""
+						},
+						{
+							"id": "1773",
+							"uri": "https://costamarindo.onrender.com/api/score",
+							"nodeName": "https:\/\/costamarindo.onrender.com\/api\/score ()({session_id,score,duration_ms,catches,nonce,signature})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "text/html",
+							"otherinfo": ""
+						},
+						{
+							"id": "1475",
+							"uri": "https://costamarindo.onrender.com/computeMetadata/v1/",
+							"nodeName": "https:\/\/costamarindo.onrender.com\/computeMetadata\/v1\/ ()({username,pin})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "text/html",
+							"otherinfo": ""
+						},
+						{
+							"id": "1468",
+							"uri": "https://costamarindo.onrender.com/latest/meta-data/",
+							"nodeName": "https:\/\/costamarindo.onrender.com\/latest\/meta-data\/ ()({username,pin})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "text/html",
+							"otherinfo": ""
+						},
+						{
+							"id": "1501",
+							"uri": "https://costamarindo.onrender.com/metadata/instance",
+							"nodeName": "https:\/\/costamarindo.onrender.com\/metadata\/instance ()({username,pin})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "text/html",
+							"otherinfo": ""
+						},
+						{
+							"id": "1506",
+							"uri": "https://costamarindo.onrender.com/metadata/v1",
+							"nodeName": "https:\/\/costamarindo.onrender.com\/metadata\/v1 ()({username,pin})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "text/html",
+							"otherinfo": ""
+						},
+						{
+							"id": "1482",
+							"uri": "https://costamarindo.onrender.com/opc/v1/instance/",
+							"nodeName": "https:\/\/costamarindo.onrender.com\/opc\/v1\/instance\/ ()({username,pin})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "text/html",
+							"otherinfo": ""
+						},
+						{
+							"id": "1488",
+							"uri": "https://costamarindo.onrender.com/opc/v2/instance/",
+							"nodeName": "https:\/\/costamarindo.onrender.com\/opc\/v2\/instance\/ ()({username,pin})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "text/html",
+							"otherinfo": ""
+						},
+						{
+							"id": "1509",
+							"uri": "https://costamarindo.onrender.com/openstack/latest/meta_data.json",
+							"nodeName": "https:\/\/costamarindo.onrender.com\/openstack\/latest\/meta_data.json ()({username,pin})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "text/html",
+							"otherinfo": ""
+						}
+					],
+					"count": "18",
+					"systemic": false,
+					"solution": "",
+					"otherinfo": "",
+					"reference": "",
+					"cweid": "-1",
+					"wascid": "-1",
+					"sourceid": "23"
+				},
+				{
+					"pluginid": "100000",
+					"alertRef": "100000-1",
+					"alert": "A Client Error response code was returned by the server",
+					"name": "A Client Error response code was returned by the server",
+					"riskcode": "0",
+					"confidence": "3",
+					"riskdesc": "Informational (High)",
+					"desc": "<p>A response code of 404 was returned by the server.</p><p>This may indicate that the application is failing to handle unexpected input correctly.</p><p>Raised by the 'Alert on HTTP Response Code Error' script</p>",
+					"instances":[ 
+						{
+							"id": "17",
+							"uri": "https://costamarindo.onrender.com/5424292872359130505",
+							"nodeName": "https:\/\/costamarindo.onrender.com\/5424292872359130505",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "2084",
+							"uri": "https://costamarindo.onrender.com/api/",
+							"nodeName": "https:\/\/costamarindo.onrender.com\/api\/",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "19",
+							"uri": "https://costamarindo.onrender.com/api/7626014581684703235",
+							"nodeName": "https:\/\/costamarindo.onrender.com\/api\/7626014581684703235",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "34",
+							"uri": "https://costamarindo.onrender.com/api/auth",
+							"nodeName": "https:\/\/costamarindo.onrender.com\/api\/auth",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "2099",
+							"uri": "https://costamarindo.onrender.com/api/auth/",
+							"nodeName": "https:\/\/costamarindo.onrender.com\/api\/auth\/",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "20",
+							"uri": "https://costamarindo.onrender.com/api/auth/727342357007483113",
+							"nodeName": "https:\/\/costamarindo.onrender.com\/api\/auth\/727342357007483113",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "2350",
+							"uri": "https://costamarindo.onrender.com/api/auth/actuator/health",
+							"nodeName": "https:\/\/costamarindo.onrender.com\/api\/auth\/actuator\/health",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "566",
+							"uri": "https://costamarindo.onrender.com/api/leaderboard?limit=5+AND+1%3D1+--+",
+							"nodeName": "https:\/\/costamarindo.onrender.com\/api\/leaderboard (limit)",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "403",
+							"otherinfo": ""
+						},
+						{
+							"id": "41",
+							"uri": "https://costamarindo.onrender.com/api/leaderboard?limit=http%3A%2F%2Fwww.google.com%2F",
+							"nodeName": "https:\/\/costamarindo.onrender.com\/api\/leaderboard (limit)",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "422",
+							"otherinfo": ""
+						},
+						{
+							"id": "40",
+							"uri": "https://costamarindo.onrender.com/api/session",
+							"nodeName": "https:\/\/costamarindo.onrender.com\/api\/session",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "2104",
+							"uri": "https://costamarindo.onrender.com/api/session/",
+							"nodeName": "https:\/\/costamarindo.onrender.com\/api\/session\/",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "21",
+							"uri": "https://costamarindo.onrender.com/api/session/7546787033351733074",
+							"nodeName": "https:\/\/costamarindo.onrender.com\/api\/session\/7546787033351733074",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "1770",
+							"uri": "https://costamarindo.onrender.com/api/auth/login",
+							"nodeName": "https:\/\/costamarindo.onrender.com\/api\/auth\/login ()({username,pin})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "403",
+							"otherinfo": ""
+						},
+						{
+							"id": "1",
+							"uri": "https://costamarindo.onrender.com/api/auth/login",
+							"nodeName": "https:\/\/costamarindo.onrender.com\/api\/auth\/login ()({username,pin})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "422",
+							"otherinfo": ""
+						},
+						{
+							"id": "2095",
+							"uri": "https://costamarindo.onrender.com/api/auth/login/",
+							"nodeName": "https:\/\/costamarindo.onrender.com\/api\/auth\/login\/ ()({username,pin})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "422",
+							"otherinfo": ""
+						},
+						{
+							"id": "4",
+							"uri": "https://costamarindo.onrender.com/api/auth/logout",
+							"nodeName": "https:\/\/costamarindo.onrender.com\/api\/auth\/logout",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "401",
+							"otherinfo": ""
+						},
+						{
+							"id": "2091",
+							"uri": "https://costamarindo.onrender.com/api/auth/logout/",
+							"nodeName": "https:\/\/costamarindo.onrender.com\/api\/auth\/logout\/",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "401",
+							"otherinfo": ""
+						},
+						{
+							"id": "33",
+							"uri": "https://costamarindo.onrender.com/api/auth/refresh",
+							"nodeName": "https:\/\/costamarindo.onrender.com\/api\/auth\/refresh ()({refresh_token})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "401",
+							"otherinfo": ""
+						},
+						{
+							"id": "1778",
+							"uri": "https://costamarindo.onrender.com/api/auth/refresh",
+							"nodeName": "https:\/\/costamarindo.onrender.com\/api\/auth\/refresh ()({refresh_token})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "403",
+							"otherinfo": ""
+						},
+						{
+							"id": "2",
+							"uri": "https://costamarindo.onrender.com/api/auth/refresh",
+							"nodeName": "https:\/\/costamarindo.onrender.com\/api\/auth\/refresh ()({refresh_token})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "422",
+							"otherinfo": ""
+						},
+						{
+							"id": "2090",
+							"uri": "https://costamarindo.onrender.com/api/auth/refresh/",
+							"nodeName": "https:\/\/costamarindo.onrender.com\/api\/auth\/refresh\/ ()({refresh_token})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "422",
+							"otherinfo": ""
+						},
+						{
+							"id": "1776",
+							"uri": "https://costamarindo.onrender.com/api/auth/register",
+							"nodeName": "https:\/\/costamarindo.onrender.com\/api\/auth\/register ()({username,pin})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "403",
+							"otherinfo": ""
+						},
+						{
+							"id": "0",
+							"uri": "https://costamarindo.onrender.com/api/auth/register",
+							"nodeName": "https:\/\/costamarindo.onrender.com\/api\/auth\/register ()({username,pin})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "422",
+							"otherinfo": ""
+						},
+						{
+							"id": "2097",
+							"uri": "https://costamarindo.onrender.com/api/auth/register/",
+							"nodeName": "https:\/\/costamarindo.onrender.com\/api\/auth\/register\/ ()({username,pin})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "422",
+							"otherinfo": ""
+						},
+						{
+							"id": "1768",
+							"uri": "https://costamarindo.onrender.com/api/claim",
+							"nodeName": "https:\/\/costamarindo.onrender.com\/api\/claim ()({session_id,username,pin})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "403",
+							"otherinfo": ""
+						},
+						{
+							"id": "10",
+							"uri": "https://costamarindo.onrender.com/api/claim",
+							"nodeName": "https:\/\/costamarindo.onrender.com\/api\/claim ()({session_id,username,pin})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "422",
+							"otherinfo": ""
+						},
+						{
+							"id": "2087",
+							"uri": "https://costamarindo.onrender.com/api/claim/",
+							"nodeName": "https:\/\/costamarindo.onrender.com\/api\/claim\/ ()({session_id,username,pin})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "422",
+							"otherinfo": ""
+						},
+						{
+							"id": "1774",
+							"uri": "https://costamarindo.onrender.com/api/dialog",
+							"nodeName": "https:\/\/costamarindo.onrender.com\/api\/dialog ()({text,context,item,kind})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "403",
+							"otherinfo": ""
+						},
+						{
+							"id": "84",
+							"uri": "https://costamarindo.onrender.com/api/dialog",
+							"nodeName": "https:\/\/costamarindo.onrender.com\/api\/dialog ()({text,context,item,kind})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "422",
+							"otherinfo": ""
+						},
+						{
+							"id": "78",
+							"uri": "https://costamarindo.onrender.com/api/dialog",
+							"nodeName": "https:\/\/costamarindo.onrender.com\/api\/dialog ()({text,context,item,kind})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "429",
+							"otherinfo": ""
+						},
+						{
+							"id": "2093",
+							"uri": "https://costamarindo.onrender.com/api/dialog/",
+							"nodeName": "https:\/\/costamarindo.onrender.com\/api\/dialog\/ ()({text,context,item,kind})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "429",
+							"otherinfo": ""
+						},
+						{
+							"id": "1772",
+							"uri": "https://costamarindo.onrender.com/api/score",
+							"nodeName": "https:\/\/costamarindo.onrender.com\/api\/score ()({session_id,score,duration_ms,catches,nonce,signature})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "403",
+							"otherinfo": ""
+						},
+						{
+							"id": "9",
+							"uri": "https://costamarindo.onrender.com/api/score",
+							"nodeName": "https:\/\/costamarindo.onrender.com\/api\/score ()({session_id,score,duration_ms,catches,nonce,signature})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "422",
+							"otherinfo": ""
+						},
+						{
+							"id": "2101",
+							"uri": "https://costamarindo.onrender.com/api/score/",
+							"nodeName": "https:\/\/costamarindo.onrender.com\/api\/score\/ ()({session_id,score,duration_ms,catches,nonce,signature})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "422",
+							"otherinfo": ""
+						},
+						{
+							"id": "1474",
+							"uri": "https://costamarindo.onrender.com/computeMetadata/v1/",
+							"nodeName": "https:\/\/costamarindo.onrender.com\/computeMetadata\/v1\/ ()({username,pin})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "421",
+							"otherinfo": ""
+						},
+						{
+							"id": "1467",
+							"uri": "https://costamarindo.onrender.com/latest/meta-data/",
+							"nodeName": "https:\/\/costamarindo.onrender.com\/latest\/meta-data\/ ()({username,pin})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "421",
+							"otherinfo": ""
+						},
+						{
+							"id": "1500",
+							"uri": "https://costamarindo.onrender.com/metadata/instance",
+							"nodeName": "https:\/\/costamarindo.onrender.com\/metadata\/instance ()({username,pin})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "421",
+							"otherinfo": ""
+						},
+						{
+							"id": "1505",
+							"uri": "https://costamarindo.onrender.com/metadata/v1",
+							"nodeName": "https:\/\/costamarindo.onrender.com\/metadata\/v1 ()({username,pin})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "421",
+							"otherinfo": ""
+						},
+						{
+							"id": "1481",
+							"uri": "https://costamarindo.onrender.com/opc/v1/instance/",
+							"nodeName": "https:\/\/costamarindo.onrender.com\/opc\/v1\/instance\/ ()({username,pin})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "421",
+							"otherinfo": ""
+						},
+						{
+							"id": "1487",
+							"uri": "https://costamarindo.onrender.com/opc/v2/instance/",
+							"nodeName": "https:\/\/costamarindo.onrender.com\/opc\/v2\/instance\/ ()({username,pin})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "421",
+							"otherinfo": ""
+						},
+						{
+							"id": "1508",
+							"uri": "https://costamarindo.onrender.com/openstack/latest/meta_data.json",
+							"nodeName": "https:\/\/costamarindo.onrender.com\/openstack\/latest\/meta_data.json ()({username,pin})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "421",
+							"otherinfo": ""
+						}
+					],
+					"count": "41",
+					"systemic": false,
+					"solution": "",
+					"otherinfo": "",
+					"reference": "",
+					"cweid": "388",
+					"wascid": "20",
+					"sourceid": "15"
+				},
+				{
+					"pluginid": "10049",
+					"alertRef": "10049-1",
+					"alert": "Non-Storable Content",
+					"name": "Non-Storable Content",
+					"riskcode": "0",
+					"confidence": "2",
+					"riskdesc": "Informational (Medium)",
+					"desc": "<p>The response contents are not storable by caching components such as proxy servers. If the response does not contain sensitive, personal or user-specific information, it may benefit from being stored and cached, to improve performance.</p>",
+					"instances":[ 
+						{
+							"id": "8",
+							"uri": "https://costamarindo.onrender.com/api/auth/login",
+							"nodeName": "https:\/\/costamarindo.onrender.com\/api\/auth\/login ()({username,pin})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "422",
+							"otherinfo": ""
+						},
+						{
+							"id": "7",
+							"uri": "https://costamarindo.onrender.com/api/auth/refresh",
+							"nodeName": "https:\/\/costamarindo.onrender.com\/api\/auth\/refresh ()({refresh_token})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "422",
+							"otherinfo": ""
+						},
+						{
+							"id": "6",
+							"uri": "https://costamarindo.onrender.com/api/auth/register",
+							"nodeName": "https:\/\/costamarindo.onrender.com\/api\/auth\/register ()({username,pin})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "422",
+							"otherinfo": ""
+						},
+						{
+							"id": "12",
+							"uri": "https://costamarindo.onrender.com/api/claim",
+							"nodeName": "https:\/\/costamarindo.onrender.com\/api\/claim ()({session_id,username,pin})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "422",
+							"otherinfo": ""
+						},
+						{
+							"id": "11",
+							"uri": "https://costamarindo.onrender.com/api/score",
+							"nodeName": "https:\/\/costamarindo.onrender.com\/api\/score ()({session_id,score,duration_ms,catches,nonce,signature})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "422",
+							"otherinfo": ""
+						}
+					],
+					"count": "5",
+					"systemic": true,
+					"solution": "<p>The content may be marked as storable by ensuring that the following conditions are satisfied:</p><p>The request method must be understood by the cache and defined as being cacheable (\"GET\", \"HEAD\", and \"POST\" are currently defined as cacheable)</p><p>The response status code must be understood by the cache (one of the 1XX, 2XX, 3XX, 4XX, or 5XX response classes are generally understood)</p><p>The \"no-store\" cache directive must not appear in the request or response header fields</p><p>For caching by \"shared\" caches such as \"proxy\" caches, the \"private\" response directive must not appear in the response</p><p>For caching by \"shared\" caches such as \"proxy\" caches, the \"Authorization\" header field must not appear in the request, unless the response explicitly allows it (using one of the \"must-revalidate\", \"public\", or \"s-maxage\" Cache-Control response directives)</p><p>In addition to the conditions above, at least one of the following conditions must also be satisfied by the response:</p><p>It must contain an \"Expires\" header field</p><p>It must contain a \"max-age\" response directive</p><p>For \"shared\" caches such as \"proxy\" caches, it must contain a \"s-maxage\" response directive</p><p>It must contain a \"Cache Control Extension\" that allows it to be cached</p><p>It must have a status code that is defined as cacheable by default (200, 203, 204, 206, 300, 301, 404, 405, 410, 414, 501).</p>",
+					"otherinfo": "",
+					"reference": "<p>https://datatracker.ietf.org/doc/html/rfc7234</p><p>https://datatracker.ietf.org/doc/html/rfc7231</p><p>https://www.w3.org/Protocols/rfc2616/rfc2616-sec13.html</p>",
+					"cweid": "524",
+					"wascid": "13",
+					"sourceid": "6"
+				},
+				{
+					"pluginid": "10015",
+					"alertRef": "10015",
+					"alert": "Re-examine Cache-control Directives",
+					"name": "Re-examine Cache-control Directives",
+					"riskcode": "0",
+					"confidence": "1",
+					"riskdesc": "Informational (Low)",
+					"desc": "<p>The cache-control header has not been set properly or is missing, allowing the browser and proxies to cache content. For static assets like css, js, or image files this might be intended, however, the resources should be reviewed to ensure that no sensitive content will be cached.</p>",
+					"instances":[ 
+						{
+							"id": "3",
+							"uri": "https://costamarindo.onrender.com/api/health",
+							"nodeName": "https:\/\/costamarindo.onrender.com\/api\/health",
+							"method": "GET",
+							"param": "cache-control",
+							"attack": "",
+							"evidence": "",
+							"otherinfo": ""
+						},
+						{
+							"id": "13",
+							"uri": "https://costamarindo.onrender.com/api/leaderboard?limit=5",
+							"nodeName": "https:\/\/costamarindo.onrender.com\/api\/leaderboard (limit)",
+							"method": "GET",
+							"param": "cache-control",
+							"attack": "",
+							"evidence": "",
+							"otherinfo": ""
+						}
+					],
+					"count": "2",
+					"systemic": false,
+					"solution": "<p>For secure content, ensure the cache-control HTTP header is set with \"no-cache, no-store, must-revalidate\". If an asset should be cached consider setting the directives \"public, max-age, immutable\".</p>",
+					"otherinfo": "",
+					"reference": "<p>https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html#web-content-caching</p><p>https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Cache-Control</p><p>https://grayduck.mn/2021/09/13/cache-control-recommendations/</p>",
+					"cweid": "525",
+					"wascid": "13",
+					"sourceid": "1"
+				},
+				{
+					"pluginid": "10049",
+					"alertRef": "10049-3",
+					"alert": "Storable and Cacheable Content",
+					"name": "Storable and Cacheable Content",
+					"riskcode": "0",
+					"confidence": "2",
+					"riskdesc": "Informational (Medium)",
+					"desc": "<p>The response contents are storable by caching components such as proxy servers, and may be retrieved directly from the cache, rather than from the origin server by the caching servers, in response to similar requests from other users. If the response data is sensitive, personal or user-specific, this may result in sensitive information being leaked. In some cases, this may even result in a user gaining complete control of the session of another user, depending on the configuration of the caching components in use in their environment. This is primarily an issue where \"shared\" caching servers such as \"proxy\" caches are configured on the local network. This configuration is typically found in corporate or educational environments, for instance.</p>",
+					"instances":[ 
+						{
+							"id": "5",
+							"uri": "https://costamarindo.onrender.com/api/health",
+							"nodeName": "https:\/\/costamarindo.onrender.com\/api\/health",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "",
+							"otherinfo": "In the absence of an explicitly specified caching lifetime directive in the response, a liberal lifetime heuristic of 1 year was assumed. This is permitted by rfc7234."
+						},
+						{
+							"id": "16",
+							"uri": "https://costamarindo.onrender.com/api/leaderboard?limit=5",
+							"nodeName": "https:\/\/costamarindo.onrender.com\/api\/leaderboard (limit)",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "",
+							"otherinfo": "In the absence of an explicitly specified caching lifetime directive in the response, a liberal lifetime heuristic of 1 year was assumed. This is permitted by rfc7234."
+						},
+						{
+							"id": "22",
+							"uri": "https://costamarindo.onrender.com/api/dialog",
+							"nodeName": "https:\/\/costamarindo.onrender.com\/api\/dialog ()({text,context,item,kind})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "",
+							"otherinfo": "In the absence of an explicitly specified caching lifetime directive in the response, a liberal lifetime heuristic of 1 year was assumed. This is permitted by rfc7234."
+						},
+						{
+							"id": "14",
+							"uri": "https://costamarindo.onrender.com/api/session/start",
+							"nodeName": "https:\/\/costamarindo.onrender.com\/api\/session\/start",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "",
+							"otherinfo": "In the absence of an explicitly specified caching lifetime directive in the response, a liberal lifetime heuristic of 1 year was assumed. This is permitted by rfc7234."
+						}
+					],
+					"count": "4",
+					"systemic": false,
+					"solution": "<p>Validate that the response does not contain sensitive, personal or user-specific information. If it does, consider the use of the following HTTP response headers, to limit, or prevent the content being stored and retrieved from the cache by another user:</p><p>Cache-Control: no-cache, no-store, must-revalidate, private</p><p>Pragma: no-cache</p><p>Expires: 0</p><p>This configuration directs both HTTP 1.0 and HTTP 1.1 compliant caching servers to not store the response, and to not retrieve the response (without validation) from the cache, in response to a similar request.</p>",
+					"otherinfo": "<p>In the absence of an explicitly specified caching lifetime directive in the response, a liberal lifetime heuristic of 1 year was assumed. This is permitted by rfc7234.</p>",
+					"reference": "<p>https://datatracker.ietf.org/doc/html/rfc7234</p><p>https://datatracker.ietf.org/doc/html/rfc7231</p><p>https://www.w3.org/Protocols/rfc2616/rfc2616-sec13.html</p>",
+					"cweid": "524",
+					"wascid": "13",
+					"sourceid": "1"
+				}
+			]
+		}
+	],
+	"sequences":[
+	]
+
+}
