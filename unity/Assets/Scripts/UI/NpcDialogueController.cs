@@ -65,12 +65,8 @@ namespace CosTamarindo.UI
         private RectTransform gameOverPanel;
         private readonly List<Image> thoughtDots = new List<Image>();
         private TMP_Text bodyText;
-        private TMP_Text historyText;
         private Coroutine hideRoutine;
         private Coroutine typingRoutine;
-        private string lastLine;
-        private readonly Queue<string> history = new Queue<string>(HistorySize);
-        private const int HistorySize = 2;
         private GameManager gameManager;
         private PlayerController player;
         private SpriteRenderer playerSprite;
@@ -359,38 +355,13 @@ namespace CosTamarindo.UI
         {
             if (bodyText == null || bubbleGroup == null || string.IsNullOrEmpty(line)) return;
 
-            // FE-09: historial corto. La línea anterior queda visible, atenuada,
-            // debajo de la nueva, para que el comentario no aparezca de la nada.
-            if (!string.IsNullOrEmpty(lastLine) && lastLine != line)
-            {
-                history.Enqueue(lastLine);
-                while (history.Count > HistorySize) history.Dequeue();
-            }
-            lastLine = line;
-            RefreshHistory();
-
             bodyText.text = line;
 
             if (hideRoutine != null) StopCoroutine(hideRoutine);
             hideRoutine = StartCoroutine(ShowRoutine());
         }
 
-        private void RefreshHistory()
-        {
-            if (historyText == null) return;
-
-            // Una línea por entrada: si una frase larga se envolviera, el
-            // historial se comería la frase principal del bocadillo.
-            var lines = new List<string>(history.Count);
-            foreach (string line in history)
-            {
-                const int maxChars = 52;
-                lines.Add(line.Length > maxChars ? line.Substring(0, maxChars - 1) + "…" : line);
-            }
-            historyText.text = string.Join("\n", lines);
-        }
-
-        /// <summary>Indicador de "escribiendo…" mientras la IA responde.</summary>
+        /// <summary>Puntos suspensivos animados mientras la IA responde.</summary>
         private void BeginTyping()
         {
             if (typingRoutine != null) StopCoroutine(typingRoutine);
@@ -399,6 +370,13 @@ namespace CosTamarindo.UI
                 StopCoroutine(hideRoutine);
                 hideRoutine = null;
             }
+
+            // Mientras la IA piensa solo se muestran los puntos junto a la
+            // cabeza; el panel con texto se reserva para la respuesta final.
+            if (bubbleGroup != null) bubbleGroup.alpha = 0f;
+            if (thoughtGroup != null) thoughtGroup.alpha = 0f;
+            if (bodyText != null) bodyText.text = string.Empty;
+
             typingRoutine = StartCoroutine(TypingRoutine());
         }
 
@@ -412,33 +390,27 @@ namespace CosTamarindo.UI
         private IEnumerator TypingRoutine()
         {
             // Un backend local responde en milisegundos; esperar evita un
-            // parpadeo de "escribiendo…" en cada captura.
+            // parpadeo de puntos en cada captura.
             yield return new WaitForSecondsRealtime(0.35f);
 
-            if (bodyText == null || bubbleGroup == null)
+            if (thoughtGroup == null)
             {
                 typingRoutine = null;
                 yield break;
             }
 
-            const string label = "escribiendo";
-            int dots = 0;
             float elapsed = 0f;
             const float fadeIn = 0.18f;
 
             while (true)
             {
-                bodyText.text = label + new string('.', dots);
-                dots = (dots + 1) % 4;
-
-                if (bubbleGroup.alpha < 1f)
+                if (thoughtGroup.alpha < 1f)
                 {
-                    elapsed += 0.35f;
-                    bubbleGroup.alpha = Mathf.Clamp01(elapsed / fadeIn);
-                    if (thoughtGroup != null) thoughtGroup.alpha = bubbleGroup.alpha;
+                    elapsed += Time.unscaledDeltaTime;
+                    thoughtGroup.alpha = Mathf.Clamp01(elapsed / fadeIn);
                 }
 
-                yield return new WaitForSecondsRealtime(0.35f);
+                yield return null;
             }
         }
 
@@ -447,6 +419,7 @@ namespace CosTamarindo.UI
             bubbleGroup.alpha = 0f;
             bubbleGroup.blocksRaycasts = false;
             bubbleGroup.interactable = false;
+            // La respuesta ya llegó: los puntos de "pensando" desaparecen.
             if (thoughtGroup != null) thoughtGroup.alpha = 0f;
 
             float elapsed = 0f;
@@ -455,11 +428,9 @@ namespace CosTamarindo.UI
             {
                 elapsed += Time.unscaledDeltaTime;
                 bubbleGroup.alpha = Mathf.Clamp01(elapsed / fadeIn);
-                if (thoughtGroup != null) thoughtGroup.alpha = bubbleGroup.alpha;
                 yield return null;
             }
             bubbleGroup.alpha = 1f;
-            if (thoughtGroup != null) thoughtGroup.alpha = 1f;
 
             yield return new WaitForSecondsRealtime(visibleSeconds);
 
@@ -469,7 +440,6 @@ namespace CosTamarindo.UI
             {
                 elapsed += Time.unscaledDeltaTime;
                 bubbleGroup.alpha = 1f - Mathf.Clamp01(elapsed / fadeOut);
-                if (thoughtGroup != null) thoughtGroup.alpha = bubbleGroup.alpha;
                 yield return null;
             }
             bubbleGroup.alpha = 0f;
@@ -574,33 +544,13 @@ namespace CosTamarindo.UI
             var bodyRect = bodyText.rectTransform;
             bodyRect.anchorMin = Vector2.zero;
             bodyRect.anchorMax = Vector2.one;
-            // Franjas separadas: nombre (arriba), frase (centro) e historial (abajo).
-            // Ninguna se traslapa aunque la frase ocupe tres líneas.
-            bodyRect.offsetMin = new Vector2(28f, 74f);
+            // Nombre arriba y frase en el resto del bocadillo.
+            bodyRect.offsetMin = new Vector2(28f, 28f);
             bodyRect.offsetMax = new Vector2(-28f, -48f);
 
             var shadow = bodyGo.AddComponent<Shadow>();
             shadow.effectColor = Theme.WithAlpha(Theme.Ink, 0.65f);
             shadow.effectDistance = new Vector2(2f, -2f);
-
-            // FE-09: dos líneas previas, pequeñas y atenuadas, al pie del bocadillo.
-            var historyGo = new GameObject("History", typeof(RectTransform), typeof(TextMeshProUGUI));
-            historyGo.transform.SetParent(bubbleGo.transform, false);
-            historyText = historyGo.GetComponent<TextMeshProUGUI>();
-            historyText.fontSize = 20f;
-            historyText.color = Theme.DialogueHistory;
-            historyText.alignment = TextAlignmentOptions.TopLeft;
-            historyText.textWrappingMode = TextWrappingModes.Normal;
-            historyText.overflowMode = TextOverflowModes.Ellipsis;
-            historyText.raycastTarget = false;
-            if (TMP_Settings.defaultFontAsset != null) historyText.font = TMP_Settings.defaultFontAsset;
-
-            var historyRect = historyText.rectTransform;
-            historyRect.anchorMin = Vector2.zero;
-            historyRect.anchorMax = new Vector2(1f, 0f);
-            historyRect.pivot = new Vector2(0.5f, 0f);
-            historyRect.offsetMin = new Vector2(28f, 16f);
-            historyRect.offsetMax = new Vector2(-28f, 68f);
         }
 
         private void CreateThoughtDots()
