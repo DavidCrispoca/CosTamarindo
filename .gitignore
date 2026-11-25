@@ -148,3 +148,8 @@ Proceso.md
 
 # Cache del registro de skills (herramientas del agente)
 .atl/
+
+# Playwright MCP artifacts
+.playwright-mcp/
+*.playwright-mcp/
+login.png
