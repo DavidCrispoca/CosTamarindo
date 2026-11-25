@@ -125,6 +125,7 @@ builds/
 infra/nginx/html/
 infra/volumes/
 infra/tls/
+infra/certs/
 backups/
 *.dump
 *.sql.gz
