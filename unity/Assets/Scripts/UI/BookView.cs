@@ -25,6 +25,10 @@ namespace CosTamarindo.UI
         [SerializeField] private Sprite[] itemSprites;
         [SerializeField] private TMP_FontAsset displayFont;
         [SerializeField] private TMP_FontAsset bodyFont;
+        [Tooltip("Fondo de madera de la tarjeta (fondo.png).")]
+        [SerializeField] private Sprite backgroundSprite;
+        [Tooltip("Ícono de cerrar (iconocerrar.png).")]
+        [SerializeField] private Sprite closeSprite;
 
         [Header("Disposición")]
         [SerializeField] private int columns = 4;
@@ -139,7 +143,8 @@ namespace CosTamarindo.UI
             // última fila quedaba debajo del botón «Cerrar».
             cardRt.sizeDelta = new Vector2(gridWidth + 120f, gridHeight + 330f);
 
-            card.GetComponent<Image>().color = PanelColor;
+            card.GetComponent<Image>().sprite = backgroundSprite;
+            card.GetComponent<Image>().color = backgroundSprite != null ? Color.white : PanelColor;
 
             // ── Título ──
             var title = CreateText(card.transform, "Title", "Mi libro del mar", 64f, displayFont, InkColor);
@@ -170,7 +175,15 @@ namespace CosTamarindo.UI
             gridRoot.anchoredPosition = new Vector2(0f, -30f);
 
             // ── Botón cerrar ──
-            var close = CreateButton(card.transform, "CloseBookButton", "Cerrar", 34f, new Vector2(240f, 68f), bodyFont);
+            Button close;
+            if (closeSprite != null)
+            {
+                close = CreateIconButton(card.transform, "CloseBookButton", closeSprite, new Vector2(72f, 72f));
+            }
+            else
+            {
+                close = CreateButton(card.transform, "CloseBookButton", "Cerrar", 34f, new Vector2(240f, 68f), bodyFont);
+            }
             var closeRt = close.GetComponent<RectTransform>();
             closeRt.anchorMin = new Vector2(0.5f, 0f);
             closeRt.anchorMax = new Vector2(0.5f, 0f);
@@ -338,6 +351,25 @@ namespace CosTamarindo.UI
             if (chosen != null) text.font = chosen;
 
             return text;
+        }
+
+        private static Button CreateIconButton(Transform parent, string name, Sprite sprite, Vector2 size)
+        {
+            var go = new GameObject(name, typeof(RectTransform), typeof(Image), typeof(Button));
+            go.transform.SetParent(parent, false);
+
+            var rt = go.GetComponent<RectTransform>();
+            rt.sizeDelta = size;
+
+            var image = go.GetComponent<Image>();
+            image.sprite = sprite;
+            image.color = Color.white;
+            image.raycastTarget = true;
+
+            var button = go.GetComponent<Button>();
+            button.targetGraphic = image;
+
+            return button;
         }
 
         private static Button CreateButton(

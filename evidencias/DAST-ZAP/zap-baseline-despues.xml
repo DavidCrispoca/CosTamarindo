@@ -1,0 +1,526 @@
+<?xml version="1.0"?>
+<OWASPZAPReport programName="ZAP" version="2.17.0" generated="Wed, 25 Nov 2026 12:12:48" created="2026-11-25T12:12:48.148073179Z">
+	
+		<site name="https://costamarindo.onrender.com" host="costamarindo.onrender.com" port="443" ssl="true">
+			<alerts>
+				
+					<alertitem>
+						<pluginid>10055</pluginid>
+						<alertRef>10055-13</alertRef>
+						<alert>CSP: Failure to Define Directive with No Fallback</alert>
+						<name>CSP: Failure to Define Directive with No Fallback</name>
+						<riskcode>2</riskcode>
+						<confidence>3</confidence>
+						<riskdesc>Medium (High)</riskdesc>
+						<confidencedesc>High</confidencedesc>
+						<desc>&lt;p&gt;The Content Security Policy fails to define one of the directives that has no fallback. Missing/excluding them is the same as allowing anything.&lt;/p&gt;</desc>
+						<instances>
+							
+								<instance>
+									<uri>https://costamarindo.onrender.com/</uri>
+									<nodeName>https://costamarindo.onrender.com/</nodeName>
+									<method>GET</method>
+									<param>content-security-policy</param>
+									<attack></attack>
+									<evidence>script-src &apos;self&apos; &apos;wasm-unsafe-eval&apos; &apos;sha256-1ntox3z/2O16VrZEMiYZhT/BnU7bFWrGH/JO1/vl80M=&apos;; default-src &apos;self&apos;; style-src &apos;self&apos; &apos;unsafe-inline&apos;; img-src &apos;self&apos; data: blob:; font-src &apos;self&apos; data:; connect-src &apos;self&apos;; worker-src &apos;self&apos; blob:; object-src &apos;none&apos;; base-uri &apos;none&apos;; frame-ancestors &apos;none&apos;</evidence>
+									<otherinfo>The directive(s): form-action is/are among the directives that do not fallback to default-src.</otherinfo>
+								</instance>
+							
+							
+								<instance>
+									<uri>https://costamarindo.onrender.com/robots.txt</uri>
+									<nodeName>https://costamarindo.onrender.com/robots.txt</nodeName>
+									<method>GET</method>
+									<param>content-security-policy</param>
+									<attack></attack>
+									<evidence>script-src &apos;self&apos; &apos;wasm-unsafe-eval&apos; &apos;sha256-1ntox3z/2O16VrZEMiYZhT/BnU7bFWrGH/JO1/vl80M=&apos;; default-src &apos;self&apos;; style-src &apos;self&apos; &apos;unsafe-inline&apos;; img-src &apos;self&apos; data: blob:; font-src &apos;self&apos; data:; connect-src &apos;self&apos;; worker-src &apos;self&apos; blob:; object-src &apos;none&apos;; base-uri &apos;none&apos;; frame-ancestors &apos;none&apos;</evidence>
+									<otherinfo>The directive(s): form-action is/are among the directives that do not fallback to default-src.</otherinfo>
+								</instance>
+							
+							
+								<instance>
+									<uri>https://costamarindo.onrender.com/sitemap.xml</uri>
+									<nodeName>https://costamarindo.onrender.com/sitemap.xml</nodeName>
+									<method>GET</method>
+									<param>content-security-policy</param>
+									<attack></attack>
+									<evidence>script-src &apos;self&apos; &apos;wasm-unsafe-eval&apos; &apos;sha256-1ntox3z/2O16VrZEMiYZhT/BnU7bFWrGH/JO1/vl80M=&apos;; default-src &apos;self&apos;; style-src &apos;self&apos; &apos;unsafe-inline&apos;; img-src &apos;self&apos; data: blob:; font-src &apos;self&apos; data:; connect-src &apos;self&apos;; worker-src &apos;self&apos; blob:; object-src &apos;none&apos;; base-uri &apos;none&apos;; frame-ancestors &apos;none&apos;</evidence>
+									<otherinfo>The directive(s): form-action is/are among the directives that do not fallback to default-src.</otherinfo>
+								</instance>
+							
+						</instances>
+						<count>3</count>
+						<systemic>false</systemic>
+						<solution>&lt;p&gt;Ensure that your web server, application server, load balancer, etc. is properly configured to set the Content-Security-Policy header.&lt;/p&gt;</solution>
+						<otherinfo>&lt;p&gt;The directive(s): form-action is/are among the directives that do not fallback to default-src.&lt;/p&gt;</otherinfo>
+						<reference>&lt;p&gt;https://www.w3.org/TR/CSP/&lt;/p&gt;&lt;p&gt;https://caniuse.com/#search=content+security+policy&lt;/p&gt;&lt;p&gt;https://content-security-policy.com/&lt;/p&gt;&lt;p&gt;https://github.com/HtmlUnit/htmlunit-csp&lt;/p&gt;&lt;p&gt;https://web.dev/articles/csp#resource-options&lt;/p&gt;</reference>
+						<cweid>693</cweid>
+						<wascid>15</wascid>
+						<sourceid>8</sourceid>
+					</alertitem>
+				
+				
+					<alertitem>
+						<pluginid>10055</pluginid>
+						<alertRef>10055-6</alertRef>
+						<alert>CSP: style-src unsafe-inline</alert>
+						<name>CSP: style-src unsafe-inline</name>
+						<riskcode>2</riskcode>
+						<confidence>3</confidence>
+						<riskdesc>Medium (High)</riskdesc>
+						<confidencedesc>High</confidencedesc>
+						<desc>&lt;p&gt;Content Security Policy (CSP) is an added layer of security that helps to detect and mitigate certain types of attacks. Including (but not limited to) Cross Site Scripting (XSS), and data injection attacks. These attacks are used for everything from data theft to site defacement or distribution of malware. CSP provides a set of standard HTTP headers that allow website owners to declare approved sources of content that browsers should be allowed to load on that page &#x2014; covered types are JavaScript, CSS, HTML frames, fonts, images and embeddable objects such as Java applets, ActiveX, audio and video files.&lt;/p&gt;</desc>
+						<instances>
+							
+								<instance>
+									<uri>https://costamarindo.onrender.com/</uri>
+									<nodeName>https://costamarindo.onrender.com/</nodeName>
+									<method>GET</method>
+									<param>content-security-policy</param>
+									<attack></attack>
+									<evidence>script-src &apos;self&apos; &apos;wasm-unsafe-eval&apos; &apos;sha256-1ntox3z/2O16VrZEMiYZhT/BnU7bFWrGH/JO1/vl80M=&apos;; default-src &apos;self&apos;; style-src &apos;self&apos; &apos;unsafe-inline&apos;; img-src &apos;self&apos; data: blob:; font-src &apos;self&apos; data:; connect-src &apos;self&apos;; worker-src &apos;self&apos; blob:; object-src &apos;none&apos;; base-uri &apos;none&apos;; frame-ancestors &apos;none&apos;</evidence>
+									<otherinfo>style-src includes unsafe-inline.</otherinfo>
+								</instance>
+							
+							
+								<instance>
+									<uri>https://costamarindo.onrender.com/robots.txt</uri>
+									<nodeName>https://costamarindo.onrender.com/robots.txt</nodeName>
+									<method>GET</method>
+									<param>content-security-policy</param>
+									<attack></attack>
+									<evidence>script-src &apos;self&apos; &apos;wasm-unsafe-eval&apos; &apos;sha256-1ntox3z/2O16VrZEMiYZhT/BnU7bFWrGH/JO1/vl80M=&apos;; default-src &apos;self&apos;; style-src &apos;self&apos; &apos;unsafe-inline&apos;; img-src &apos;self&apos; data: blob:; font-src &apos;self&apos; data:; connect-src &apos;self&apos;; worker-src &apos;self&apos; blob:; object-src &apos;none&apos;; base-uri &apos;none&apos;; frame-ancestors &apos;none&apos;</evidence>
+									<otherinfo>style-src includes unsafe-inline.</otherinfo>
+								</instance>
+							
+							
+								<instance>
+									<uri>https://costamarindo.onrender.com/sitemap.xml</uri>
+									<nodeName>https://costamarindo.onrender.com/sitemap.xml</nodeName>
+									<method>GET</method>
+									<param>content-security-policy</param>
+									<attack></attack>
+									<evidence>script-src &apos;self&apos; &apos;wasm-unsafe-eval&apos; &apos;sha256-1ntox3z/2O16VrZEMiYZhT/BnU7bFWrGH/JO1/vl80M=&apos;; default-src &apos;self&apos;; style-src &apos;self&apos; &apos;unsafe-inline&apos;; img-src &apos;self&apos; data: blob:; font-src &apos;self&apos; data:; connect-src &apos;self&apos;; worker-src &apos;self&apos; blob:; object-src &apos;none&apos;; base-uri &apos;none&apos;; frame-ancestors &apos;none&apos;</evidence>
+									<otherinfo>style-src includes unsafe-inline.</otherinfo>
+								</instance>
+							
+						</instances>
+						<count>3</count>
+						<systemic>false</systemic>
+						<solution>&lt;p&gt;Ensure that your web server, application server, load balancer, etc. is properly configured to set the Content-Security-Policy header.&lt;/p&gt;</solution>
+						<otherinfo>&lt;p&gt;style-src includes unsafe-inline.&lt;/p&gt;</otherinfo>
+						<reference>&lt;p&gt;https://www.w3.org/TR/CSP/&lt;/p&gt;&lt;p&gt;https://caniuse.com/#search=content+security+policy&lt;/p&gt;&lt;p&gt;https://content-security-policy.com/&lt;/p&gt;&lt;p&gt;https://github.com/HtmlUnit/htmlunit-csp&lt;/p&gt;&lt;p&gt;https://web.dev/articles/csp#resource-options&lt;/p&gt;</reference>
+						<cweid>693</cweid>
+						<wascid>15</wascid>
+						<sourceid>1</sourceid>
+					</alertitem>
+				
+				
+					<alertitem>
+						<pluginid>10027</pluginid>
+						<alertRef>10027</alertRef>
+						<alert>Information Disclosure - Suspicious Comments</alert>
+						<name>Information Disclosure - Suspicious Comments</name>
+						<riskcode>0</riskcode>
+						<confidence>2</confidence>
+						<riskdesc>Informational (Medium)</riskdesc>
+						<confidencedesc>Medium</confidencedesc>
+						<desc>&lt;p&gt;The response appears to contain suspicious comments which may help an attacker.&lt;/p&gt;</desc>
+						<instances>
+							
+								<instance>
+									<uri>https://costamarindo.onrender.com/</uri>
+									<nodeName>https://costamarindo.onrender.com/</nodeName>
+									<method>GET</method>
+									<param></param>
+									<attack></attack>
+									<evidence>// user.</evidence>
+									<otherinfo>The following pattern was used: \bUSER\b and was detected 3 times, the first in likely comment: &quot;// user.&quot;, see evidence field for the suspicious comment/snippet.</otherinfo>
+								</instance>
+							
+							
+								<instance>
+									<uri>https://costamarindo.onrender.com/</uri>
+									<nodeName>https://costamarindo.onrender.com/</nodeName>
+									<method>GET</method>
+									<param></param>
+									<attack></attack>
+									<evidence>his synchronization from</evidence>
+									<otherinfo>The following pattern was used: \bFROM\b and was detected in likely comment: &quot;// Set this to false if you want to decouple this synchronization from&quot;, see evidence field for the suspicious comment/snippet.</otherinfo>
+								</instance>
+							
+						</instances>
+						<count>2</count>
+						<systemic>false</systemic>
+						<solution>&lt;p&gt;Remove all comments that return information that may help an attacker and fix any underlying problems they refer to.&lt;/p&gt;</solution>
+						<otherinfo>&lt;p&gt;The following pattern was used: \bUSER\b and was detected 3 times, the first in likely comment: &quot;// user.&quot;, see evidence field for the suspicious comment/snippet.&lt;/p&gt;</otherinfo>
+						<reference></reference>
+						<cweid>615</cweid>
+						<wascid>13</wascid>
+						<sourceid>8</sourceid>
+					</alertitem>
+				
+				
+					<alertitem>
+						<pluginid>10109</pluginid>
+						<alertRef>10109</alertRef>
+						<alert>Modern Web Application</alert>
+						<name>Modern Web Application</name>
+						<riskcode>0</riskcode>
+						<confidence>2</confidence>
+						<riskdesc>Informational (Medium)</riskdesc>
+						<confidencedesc>Medium</confidencedesc>
+						<desc>&lt;p&gt;The application appears to be a modern web application. If you need to explore it automatically then the Client Spider may well be more effective than the standard one.&lt;/p&gt;</desc>
+						<instances>
+							
+								<instance>
+									<uri>https://costamarindo.onrender.com/</uri>
+									<nodeName>https://costamarindo.onrender.com/</nodeName>
+									<method>GET</method>
+									<param></param>
+									<attack></attack>
+									<evidence>&lt;script&gt;
+      var canvas = document.querySelector(&quot;#unity-canvas&quot;);
+
+      // Shows a temporary message banner/ribbon for a few seconds, or
+      // a permanent error message on top of the canvas if type==&apos;error&apos;.
+      // If type==&apos;warning&apos;, a yellow highlight color is used.
+      // Modify or remove this function to customize the visually presented
+      // way that non-critical warnings and error messages are presented to the
+      // user.
+      function unityShowBanner(msg, type) {
+        var warningBanner = document.querySelector(&quot;#unity-warning&quot;);
+        function updateBannerVisibility() {
+          warningBanner.style.display = warningBanner.children.length ? &apos;block&apos; : &apos;none&apos;;
+        }
+        var div = document.createElement(&apos;div&apos;);
+        div.innerHTML = msg;
+        warningBanner.appendChild(div);
+        if (type == &apos;error&apos;) div.style = &apos;background: red; padding: 10px;&apos;;
+        else {
+          if (type == &apos;warning&apos;) div.style = &apos;background: yellow; padding: 10px;&apos;;
+          setTimeout(function() {
+            warningBanner.removeChild(div);
+            updateBannerVisibility();
+          }, 5000);
+        }
+        updateBannerVisibility();
+      }
+
+      var buildUrl = &quot;Build&quot;;
+      var loaderUrl = buildUrl + &quot;/webgl.loader.js&quot;;
+      var config = {
+        arguments: [],
+        dataUrl: buildUrl + &quot;/webgl.data.gz&quot;,
+        frameworkUrl: buildUrl + &quot;/webgl.framework.js.gz&quot;,
+        codeUrl: buildUrl + &quot;/webgl.wasm.gz&quot;,
+        streamingAssetsUrl: &quot;StreamingAssets&quot;,
+        companyName: &quot;DefaultCompany&quot;,
+        productName: &quot;CosTamarindo&quot;,
+        productVersion: &quot;0.3.0&quot;,
+        showBanner: unityShowBanner,
+        // errorHandler: function(err, url, line) {
+        //    alert(&quot;error &quot; + err + &quot; occurred at line &quot; + line);
+        //    // Return &apos;true&apos; if you handled this error and don&apos;t want Unity
+        //    // to process it further, &apos;false&apos; otherwise.
+        //    return true;
+        // },
+      };
+
+      // By default, Unity keeps WebGL canvas render target size matched with
+      // the DOM size of the canvas element (scaled by window.devicePixelRatio)
+      // Set this to false if you want to decouple this synchronization from
+      // happening inside the engine, and you would instead like to size up
+      // the canvas DOM size and WebGL render target sizes yourself.
+      // config.matchWebGLToCanvasSize = false;
+
+      // If you would like all file writes inside Unity Application.persistentDataPath
+      // directory to automatically persist so that the contents are remembered when
+      // the user revisits the site the next time, uncomment the following line:
+      // config.autoSyncPersistentDataPath = true;
+      // This autosyncing is currently not the default behavior to avoid regressing
+      // existing user projects that might rely on the earlier manual
+      // JS_FileSystem_Sync() behavior, but in future Unity version, this will be
+      // expected to change.
+
+      if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+        // Mobile device style: fill the whole browser client area with the game canvas:
+
+        var meta = document.createElement(&apos;meta&apos;);
+        meta.name = &apos;viewport&apos;;
+        meta.content = &apos;width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes&apos;;
+        document.getElementsByTagName(&apos;head&apos;)[0].appendChild(meta);
+        document.querySelector(&quot;#unity-container&quot;).className = &quot;unity-mobile&quot;;
+        canvas.className = &quot;unity-mobile&quot;;
+
+        // To lower canvas resolution on mobile devices to gain some
+        // performance, uncomment the following line:
+        // config.devicePixelRatio = 1;
+
+
+      } else {
+        // Desktop style: Render the game canvas in a window that can be maximized to fullscreen:
+        canvas.style.width = &quot;960px&quot;;
+        canvas.style.height = &quot;600px&quot;;
+      }
+
+      document.querySelector(&quot;#unity-loading-bar&quot;).style.display = &quot;block&quot;;
+
+      var script = document.createElement(&quot;script&quot;);
+      script.src = loaderUrl;
+      script.onload = () =&gt; {
+        createUnityInstance(canvas, config, (progress) =&gt; {
+          document.querySelector(&quot;#unity-progress-bar-full&quot;).style.width = 100 * progress + &quot;%&quot;;
+              }).then((unityInstance) =&gt; {
+                document.querySelector(&quot;#unity-loading-bar&quot;).style.display = &quot;none&quot;;
+                document.querySelector(&quot;#unity-fullscreen-button&quot;).onclick = () =&gt; {
+                  unityInstance.SetFullscreen(1);
+                };
+
+              }).catch((message) =&gt; {
+                alert(message);
+              });
+            };
+
+      document.body.appendChild(script);
+
+    &lt;/script&gt;</evidence>
+									<otherinfo>No links have been found while there are scripts, which is an indication that this is a modern web application.</otherinfo>
+								</instance>
+							
+						</instances>
+						<count>1</count>
+						<systemic>false</systemic>
+						<solution>&lt;p&gt;This is an informational alert and so no changes are required.&lt;/p&gt;</solution>
+						<otherinfo>&lt;p&gt;No links have been found while there are scripts, which is an indication that this is a modern web application.&lt;/p&gt;</otherinfo>
+						<reference></reference>
+						<cweid>-1</cweid>
+						<wascid>-1</wascid>
+						<sourceid>8</sourceid>
+					</alertitem>
+				
+				
+					<alertitem>
+						<pluginid>10015</pluginid>
+						<alertRef>10015</alertRef>
+						<alert>Re-examine Cache-control Directives</alert>
+						<name>Re-examine Cache-control Directives</name>
+						<riskcode>0</riskcode>
+						<confidence>1</confidence>
+						<riskdesc>Informational (Low)</riskdesc>
+						<confidencedesc>Low</confidencedesc>
+						<desc>&lt;p&gt;The cache-control header has not been set properly or is missing, allowing the browser and proxies to cache content. For static assets like css, js, or image files this might be intended, however, the resources should be reviewed to ensure that no sensitive content will be cached.&lt;/p&gt;</desc>
+						<instances>
+							
+								<instance>
+									<uri>https://costamarindo.onrender.com/</uri>
+									<nodeName>https://costamarindo.onrender.com/</nodeName>
+									<method>GET</method>
+									<param>cache-control</param>
+									<attack></attack>
+									<evidence>no-cache</evidence>
+									<otherinfo></otherinfo>
+								</instance>
+							
+						</instances>
+						<count>1</count>
+						<systemic>false</systemic>
+						<solution>&lt;p&gt;For secure content, ensure the cache-control HTTP header is set with &quot;no-cache, no-store, must-revalidate&quot;. If an asset should be cached consider setting the directives &quot;public, max-age, immutable&quot;.&lt;/p&gt;</solution>
+						<otherinfo></otherinfo>
+						<reference>&lt;p&gt;https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html#web-content-caching&lt;/p&gt;&lt;p&gt;https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Cache-Control&lt;/p&gt;&lt;p&gt;https://grayduck.mn/2021/09/13/cache-control-recommendations/&lt;/p&gt;</reference>
+						<cweid>525</cweid>
+						<wascid>13</wascid>
+						<sourceid>1</sourceid>
+					</alertitem>
+				
+				
+					<alertitem>
+						<pluginid>10049</pluginid>
+						<alertRef>10049-3</alertRef>
+						<alert>Storable and Cacheable Content</alert>
+						<name>Storable and Cacheable Content</name>
+						<riskcode>0</riskcode>
+						<confidence>2</confidence>
+						<riskdesc>Informational (Medium)</riskdesc>
+						<confidencedesc>Medium</confidencedesc>
+						<desc>&lt;p&gt;The response contents are storable by caching components such as proxy servers, and may be retrieved directly from the cache, rather than from the origin server by the caching servers, in response to similar requests from other users. If the response data is sensitive, personal or user-specific, this may result in sensitive information being leaked. In some cases, this may even result in a user gaining complete control of the session of another user, depending on the configuration of the caching components in use in their environment. This is primarily an issue where &quot;shared&quot; caching servers such as &quot;proxy&quot; caches are configured on the local network. This configuration is typically found in corporate or educational environments, for instance.&lt;/p&gt;</desc>
+						<instances>
+							
+								<instance>
+									<uri>https://costamarindo.onrender.com/TemplateData/favicon.ico</uri>
+									<nodeName>https://costamarindo.onrender.com/TemplateData/favicon.ico</nodeName>
+									<method>GET</method>
+									<param></param>
+									<attack></attack>
+									<evidence>max-age=604800</evidence>
+									<otherinfo></otherinfo>
+								</instance>
+							
+							
+								<instance>
+									<uri>https://costamarindo.onrender.com/TemplateData/style.css</uri>
+									<nodeName>https://costamarindo.onrender.com/TemplateData/style.css</nodeName>
+									<method>GET</method>
+									<param></param>
+									<attack></attack>
+									<evidence>max-age=604800</evidence>
+									<otherinfo></otherinfo>
+								</instance>
+							
+							
+								<instance>
+									<uri>https://costamarindo.onrender.com/robots.txt</uri>
+									<nodeName>https://costamarindo.onrender.com/robots.txt</nodeName>
+									<method>GET</method>
+									<param></param>
+									<attack></attack>
+									<evidence>max-age=604800</evidence>
+									<otherinfo></otherinfo>
+								</instance>
+							
+							
+								<instance>
+									<uri>https://costamarindo.onrender.com/sitemap.xml</uri>
+									<nodeName>https://costamarindo.onrender.com/sitemap.xml</nodeName>
+									<method>GET</method>
+									<param></param>
+									<attack></attack>
+									<evidence>max-age=604800</evidence>
+									<otherinfo></otherinfo>
+								</instance>
+							
+						</instances>
+						<count>4</count>
+						<systemic>false</systemic>
+						<solution>&lt;p&gt;Validate that the response does not contain sensitive, personal or user-specific information. If it does, consider the use of the following HTTP response headers, to limit, or prevent the content being stored and retrieved from the cache by another user:&lt;/p&gt;&lt;p&gt;Cache-Control: no-cache, no-store, must-revalidate, private&lt;/p&gt;&lt;p&gt;Pragma: no-cache&lt;/p&gt;&lt;p&gt;Expires: 0&lt;/p&gt;&lt;p&gt;This configuration directs both HTTP 1.0 and HTTP 1.1 compliant caching servers to not store the response, and to not retrieve the response (without validation) from the cache, in response to a similar request.&lt;/p&gt;</solution>
+						<otherinfo></otherinfo>
+						<reference>&lt;p&gt;https://datatracker.ietf.org/doc/html/rfc7234&lt;/p&gt;&lt;p&gt;https://datatracker.ietf.org/doc/html/rfc7231&lt;/p&gt;&lt;p&gt;https://www.w3.org/Protocols/rfc2616/rfc2616-sec13.html&lt;/p&gt;</reference>
+						<cweid>524</cweid>
+						<wascid>13</wascid>
+						<sourceid>13</sourceid>
+					</alertitem>
+				
+				
+					<alertitem>
+						<pluginid>10049</pluginid>
+						<alertRef>10049-2</alertRef>
+						<alert>Storable but Non-Cacheable Content</alert>
+						<name>Storable but Non-Cacheable Content</name>
+						<riskcode>0</riskcode>
+						<confidence>2</confidence>
+						<riskdesc>Informational (Medium)</riskdesc>
+						<confidencedesc>Medium</confidencedesc>
+						<desc>&lt;p&gt;The response contents are storable by caching components such as proxy servers, but will not be retrieved directly from the cache, without validating the request upstream, in response to similar requests from other users.&lt;/p&gt;</desc>
+						<instances>
+							
+								<instance>
+									<uri>https://costamarindo.onrender.com/</uri>
+									<nodeName>https://costamarindo.onrender.com/</nodeName>
+									<method>GET</method>
+									<param></param>
+									<attack></attack>
+									<evidence>no-cache</evidence>
+									<otherinfo></otherinfo>
+								</instance>
+							
+						</instances>
+						<count>1</count>
+						<systemic>false</systemic>
+						<solution></solution>
+						<otherinfo></otherinfo>
+						<reference>&lt;p&gt;https://datatracker.ietf.org/doc/html/rfc7234&lt;/p&gt;&lt;p&gt;https://datatracker.ietf.org/doc/html/rfc7231&lt;/p&gt;&lt;p&gt;https://www.w3.org/Protocols/rfc2616/rfc2616-sec13.html&lt;/p&gt;</reference>
+						<cweid>524</cweid>
+						<wascid>13</wascid>
+						<sourceid>8</sourceid>
+					</alertitem>
+				
+			</alerts>
+		</site>
+	
+	
+		<insights>
+			
+				<insight>
+					<level>Info</level>
+					<reason>Informational</reason>
+					<site>https://costamarindo.onrender.com</site>
+					<key>insight.code.2xx</key>
+					<description>Percentage of responses with status code 2xx</description>
+					<statistic>66</statistic>
+				</insight>
+			
+			
+				<insight>
+					<level>Info</level>
+					<reason>Informational</reason>
+					<site>https://costamarindo.onrender.com</site>
+					<key>insight.code.4xx</key>
+					<description>Percentage of responses with status code 4xx</description>
+					<statistic>33</statistic>
+				</insight>
+			
+			
+				<insight>
+					<level>Info</level>
+					<reason>Informational</reason>
+					<site>https://costamarindo.onrender.com</site>
+					<key>insight.endpoint.ctype.image/x-icon</key>
+					<description>Percentage of endpoints with content type image/x-icon</description>
+					<statistic>20</statistic>
+				</insight>
+			
+			
+				<insight>
+					<level>Info</level>
+					<reason>Informational</reason>
+					<site>https://costamarindo.onrender.com</site>
+					<key>insight.endpoint.ctype.text/css</key>
+					<description>Percentage of endpoints with content type text/css</description>
+					<statistic>20</statistic>
+				</insight>
+			
+			
+				<insight>
+					<level>Info</level>
+					<reason>Informational</reason>
+					<site>https://costamarindo.onrender.com</site>
+					<key>insight.endpoint.ctype.text/html</key>
+					<description>Percentage of endpoints with content type text/html</description>
+					<statistic>60</statistic>
+				</insight>
+			
+			
+				<insight>
+					<level>Info</level>
+					<reason>Informational</reason>
+					<site>https://costamarindo.onrender.com</site>
+					<key>insight.endpoint.method.GET</key>
+					<description>Percentage of endpoints with method GET</description>
+					<statistic>100</statistic>
+				</insight>
+			
+			
+				<insight>
+					<level>Info</level>
+					<reason>Informational</reason>
+					<site>https://costamarindo.onrender.com</site>
+					<key>insight.endpoint.total</key>
+					<description>Count of total endpoints</description>
+					<statistic>5</statistic>
+				</insight>
+			
+			
+				<insight>
+					<level>Info</level>
+					<reason>Informational</reason>
+					<site>https://costamarindo.onrender.com</site>
+					<key>insight.response.slow</key>
+					<description>Percentage of slow responses</description>
+					<statistic>100</statistic>
+				</insight>
+			
+		</insights>
+	
+	
+	
+</OWASPZAPReport>

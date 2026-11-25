@@ -14,4 +14,10 @@ uvicorn app.main:app \
   --proxy-headers --forwarded-allow-ips '*' --no-server-header &
 
 # Nginx en primer plano (Render le manda el tráfico al puerto $PORT).
+# Integridad del build (A.8.19). Se activa con VERIFY_INTEGRITY=1 una vez que
+# SHA256SUMS (y su firma) esten regenerados sobre el build final.
+if [ "${VERIFY_INTEGRITY:-0}" = "1" ]; then
+  /verify-integrity.sh
+fi
+
 exec nginx -g 'daemon off;'
