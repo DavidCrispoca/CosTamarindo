@@ -11,7 +11,7 @@ services:
     healthCheckPath: /api/health
     envVars:
       - key: ENV
-        value: prod
+        sync: false   # dev para probar rápido con Supabase DEV; prod para producción
       - key: LOG_LEVEL
         value: INFO
       - key: OLLAMA_URL
