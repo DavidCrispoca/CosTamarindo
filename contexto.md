@@ -4,7 +4,7 @@
 > pueda retomarlo sin leer todo el repositorio. Resume qué es el juego, cómo está armado, qué está
 > verificado, qué evidencias existen y **qué falta o está en curso**.
 >
-> **Fecha:** 2026-11-25 · **Rama:** `main` · **Último commit de código:** `e2de1e5`
+> **Fecha:** 2026-11-25 · **Rama:** `main` · **Último commit:** `5cbbdc2`
 > **Fuentes de verdad:** [`Plan.md`](Plan.md) (plan y decisiones), [`docs/api.md`](docs/api.md)
 > (contratos), [`README.md`](README.md) (arranque).
 > **Regla de oro:** ningún secreto, token, cadena de conexión ni valor de `.env` se escribe en
@@ -88,7 +88,8 @@ origen; el backend es el único que conoce la clave secreta, la base y la IA (D1
 - Backup `infra/backups/costamarindo-20261106T232300Z.dump` con hash y restauración probada.
 - Advisories del MCP: `health` limpio; `security` y `performance` solo con avisos **INFO**
   esperados por diseño (RLS sin políticas; dos índices aún sin uso). No requieren acción.
-- **Pendiente:** proyecto PROD al desplegar (DB-08 / A.8.31).
+- **PROD:** proyecto `CosTamarindo-prod` en Supabase, usado por el despliegue de Render
+  (`env=prod`). La separación DEV/PROD quedó verificada en A.8.31.
 
 ### 4.2 `Sg-Backend` — ✅ operativo
 
@@ -105,15 +106,16 @@ origen; el backend es el único que conoce la clave secreta, la base y la IA (D1
 - **Evidencias:** `evidencias/F7/16-backend-real.txt`, `17-e2e-real.md`.
 - **Pendiente:** nada bloqueante en el código.
 
-### 4.3 `Sg-Frontend` — ✅ operativo (falta URL pública)
+### 4.3 `Sg-Frontend` — ✅ operativo (público en Render)
 
 - Build Release con arte curado: 17 archivos, 16,5 MB.
-- Servido en `https://juego.local` (Nginx + TLS mkcert, CSP por hash, HSTS, proxy `/api/`).
+- **PROD público:** `https://costamarindo.onrender.com` (`env=prod`, `database: true`); el build
+  WebGL está servido y es jugable.
+- Local: `https://juego.local` (Nginx + TLS mkcert, CSP por hash, HSTS, proxy `/api/`).
 - Medición real en navegador: `unityReady: true`, ~1,5 s, canvas 960×600, 0 errores de app.
 - 15/15 tests PlayMode.
 - Flujo `Login → Game` verificado; NPC y panel de reclamo visibles.
 - **Pendiente:**
-  - 🟡 Publicar en URL pública (dominio/VPS o demo estática).
   - ⛔ `FE-05`/`FE-06`: kit de 10 prefabs de UI, bloqueado por `FIGMA_TOKEN`.
   - ⬜ `FE-11`: playtest humano de 10–15 min y ajuste de dificultad.
 
@@ -125,16 +127,45 @@ origen; el backend es el único que conoce la clave secreta, la base y la IA (D1
 - **Validado contra el backend real/Supabase** (`F7/16` y `F7/17`).
 - **Pendiente:** nada bloqueante.
 
-### 4.5 `Sg-Security` — 🟡 en curso
+### 4.5 `Sg-Security` — 🟡 en curso · 8 de 10 controles cerrados con ataque real
 
-- A.8.25 (Gitleaks), SEC-01, SEC-02, SEC-06 (parcial), SEC-08 (parcial), SEC-12, SEC-13 y SEC-14
-  cerrados; SoA de 93 controles.
-- Wazuh 4.14 en VM, agente activo, reglas `100200–100250`, logs Nginx reales.
-- **Desbloqueado ahora:** el backend real está arriba y `backend.log` existe, así que los ataques
-  A.8.5, A.8.24 y A.8.28 ya se pueden ejecutar con `curl`/Burp.
-- **Pendiente:** ataques y evidencias de los 10 controles, alerta FIM end-to-end, prueba de
-  aislamiento desde otro contenedor y tailnet, y el proyecto PROD para A.8.31.
-- **Nota:** el perfil `security` no está levantado en este equipo.
+Los 10 controles ISO se cierran con «antes vulnerable → ataque reproducible → corrección →
+verificación». Estado tras las dos pasadas del 2026-11-25 (commits `29b1030` y `5cbbdc2`):
+
+| Control | Estado | Qué se hizo / evidencia |
+| :--- | :--- | :--- |
+| **A.8.5** Autenticación | ✅ cerrado | Fuerza bruta → `401×4` + `423` (`Retry-After: 60`); JWT manipulado → `401`; `weak_pin` y `username_taken`. [`evidencias/A.8.5/`](evidencias/A.8.5/README.md) |
+| **A.8.9** Configuración | ✅ cerrado | PlayerPrefs solo con récord/colección local; vidas/puntaje/token en memoria; sin lógica autoritativa en el cliente. [`evidencias/A.8.9/`](evidencias/A.8.9/README.md) |
+| **A.8.12** DLP | ✅ cerrado | Escaneo del build WebGL: 0 secretos, 0 claves de Supabase, 0 URLs internas. [`evidencias/A.8.12/`](evidencias/A.8.12/README.md) |
+| **A.8.19** Instalación | ✅ cerrado | `SHA256SUMS` generado y **firmado con GPG** (GnuPG 2.5.24); `pubkey.asc` versionado. [`evidencias/A.8.19/`](evidencias/A.8.19/README.md) |
+| **A.8.20** Redes | ✅ cerrado | `nmap` host (8000/11434/5432 cerrados) + aislamiento desde contenedor: la DMZ no alcanza la IA, el backend sí. [`evidencias/A.8.20/`](evidencias/A.8.20/README.md) |
+| **A.8.25** SDLC | ✅ cerrado | Gitleaks en hook y CI; 84 commits y árbol sin hallazgos. [`evidencias/A.8.25/`](evidencias/A.8.25/README.md) |
+| **A.8.28** Codificación segura | ✅ cerrado | SQLi → `422`, XSS/rich text → `422`/sin etiquetas, prompt injection → `blocked: true`, entrada larga → `422`. [`evidencias/A.8.28/`](evidencias/A.8.28/README.md) |
+| **A.8.31** Separación | ✅ cerrado | Token DEV (`env=dev`) rechazado en PROD `costamarindo.onrender.com` → `401`; token PROD válido en PROD. [`evidencias/A.8.31/`](evidencias/A.8.31/README.md) |
+| **A.8.24** Criptografía | 🟡 parcial | TLS (1.2/1.3, HSTS/CSP) y firma HMAC del puntaje verificados (`bad_signature`, `bad_nonce`, `session_used`, `implausible_score`). Falta **cifrado en reposo** y **gestión de claves**. [`evidencias/A.8.24/`](evidencias/A.8.24/README.md) |
+| **A.8.15** Logging | 🟡 parcial | `backend.log` escribe eventos de negocio JSON con `request_id` e IP enmascarada. Falta **alerta FIM por archivo** y llegada de `backend.log` al manager Wazuh. [`evidencias/A.8.15/`](evidencias/A.8.15/README.md) |
+
+**Qué cambió en este cierre.** El bloqueo histórico era el backend (sin claves de Supabase/JWT)
+y la falta de PROD. Al quedar ambos resueltos:
+
+- **Primera pasada (`29b1030`):** con el backend real arriba se ejecutaron y evidenciaron los
+  ataques de A.8.5, A.8.12 y A.8.28 (script `evidencias/ataques/iso-api-ataques.mjs`, 19
+  comprobaciones), y se avanzó A.8.24, A.8.15 y A.8.19.
+- **Segunda pasada (`5cbbdc2`):** con el PROD desplegado en `costamarindo.onrender.com`
+  (Supabase `CosTamarindo-prod`) se cerraron A.8.31 (separación DEV/PROD), A.8.20 (instalado
+  Nmap 7.80 y probado el aislamiento desde contenedor), A.8.19 (instalado GnuPG 2.5.24 y firmado
+  el `SHA256SUMS`) y A.8.9 (inspección de PlayerPrefs con Playwright sobre el build público).
+
+**Herramientas instaladas en este equipo:** GnuPG 2.5.24 (`C:\Program Files\GnuPG`) y
+Nmap 7.80 (`C:\Program Files (x86)\Nmap`), ambas por `winget`.
+
+**Scripts de ataque reutilizables** (en `evidencias/ataques/`): `iso-api-ataques.mjs`,
+`iso-a831-env.mjs` y `iso-a89-playerprefs.mjs`. Redactan tokens/claves y salen `0/1`.
+
+**Queda pendiente (parciales):** A.8.24 (cifrado en reposo y gestión/rotación de claves) y
+A.8.15 (alerta FIM por archivo, que Wazuh 4.14 all-in-one no emite, y llegada de `backend.log`
+al manager). Adicionalmente `SEC-13` (CI) existe pero falta su primera ejecución remota, y el
+perfil `security` no está levantado en este equipo.
 
 ---
 
@@ -189,7 +220,17 @@ Detalle en [`Plan.md`](Plan.md) §11.5.
 | `evidencias/F5/` | Backend FastAPI y puntaje firmado |
 | `evidencias/F6/` | Infraestructura Docker de 5 nodos |
 | `evidencias/F7/` | NPC con Ollama: simulación (`01`–`15`) y **validación real (`16`, `17`)** |
-| `evidencias/A.8.*`, `SEC-12`, `SEC-13` | Controles ISO y auditorías |
+| `evidencias/A.8.5/` | Autenticación: fuerza bruta (423) + JWT manipulado (401) |
+| `evidencias/A.8.9/` | Configuración: PlayerPrefs locales, cliente no autoritativo |
+| `evidencias/A.8.12/` | DLP: escaneo del build, 0 secretos/URLs |
+| `evidencias/A.8.15/` | Logging: Wazuh + `backend.log` con `request_id` e IP enmascarada |
+| `evidencias/A.8.19/` | Instalación: `SHA256SUMS` firmado con GPG + `pubkey.asc` |
+| `evidencias/A.8.20/` | Redes: `nmap` host y aislamiento desde contenedor |
+| `evidencias/A.8.24/` | Criptografía: TLS y firma HMAC del puntaje |
+| `evidencias/A.8.25/` | SDLC: Gitleaks (hook + historial) |
+| `evidencias/A.8.28/` | Codificación segura: SQLi, XSS, prompt injection |
+| `evidencias/A.8.31/` | Separación de entornos: token DEV rechazado en PROD |
+| `evidencias/ataques/` | Scripts reproducibles: `iso-api-ataques.mjs`, `iso-a831-env.mjs`, `iso-a89-playerprefs.mjs`, `nmap.ps1`, `tls-headers.ps1` |
 | `evidencias/_plantilla/` | Formato obligatorio de una carpeta de evidencia |
 
 Evidencias F7 reales de este cierre:
@@ -206,9 +247,10 @@ Leyenda: ✅ hecho · 🟡 en curso · ⬜ pendiente · ⛔ bloqueado.
 
 | Tema | Estado | Qué falta / nota |
 | :--- | :--- | :--- |
-| Sincronización documental + evidencias F7 reales | 🟡 en curso | Se cierra con este commit (`contexto.md`, README, Plan, handoffs y `F7/16`–`17`) |
-| Publicación pública del juego | 🟡 en curso | Decidir dominio/VPS o demo estática; `juego.local` solo funciona en este equipo |
-| Ataques ISO con backend real | 🟡 en curso | Security: backend arriba y `backend.log` disponible desbloquean A.8.5/A.8.24/A.8.28 |
+| Cierre ISO (8/10 controles) | ✅ hecho | Quedan parciales A.8.24 (cifrado en reposo) y A.8.15 (alerta FIM) |
+| Publicación pública del juego | ✅ hecho | `https://costamarindo.onrender.com` (`env=prod`) |
+| Kit de UI (`FE-05`/`FE-06`) | ⛔ bloqueado | `FIGMA_TOKEN` / Frontend |
+| Playtest humano (`FE-11`) | ⬜ pendiente | una persona real / Frontend |
 
 ### 8.2 Pendientes
 
@@ -216,13 +258,12 @@ Leyenda: ✅ hecho · 🟡 en curso · ⬜ pendiente · ⛔ bloqueado.
 | :--- | :--- | :--- |
 | `FE-05`/`FE-06`: kit de 10 prefabs de UI | ⛔ bloqueado | `FIGMA_TOKEN` / Frontend |
 | `FE-11`: playtest humano 10–15 min | ⬜ pendiente | una persona real / Frontend |
-| Ataques y evidencias de los 10 controles ISO | 🟡 en curso | Security |
-| Alerta FIM end-to-end y aislamiento desde contenedor | ⬜ pendiente | Security |
-| Proyecto PROD + `pg_dump` inicial (DB-08 / A.8.31) | ⬜ pendiente | DB / Security, al desplegar |
-| Publicación con dominio real y certificado válido | 🟡 en curso | decisión de infraestructura |
-| Demo reproducible + video de respaldo | ⬜ pendiente | entrega final |
-| Informe final de entrega | ⬜ pendiente | después del despliegue |
+| A.8.24: cifrado en reposo y gestión/rotación de claves | 🟡 parcial | Security (infra) |
+| A.8.15: alerta FIM por archivo y llegada de `backend.log` al manager | 🟡 parcial | Security (limitación Wazuh 4.14 all-in-one) |
+| `SEC-13`: primera ejecución remota del CI | ⬜ pendiente | GitHub Actions |
 | Levantar el perfil `security` en este equipo | ⬜ pendiente | `up.ps1 security` (Wazuh) |
+| Demo reproducible + video de respaldo | ⬜ pendiente | entrega final |
+| Informe final de entrega | ⬜ pendiente | después del despliegue y cierre ISO |
 
 ---
 
