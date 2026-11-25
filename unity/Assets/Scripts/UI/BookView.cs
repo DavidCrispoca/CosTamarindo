@@ -53,6 +53,9 @@ namespace CosTamarindo.UI
             }
 
             BuildInterface();
+
+            // El botón «Libro» del HUD no estaba cableado en la escena: se conecta aquí.
+            WireButton("BookButton", Toggle);
         }
 
         private void Update()
@@ -286,6 +289,17 @@ namespace CosTamarindo.UI
         }
 
         // ── Utilidades de UI ─────────────────────────────────────────────
+
+        private void WireButton(string objectName, UnityEngine.Events.UnityAction action)
+        {
+            var buttons = transform.root.GetComponentsInChildren<Button>(true);
+            foreach (var button in buttons)
+            {
+                if (button.name != objectName) continue;
+                button.onClick.RemoveAllListeners();
+                button.onClick.AddListener(action);
+            }
+        }
 
         private static TextMeshProUGUI CreateText(
             Transform parent, string name, string content, float size,

@@ -1094,6 +1094,7 @@ GameObject:
   - component: {fileID: 247553462}
   - component: {fileID: 247553461}
   - component: {fileID: 247553460}
+  - component: {fileID: 900000301}
   m_Layer: 0
   m_Name: UI
   m_TagString: Untagged
@@ -1248,6 +1249,23 @@ MonoBehaviour:
   columns: 4
   cellSize: {x: 190, y: 190}
   spacing: 22
+--- !u!114 &900000301
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 247553459}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e2d8c4f1a5b6473c9d0e1f2a3b4c5d6e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: CosTamarindo::CosTamarindo.UI.LeaderboardView
+  displayFont: {fileID: 11400000, guid: 7e6a472f19fdb7e47b87bf84b201fad1, type: 2}
+  bodyFont: {fileID: 11400000, guid: 245977259d2cb8741956f121cb4f40b8, type: 2}
+  cardSize: {x: 700, y: 720}
+  rowHeight: 84
+  rowSpacing: 12
 --- !u!114 &247553463
 MonoBehaviour:
   m_ObjectHideFlags: 0
